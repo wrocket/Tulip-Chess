@@ -1,0 +1,166 @@
+// The MIT License (MIT)
+
+// Copyright (c) 2015 Brian Wray (brian@wrocket.org)
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "gamestate.h"
+#include "board.h"
+#include "move.h"
+#include "json.h"
+
+static const char* maskBooleanToStrU(unsigned int value, unsigned int mask) {
+	return (value & mask) ? "true" : "false";
+}
+
+static void printSq(char* buff, int sq) {
+	int idx = printSquareIndex(sq, buff);
+	buff[idx] = '\0';
+}
+
+static const char* printColor(int color) {
+	switch(color) {
+		case COLOR_WHITE: return "white";
+		case COLOR_BLACK: return "black";
+		default: return "unknown";
+	}
+}
+
+void printMovelistJson(char* position, char* listType, MoveBuffer* buffer) {
+	char strBuff[16];
+
+	printf("{");
+
+	printf("\"fenString\": \"%s\", ", position);
+
+	printf("\"moveListType\": \"%s\", ", listType);
+
+	printf("\"moveList\": [");
+	for(int i=0; i<buffer->length; i++) {
+		if(i > 0) {
+			printf(", ");
+		}
+
+		printMoveCoordinate(&(buffer->moves[i]), strBuff);
+		printf("\"%s\"", strBuff);
+	}
+	printf("]");
+	printf("}\n");
+}
+
+void printAttackList(char* position, bool* attackGrid, GameState* state) {
+	printf("{");
+	printf("\"fenString\": \"%s\", ", position);
+	printf("\"attackedSquares\": [");
+
+	char strBuff[4];
+
+	bool atLeastOne = false;
+	for(int i=0; i<64; i++) {
+		int idx = BOARD_SQUARES[i];
+		if(attackGrid[idx]) {
+			if(atLeastOne) {
+				printf(", ");
+			}
+
+			atLeastOne = true;
+			strBuff[printSquareIndex(idx, strBuff)] = '\0';
+			printf("\"%s\"", strBuff);
+		}
+	}
+
+	printf("]}\n");
+}
+
+void printGameState(char* position, GameState* state) {
+	char squareStr[8];
+	StateData* stateData;
+
+	stateData = state->current;
+
+	printf("{");
+	printf("\"fenString\": \"%s\", ", position);
+
+	printf("\"toMove\": \"%s\", ", printColor(stateData->toMove));
+
+	printSq(squareStr, stateData->whiteKingSquare);
+	printf("\"whiteKingSquare\": \"%s\", ", squareStr);
+
+	printSq(squareStr, stateData->blackKingSquare);
+	printf("\"blackKingSquare\": \"%s\", ", squareStr);
+
+	const int flags = stateData->castleFlags;
+	printf("\"castleWhiteKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
+	printf("\"castleWhiteQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
+	printf("\"castleBlackKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
+	printf("\"castleBlackQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
+
+	printf("\"epFile\": ");
+
+	if(stateData->epFile == NO_EP_FILE) {
+		printf("\"none\", ");
+	} else {
+		printf("\"%c\", ", fileToChar(stateData->epFile));
+	}
+
+	printf("\"board\": {");
+	for(int i=0; i<64; i++) {
+		const int sq = BOARD_SQUARES[i];
+		const Piece* p = stateData->board[sq];
+		if(p != &EMPTY) {
+			if(i > 0) {
+				printf(", ");
+			}
+
+			printSq(squareStr, sq);
+			printf("\"%s\": \"%c\"", squareStr, p->name);
+		}
+	}
+
+	printf("}, ");
+
+	printf("\"pieceCounts\": {");
+	const Piece* pieces[] = {&WPAWN, &BPAWN, &WKNIGHT, &BKNIGHT, &WBISHOP,
+							 &BBISHOP, &WROOK, &BROOK, &WQUEEN, &BQUEEN, 
+							 &WKING, &BKING, &EMPTY, &OFF_BOARD};
+
+	for(int i=0; i<14; i++) {
+		if(i > 0) {
+			printf(", ");
+		}
+
+		printf("\"%c\": %i", (pieces[i])->name, stateData->pieceCounts[pieces[i]->ordinal]);
+
+	}
+	printf("},");
+	printf(" \"bitboards\" : {");
+	for(int i=0; i<ALL_PIECES_LEN; i++) {
+		if(i > 0) {
+			printf(", ");
+		}
+
+		const Piece* p = ALL_PIECES[i];
+		printf("\"%c\": \"%016llX\"", p->name, state->bitboards[p->ordinal]);
+	}
+	printf("}");
+	printf("}\n");
+}

@@ -1,0 +1,4 @@
+*.o
+src/tulip
+.DS_Store
+__pycache__
