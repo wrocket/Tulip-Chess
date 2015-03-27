@@ -116,6 +116,12 @@ int generatePsuedoMoves(GameState* gs, MoveBuffer* moveBuff) {
 	int count = 0;
 	const Piece** board = gs->current->board;
 	Move* moveArr = moveBuff->moves;
+
+	if(gs->current->toMove == COLOR_BLACK) {
+		fprintf(stderr, "Black move generation not yet implemented.");
+		return 0;
+	}
+
 	for(int i=0; i<64; i++) {
 		const int sq = BOARD_SQUARES[i];
 		const Piece* p = board[sq];
