@@ -32,7 +32,7 @@ def board_index(file, rank):
 
 def compute_piece_bit_array(bit_name):
 	result = ['0x0' for x in range(144)]
-	for file, rank in itertools.product(range(0, 8), range(0, 8)):
+	for file, rank in itertools.product(range(8), range(8)):
 		result[board_index(file, rank)] = '%s_%s' % (bit_name, print_sq(file, rank))
 	return result
 
@@ -64,14 +64,14 @@ def get_sq_bit(index):
 
 def compute_rank_mask(rank):
 	result = 0
-	for file in range(0, 8):
+	for file in range(8):
 		result = result | get_sq_bit(square_index(file, rank))
 	return result
 
 
 def compute_file_mask(file):
 	result = 0
-	for rank in range(0, 8):
+	for rank in range(8):
 		result = result | get_sq_bit(square_index(file, rank))
 	return result
 
@@ -84,7 +84,7 @@ def compute_bishop_mask(file, rank):
 		offset_r = o[1]
 		current_f = file + offset_f
 		current_r = rank + offset_r
-		while current_f in range(0, 8) and current_r in range(0, 8):
+		while current_f in range(8) and current_r in range(8):
 			result = result | get_sq_bit(square_index(current_f, current_r))
 			current_r += offset_r
 			current_f += offset_f
@@ -121,9 +121,9 @@ def compute_bpawn_mask(file, rank):
 
 # Useful for debugging
 def print_mask_as_board(mask):
-	for rank in reversed(range(0, 8)):
+	for rank in reversed(range(8)):
 		line = []
-		for file in range(0, 8):
+		for file in range(8):
 			if mask & get_sq_bit(square_index(file, rank)) != 0:
 				line.append('X')
 			else:
@@ -135,7 +135,7 @@ def compute_nonslider_mask(file, rank, offsets):
 	for o in offsets:
 		offset_f = file + o[0]
 		offset_r = rank + o[1]
-		if offset_f in range(0, 8) and offset_r in range(0, 8):
+		if offset_f in range(8) and offset_r in range(8):
 			bit = get_sq_bit(square_index(file + o[0], rank + o[1]))
 			result |= bit
 	return result
@@ -154,7 +154,7 @@ def compute_king_mask(file, rank):
 
 
 print("// Bitmasks for individual squares.")
-for file, rank in itertools.product(range(0, 8), range(0, 8)):
+for file, rank in itertools.product(range(8), range(8)):
 	idx = square_index(file, rank)
 	mask = get_sq_bit(idx)
 	sq_str = print_sq(file, rank)
@@ -164,57 +164,57 @@ for file, rank in itertools.product(range(0, 8), range(0, 8)):
 
 print()
 print("// Bitmasks for particular ranks (basically an OR of all the square bitmasks on a given rank)")
-for rank in range(0, 8):
+for rank in range(8):
 	result = compute_rank_mask(rank)
 	hex_str = print_hex(result)
 	print('#define BIT_RANK_%s\t%s' % (_rank_strs[rank], hex_str))
 
 print()
 print("// Bitmasks for particular file (basically an OR of all the square bitmasks on a given file)")
-for file in range(0, 8):
+for file in range(8):
 	result = compute_file_mask(file)
 	hex_str = print_hex(result)
 	print('#define BIT_FILE_%s\t%s' % (_file_strs[file], hex_str))
 
 print()
 print("// Bitmasks for rook moves from a particular square.")
-for file, rank in itertools.product(range(0, 8), range(0, 8)):
+for file, rank in itertools.product(range(8), range(8)):
 	mask = compute_rook_mask(file, rank)
 	print('#define BIT_ROOK_%s\t%s' % (print_sq(file, rank), print_hex(mask)))
 
 print()
 print("// Bitmasks for bishop moves from a particular square.")
-for file, rank in itertools.product(range(0, 8), range(0, 8)):
+for file, rank in itertools.product(range(8), range(8)):
 	mask = compute_bishop_mask(file, rank)
 	print('#define BIT_BISHOP_%s\t%s' % (print_sq(file, rank), print_hex(mask)))
 
 print()
 print("// Bitmasks for queen moves from a particular square.")
-for file, rank in itertools.product(range(0, 8), range(0, 8)):
+for file, rank in itertools.product(range(8), range(8)):
 	mask = compute_queen_mask(file, rank)
 	print('#define BIT_QUEEN_%s\t%s' % (print_sq(file, rank), print_hex(mask)))
 
 print()
 print("// Bitmasks for knight moves from a particular square.")
-for file, rank in itertools.product(range(0, 8), range(0, 8)):
+for file, rank in itertools.product(range(8), range(8)):
 	mask = compute_knight_mask(file, rank)
 	print('#define BIT_KNIGHT_%s\t%s' % (print_sq(file, rank), print_hex(mask)))
 
 print()
 print("// Bitmasks for king moves from a particular square.")
-for file, rank in itertools.product(range(0, 8), range(0, 8)):
+for file, rank in itertools.product(range(8), range(8)):
 	mask = compute_king_mask(file, rank)
 	print('#define BIT_KING_%s\t%s' % (print_sq(file, rank), print_hex(mask)))
 
 print()
 print("// Bitmasks for white pawn attacks.")
-for file, rank in itertools.product(range(0, 8), range(0, 8)):
+for file, rank in itertools.product(range(8), range(8)):
 	mask = compute_wpawn_mask(file, rank)
 	print('#define BIT_WPAWN_%s\t%s' % (print_sq(file, rank), print_hex(mask)))
 
 print()
 print("// Bitmasks for black pawn attacks.")
-for file, rank in itertools.product(range(0, 8), range(0, 8)):
+for file, rank in itertools.product(range(8), range(8)):
 	mask = compute_bpawn_mask(file, rank)
 	print('#define BIT_BPAWN_%s\t%s' % (print_sq(file, rank), print_hex(mask)))
 
