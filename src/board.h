@@ -196,10 +196,10 @@ extern const int BOARD_SQUARES[64];
 #define B_IDX(FILE, RANK)	(12 * ((RANK) + 2) + (FILE) + 2)
 
 // Derive the zero-indexed rank from a board index.
-#define RANK_IDX(RANK)	((RANK) / 12) - 2
+#define RANK_IDX(RANK)	(((RANK) / 12) - 2)
 
 // Derive the zero-indexed file from a board index.
-#define FILE_IDX(FILE)	((FILE) % 12) - 2
+#define FILE_IDX(FILE)	(((FILE) % 12) - 2)
 
 // Given a human-readable character for a file, return the zero-based file index.
 // E.g.: an input of 'c' returns FILE_C.

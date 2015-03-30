@@ -25,8 +25,6 @@
 
 #include <stdlib.h>
 
-typedef unsigned char BYTE;
-
 // malloc()s a chunk of memory and exits with an error if the allocation failed.
 #define ALLOC(qty, type, ptr, msg)	malloc((qty) * sizeof(type)); if(!(ptr)) {fprintf(stderr, (msg)); exit(EXIT_FAILURE);}
 
