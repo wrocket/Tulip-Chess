@@ -25,6 +25,8 @@
 
 #include "gamestate.h"
 
+// Determines if a given color can attack (ignoring check) a given square.
+// This determination ignores rules around moving into check.
 bool canAttack(const int color, const int sq, GameState* state);
 
 #endif

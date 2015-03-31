@@ -76,6 +76,8 @@ extern const Piece OFF_BOARD;
 #define ALL_PIECES_LEN	13
 extern const Piece* ALL_PIECES[13];
 
+// Given a human-readable piece character, return a pointer to the relevant piece.
+// E.g. "n" returns a pointer to BKNIGHT. Returns NULL if no piece matches.
 const Piece* parsePiece(char);
 
 #endif
