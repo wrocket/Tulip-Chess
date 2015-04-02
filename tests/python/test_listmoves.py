@@ -148,6 +148,37 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('epCapture', epMove['moveCode'])
         self.assertEqual('p', epMove['capturedPiece'])
         self.assertEqual('P', epMove['movingPiece'])
+
+    def test_promote_pawn_no_captures(self):
+        moves = self.listPsuedoMovesDetails('2k5/5P2/8/8/8/8/8/2K5 w - - 0 1')
+        desired = {'f7f8=q': 'promoteQueen', 'f7f8=n': 'promoteKnight', 'f7f8=r': 'promoteRook', 'f7f8=b': 'promoteBishop'}
+        for move, promote in desired.items():
+            self.assertTrue(move in moves.keys(), move + ' not in move list.')
+            m = moves[move]
+            self.assertEqual(promote, m['moveCode'])
+            self.assertEqual('-', m['capturedPiece'])
+            self.assertEqual('P', m['movingPiece'])
         
+    def test_promote_pawn_captures(self):
+        moves = self.listPsuedoMovesDetails('2k1brn1/5P2/8/8/8/8/8/2K5 w - c6 0 1')
+        desired = {'f7g8=q': 'promoteQueen', 'f7g8=n': 'promoteKnight', 'f7g8=r': 'promoteRook', 'f7g8=b': 'promoteBishop'}
+        for move, promote in desired.items():
+            self.assertTrue(move in moves.keys(), move + ' not in move list.')
+            m = moves[move]
+            self.assertEqual(promote, m['moveCode'])
+            self.assertEqual('n', m['capturedPiece'])
+            self.assertEqual('P', m['movingPiece'])
+
+        desired = {'f7e8=q': 'promoteQueen', 'f7e8=n': 'promoteKnight', 'f7e8=r': 'promoteRook', 'f7e8=b': 'promoteBishop'}
+        for move, promote in desired.items():
+            self.assertTrue(move in moves.keys(), move + ' not in move list.')
+            m = moves[move]
+            self.assertEqual(promote, m['moveCode'])
+            self.assertEqual('b', m['capturedPiece'])
+            self.assertEqual('P', m['movingPiece'])
+
+        # Make sure no f7f8 moves exist.
+        self.assertEqual(0, len(list(filter(lambda m: m.startswith('f7f8'), moves.keys()))))
+
 if __name__ == '__main__':
     unittest.main()

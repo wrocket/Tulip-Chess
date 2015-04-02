@@ -83,6 +83,53 @@ static void whitePawnEp(const int sq, const Piece** board, Move* moveBuffer, int
 	}
 }
 
+static void pawnPromote(Move* moveBuff, const int from, const int to, const Piece* captures, int* count, const Piece* pawn) {
+		Move* m = &moveBuff[*count];
+
+		m->to = to;
+		m->from = from;
+		m->movingPiece = pawn;
+		m->captures = captures;
+		m->moveCode = PROMOTE_Q;
+
+		m++;
+		m->to = to;
+		m->from = from;
+		m->movingPiece = pawn;
+		m->captures = captures;
+		m->moveCode = PROMOTE_N;
+
+		m++;
+		m->to = to;
+		m->from = from;
+		m->movingPiece = pawn;
+		m->captures = captures;
+		m->moveCode = PROMOTE_R;
+
+		m++;
+		m->to = to;
+		m->from = from;
+		m->movingPiece = pawn;
+		m->captures = captures;
+		m->moveCode = PROMOTE_B;
+
+		(*count) += 4;
+}
+
+static void whitePawnPromote(const int sq, const Piece** board, Move* moveBuff, int* count) {
+	if(board[sq + OFFSET_N] == &EMPTY) {
+		pawnPromote(moveBuff, sq, sq + OFFSET_N, &EMPTY, count, &WPAWN);
+	}
+
+	if(board[sq + OFFSET_NE]->color == COLOR_BLACK) {
+		pawnPromote(moveBuff, sq, sq + OFFSET_NE, board[sq + OFFSET_NE], count, &WPAWN);
+	}
+
+	if(board[sq + OFFSET_NW]->color == COLOR_BLACK) {
+		pawnPromote(moveBuff, sq, sq + OFFSET_NW, board[sq + OFFSET_NW], count, &WPAWN);
+	}
+}
+
 static void whitePawn(const int sq, const Piece** board, Move* moveBuff, int* count) {
 	if(board[sq + OFFSET_N] == &EMPTY) {
 		Move* m = &moveBuff[*count];
@@ -143,9 +190,13 @@ int generatePsuedoMoves(GameState* gs, MoveBuffer* moveBuff) {
 
 		switch(p->ordinal) {
 			case ORD_WPAWN:
-				whitePawn(sq, board, moveArr, &count);
-				if(epFile != NO_EP_FILE) {
-					whitePawnEp(sq, board, moveArr, &count, epFile);
+				if(sq >= SQ_A7 && sq <= SQ_H7) {
+					whitePawnPromote(sq, board, moveArr, &count);
+				} else {
+					whitePawn(sq, board, moveArr, &count);
+					if(epFile != NO_EP_FILE) {
+						whitePawnEp(sq, board, moveArr, &count, epFile);
+					}
 				}
 				break;
 			case ORD_WKNIGHT:
