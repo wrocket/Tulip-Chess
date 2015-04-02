@@ -37,6 +37,44 @@ static void printSq(char* buff, int sq) {
 	buff[idx] = '\0';
 }
 
+static void printMoveDetail(Move* m) {
+	char strBuff[16];
+	printMoveCoordinate(m, strBuff);
+	printf("{");
+	printf("\"move\": \"%s\", ", strBuff);
+	printf("\"movingPiece\": \"%c\", ", m->movingPiece->name);
+	printf("\"capturedPiece\": \"%c\", ", m->captures->name);
+
+	const char* codeStr;
+
+	switch(m->moveCode) {
+		case NO_MOVE_CODE:
+			codeStr = "none";
+			break;
+		case PROMOTE_R:
+			codeStr = "promoteRook";
+			break;
+		case PROMOTE_B:
+			codeStr = "promoteBishop";
+			break;
+		case PROMOTE_N:
+			codeStr = "promoteKnight";
+			break;
+		case PROMOTE_Q:
+			codeStr = "promoteQueen";
+			break;
+		case CAPTURE_EP:
+			codeStr = "epCapture";
+			break;
+		default:
+			codeStr = "unknown";
+			break;
+	}
+
+	printf("\"moveCode\": \"%s\"", codeStr);
+	printf("}");
+}
+
 static const char* printColor(int color) {
 	switch(color) {
 		case COLOR_WHITE: return "white";
@@ -62,6 +100,15 @@ void printMovelistJson(char* position, char* listType, MoveBuffer* buffer) {
 
 		printMoveCoordinate(&(buffer->moves[i]), strBuff);
 		printf("\"%s\"", strBuff);
+	}
+	printf("], ");
+	printf("\"moveDetails\": [");
+	for(int i=0; i<buffer->length; i++) {
+		if(i > 0) {
+			printf(", ");
+		}
+
+		printMoveDetail(&(buffer->moves[i]));
 	}
 	printf("]");
 	printf("}\n");

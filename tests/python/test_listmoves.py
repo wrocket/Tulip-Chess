@@ -39,6 +39,12 @@ class TestBasicMoveList(unittest.TestCase):
         parsed_output = json.loads(result)
         return parsed_output['moveList']
 
+    def listPsuedoMovesDetails(self, fen):
+        result = call_tulip(['-listmoves', 'pseudo', fen])
+        parsed_output = json.loads(result)
+        moves = parsed_output['moveDetails']
+        return {m['move']: m for m in moves}
+
     def test_knight_01(self):
         moves = self.listPsuedoMoves('7K/8/4n3/2N5/8/3P4/8/k7 w - - 0 1')
         knight_moves = list(filter(lambda m: m.startswith('c5'), moves))
@@ -126,6 +132,22 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertTrue('c7e6' in moves)
         self.assertTrue('c7a8' in moves)
         self.assertTrue('c7a6' in moves)
+
+    def test_ep_white_01(self):
+        moves = self.listPsuedoMovesDetails('2k5/8/8/5pP1/8/8/8/2K5 w - f6 0 1')
+        self.assertTrue('g5f6' in moves.keys())
+        epMove = moves['g5f6']
+        self.assertEqual('epCapture', epMove['moveCode'])
+        self.assertEqual('p', epMove['capturedPiece'])
+        self.assertEqual('P', epMove['movingPiece'])
+
+    def test_ep_white_02(self):
+        moves = self.listPsuedoMovesDetails('2k5/8/8/1Pp5/8/8/8/2K5 w KQkq c6 0 1')
+        self.assertTrue('b5c6' in moves.keys())
+        epMove = moves['b5c6']
+        self.assertEqual('epCapture', epMove['moveCode'])
+        self.assertEqual('p', epMove['capturedPiece'])
+        self.assertEqual('P', epMove['movingPiece'])
         
 if __name__ == '__main__':
     unittest.main()

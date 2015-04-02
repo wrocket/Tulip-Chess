@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "tulip.h"
 #include "move.h"
@@ -65,6 +66,19 @@ static void slider(const int sq, const int offset, const Piece** board, Move* mo
 		m->movingPiece = movingPiece;
 		m->captures = targetPiece;
 		m->moveCode = NO_MOVE_CODE;
+		(*count)++;
+	}
+}
+
+static void whitePawnEp(const int sq, const Piece** board, Move* moveBuffer, int* count, int epFile) {
+	const int dF = epFile - FILE_IDX(sq);
+	if((dF == 1 || dF == -1) && RANK_IDX(sq) == RANK_5) {
+		Move* m = &moveBuffer[*count];
+		m->to = sq + (dF * OFFSET_E) + OFFSET_N; // Assumes OFFSET_E is -1 * OFFSET_W
+		m->from = sq;
+		m->movingPiece = &WPAWN;
+		m->captures = &BPAWN;
+		m->moveCode = CAPTURE_EP;
 		(*count)++;
 	}
 }
@@ -115,6 +129,7 @@ static void whitePawn(const int sq, const Piece** board, Move* moveBuff, int* co
 int generatePsuedoMoves(GameState* gs, MoveBuffer* moveBuff) {
 	int count = 0;
 	const Piece** board = gs->board;
+	const int epFile = gs->current->epFile;
 	Move* moveArr = moveBuff->moves;
 
 	if(gs->current->toMove == COLOR_BLACK) {
@@ -129,6 +144,9 @@ int generatePsuedoMoves(GameState* gs, MoveBuffer* moveBuff) {
 		switch(p->ordinal) {
 			case ORD_WPAWN:
 				whitePawn(sq, board, moveArr, &count);
+				if(epFile != NO_EP_FILE) {
+					whitePawnEp(sq, board, moveArr, &count, epFile);
+				}
 				break;
 			case ORD_WKNIGHT:
 				nonSlider(sq, OFFSET_KNIGHT_1, board, moveArr, &count, COLOR_BLACK);
