@@ -114,7 +114,7 @@ static void whitePawn(const int sq, const Piece** board, Move* moveBuff, int* co
 
 int generatePsuedoMoves(GameState* gs, MoveBuffer* moveBuff) {
 	int count = 0;
-	const Piece** board = gs->current->board;
+	const Piece** board = gs->board;
 	Move* moveArr = moveBuff->moves;
 
 	if(gs->current->toMove == COLOR_BLACK) {

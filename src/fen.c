@@ -97,7 +97,7 @@ static int parseCastleFlags(char* t, int* result) {
 }
 
 static int parseBoard(char* t, GameState* gs) {
-	const Piece** board = gs->current->board;
+	const Piece** board = gs->board;
 
 	bool result = true;
 	int currentFile = FILE_A;
@@ -116,7 +116,7 @@ static int parseBoard(char* t, GameState* gs) {
 			int spaceDigits = *c - '0'; // Hack: Char to int. Might be funny in strange encodings...
 			for(int i=0; i<spaceDigits; i++) {
 				board[B_IDX(currentFile++, currentRank)] = &EMPTY;
-				gs->current->pieceCounts[(&EMPTY)->ordinal]++;
+				gs->pieceCounts[(&EMPTY)->ordinal]++;
 				squares++;
 			}
 		} else {
@@ -147,7 +147,7 @@ static int parseBoard(char* t, GameState* gs) {
 				sqbk = idx;
 			}
 
-			gs->current->pieceCounts[p->ordinal]++;
+			gs->pieceCounts[p->ordinal]++;
 
 			board[idx] = p;
 			squares++;

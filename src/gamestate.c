@@ -40,9 +40,25 @@ void initializeGamestate(GameState* gs) {
 
 	gs->bitboards = ALLOC_ZERO(ORD_MAX, uint64_t, gs->bitboards, "Unable to allocate bitboards.");
 
+	gs->board = ALLOC(144, Piece*, gs->board, "Error allocating board array.");
+	gs->pieceCounts = ALLOC_ZERO(ORD_MAX, int, gs->pieceCounts, "Error allocating piece count array.");
+
 	gs->stackPtr = 0;
 	gs->current = &(gs->dataStack[0]);
 	gs->created = true;
+
+	for(int i=0; i<144; i++) {
+		gs->board[i] = &OFF_BOARD;
+	}
+
+	for(int file = FILE_A; file <= FILE_H; file++) {
+		for(int rank = RANK_1; rank <= RANK_8; rank++) {
+			gs->board[B_IDX(file, rank)] = &EMPTY;
+		}
+	}
+
+	// memcpy(to->board, from->board, 144 * sizeof(Piece*));
+	// memcpy(to->pieceCounts, from->pieceCounts, ORD_MAX * sizeof(int));
 }
 
 void reinitBitboards(GameState* gs) {
@@ -50,7 +66,7 @@ void reinitBitboards(GameState* gs) {
 		gs->bitboards[i] = 0;
 	}
 
-	const Piece** board = gs->current->board;
+	const Piece** board = gs->board;
 
 	for(int i=0; i<64; i++) {
 		int sq = BOARD_SQUARES[i];
@@ -70,5 +86,7 @@ void destroyGamestate(GameState* gs) {
 
 	free(gs->bitboards);
 	free(gs->dataStack);
+	free(gs->board);
+	free(gs->pieceCounts);
 	gs->created = false;
 }

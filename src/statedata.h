@@ -40,13 +40,11 @@
 #define NO_EP_FILE	INVALID_FILE
 
 typedef struct {
-	const Piece** board;			// A 144 element array that corresponds to a 12x12 board.
 	unsigned int toMove; 			// The side to move, either COLOR_WHITE or COLOR_BLACK
 	unsigned int castleFlags;		// The castle flags as a bitmap; see CASTLE_WK and others.
 	int whiteKingSquare;	// The current square index of the white king.
 	int blackKingSquare;	// The current square index of the black king.
 	int epFile;				// The current en passant file, if any.
-	int* pieceCounts;		// The current piece counts, indexed by the piece ordinal.
 	uint64_t hash;					// The current state hash.
 } StateData;
 

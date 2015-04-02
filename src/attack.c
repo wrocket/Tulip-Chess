@@ -55,7 +55,7 @@ bool canAttack(const int color, const int sq, GameState* state) {
 	const Piece* pawn;
 	uint64_t pawnMask;
 
-	const Piece** b = state->current->board;
+	const Piece** b = state->board;
 
 	bool result;
 

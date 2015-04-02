@@ -125,7 +125,7 @@ void printGameState(char* position, GameState* state) {
 	printf("\"board\": {");
 	for(int i=0; i<64; i++) {
 		const int sq = BOARD_SQUARES[i];
-		const Piece* p = stateData->board[sq];
+		const Piece* p = state->board[sq];
 		if(p != &EMPTY) {
 			if(i > 0) {
 				printf(", ");
@@ -148,7 +148,7 @@ void printGameState(char* position, GameState* state) {
 			printf(", ");
 		}
 
-		printf("\"%c\": %i", (pieces[i])->name, stateData->pieceCounts[pieces[i]->ordinal]);
+		printf("\"%c\": %i", (pieces[i])->name, state->pieceCounts[pieces[i]->ordinal]);
 
 	}
 	printf("},");
