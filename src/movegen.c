@@ -174,7 +174,11 @@ static void whitePawn(const int sq, const Piece** board, Move* moveBuff, int* co
 	}
 }
 
-int generatePsuedoMoves(GameState* gs, MoveBuffer* moveBuff) {
+int generatePsuedoMovesBlack(GameState* gs, MoveBuffer* moveBuff) {
+	return 0; // TODO: implement
+}
+
+int generatePsuedoMovesWhite(GameState* gs, MoveBuffer* moveBuff) {
 	int count = 0;
 	const Piece** board = gs->board;
 	const int epFile = gs->current->epFile;
@@ -270,9 +274,21 @@ int generatePsuedoMoves(GameState* gs, MoveBuffer* moveBuff) {
 
 				break;
 		}
-
 	}
 
 	moveBuff->length = count;
 	return count;
+}
+
+int generatePsuedoMoves(GameState* gs, MoveBuffer* moveBuff) {
+	const int toMove = gs->current->toMove;
+	if(toMove == COLOR_WHITE) {
+		return generatePsuedoMovesWhite(gs, moveBuff);
+	}
+	if(toMove == COLOR_BLACK) {
+		return generatePsuedoMovesBlack(gs, moveBuff);
+	} else {
+		fprintf(stderr, "Invalid to-move: %d\n", toMove);
+		return 0;
+	}
 }
