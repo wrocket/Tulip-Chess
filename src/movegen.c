@@ -28,6 +28,7 @@
 #include "gamestate.h"
 #include "board.h"
 #include "piece.h"
+#include "attack.h"
 
 static void nonSlider(const int sq, const int offset, const Piece** board, Move* moveBuff, int* count, const int capturable) {
 	const int target = sq + offset;
@@ -239,6 +240,34 @@ int generatePsuedoMoves(GameState* gs, MoveBuffer* moveBuff) {
 				nonSlider(sq, OFFSET_NW, board, moveArr, &count, COLOR_BLACK);
 				nonSlider(sq, OFFSET_SE, board, moveArr, &count, COLOR_BLACK);
 				nonSlider(sq, OFFSET_SW, board, moveArr, &count, COLOR_BLACK);
+
+				if((gs->current->castleFlags & CASTLE_WK)
+					&& board[SQ_F1] == &EMPTY
+					&& board[SQ_G1] == &EMPTY
+					&& !canAttack(COLOR_BLACK, SQ_F1, gs)) {	// TODO: Expensive. Check for moving-through-check later?
+					Move* m = &moveArr[count];
+					m->to = SQ_G1;
+					m->from = SQ_E1;
+					m->movingPiece = &WKING;
+					m->captures = &EMPTY;
+					m->moveCode = NO_MOVE_CODE;
+					count++;
+				}
+
+				if((gs->current->castleFlags & CASTLE_WQ)
+					&& board[SQ_D1] == &EMPTY
+					&& board[SQ_C1] == &EMPTY
+					&& board[SQ_B1] == &EMPTY
+					&& !canAttack(COLOR_BLACK, SQ_D1, gs)) {
+					Move* m = &moveArr[count];
+					m->to = SQ_C1;
+					m->from = SQ_E1;
+					m->movingPiece = &WKING;
+					m->captures = &EMPTY;
+					m->moveCode = NO_MOVE_CODE;
+					count++;
+				}
+
 				break;
 		}
 
