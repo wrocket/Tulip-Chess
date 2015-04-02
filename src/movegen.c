@@ -71,6 +71,42 @@ static void slider(const int sq, const int offset, const Piece** board, Move* mo
 	}
 }
 
+static void bishop(const int sq, const Piece** board, Move* moveArr, int* count, const int capturable) {
+	slider(sq, OFFSET_NE, board, moveArr, count, capturable);
+	slider(sq, OFFSET_NW, board, moveArr, count, capturable);
+	slider(sq, OFFSET_SE, board, moveArr, count, capturable);
+	slider(sq, OFFSET_SW, board, moveArr, count, capturable);
+}
+
+static void rook(const int sq, const Piece** board, Move* moveArr, int* count, const int capturable) {
+	slider(sq, OFFSET_N, board, moveArr, count, capturable);
+	slider(sq, OFFSET_W, board, moveArr, count, capturable);
+	slider(sq, OFFSET_E, board, moveArr, count, capturable);
+	slider(sq, OFFSET_S, board, moveArr, count, capturable);
+}
+
+static void knight(const int sq, const Piece** board, Move* moveArr, int* count, const int capturable) {
+	nonSlider(sq, OFFSET_KNIGHT_1, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_KNIGHT_2, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_KNIGHT_3, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_KNIGHT_4, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_KNIGHT_5, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_KNIGHT_6, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_KNIGHT_7, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_KNIGHT_8, board, moveArr, count, capturable);
+}
+
+static void king(const int sq, const Piece** board, Move* moveArr, int* count, const int capturable) {
+	nonSlider(sq, OFFSET_N, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_S, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_E, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_W, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_NE, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_NW, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_SE, board, moveArr, count, capturable);
+	nonSlider(sq, OFFSET_SW, board, moveArr, count, capturable);
+}
+
 static void whitePawnEp(const int sq, const Piece** board, Move* moveBuffer, int* count, int epFile) {
 	const int dF = epFile - FILE_IDX(sq);
 	if((dF == 1 || dF == -1) && RANK_IDX(sq) == RANK_5) {
@@ -184,11 +220,6 @@ int generatePsuedoMovesWhite(GameState* gs, MoveBuffer* moveBuff) {
 	const int epFile = gs->current->epFile;
 	Move* moveArr = moveBuff->moves;
 
-	if(gs->current->toMove == COLOR_BLACK) {
-		fprintf(stderr, "Black move generation not yet implemented.");
-		return 0;
-	}
-
 	for(int i=0; i<64; i++) {
 		const int sq = BOARD_SQUARES[i];
 		const Piece* p = board[sq];
@@ -205,45 +236,20 @@ int generatePsuedoMovesWhite(GameState* gs, MoveBuffer* moveBuff) {
 				}
 				break;
 			case ORD_WKNIGHT:
-				nonSlider(sq, OFFSET_KNIGHT_1, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_KNIGHT_2, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_KNIGHT_3, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_KNIGHT_4, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_KNIGHT_5, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_KNIGHT_6, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_KNIGHT_7, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_KNIGHT_8, board, moveArr, &count, COLOR_BLACK);
+				knight(sq, board, moveArr, &count, COLOR_BLACK);
 				break;
 			case ORD_WBISHOP:
-				slider(sq, OFFSET_NE, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_NW, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_SE, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_SW, board, moveArr, &count, COLOR_BLACK);
+				bishop(sq, board, moveArr, &count, COLOR_BLACK);
 				break;
 			case ORD_WROOK:
-				slider(sq, OFFSET_N, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_S, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_E, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_W, board, moveArr, &count, COLOR_BLACK);
+				rook(sq, board, moveArr, &count, COLOR_BLACK);
 				break;
 			case ORD_WQUEEN:
-				slider(sq, OFFSET_N, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_S, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_E, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_W, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_NE, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_NW, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_SE, board, moveArr, &count, COLOR_BLACK);
-				slider(sq, OFFSET_SW, board, moveArr, &count, COLOR_BLACK);
+				bishop(sq, board, moveArr, &count, COLOR_BLACK);
+				rook(sq, board, moveArr, &count, COLOR_BLACK);
+				break;
 			case ORD_WKING:
-				nonSlider(sq, OFFSET_N, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_S, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_E, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_W, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_NE, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_NW, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_SE, board, moveArr, &count, COLOR_BLACK);
-				nonSlider(sq, OFFSET_SW, board, moveArr, &count, COLOR_BLACK);
+				king(sq, board, moveArr, &count, COLOR_BLACK);
 
 				if((gs->current->castleFlags & CASTLE_WK)
 					&& board[SQ_F1] == &EMPTY
