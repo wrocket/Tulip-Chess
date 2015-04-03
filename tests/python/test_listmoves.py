@@ -157,7 +157,7 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('p', m['capturedPiece'])
         self.assertEqual('P', m['movingPiece'])
 
-    def test_promote_pawn_no_captures(self):
+    def test_promote_wpawn_no_captures(self):
         moves = self.listPsuedoMovesDetails('2k5/5P2/8/8/8/8/8/2K5 w - - 0 1')
         desired = {'f7f8=q': 'promoteQueen', 'f7f8=n': 'promoteKnight', 'f7f8=r': 'promoteRook', 'f7f8=b': 'promoteBishop'}
         for move, promote in desired.items():
@@ -165,8 +165,17 @@ class TestBasicMoveList(unittest.TestCase):
             self.assertEqual(promote, m['moveCode'])
             self.assertEqual('-', m['capturedPiece'])
             self.assertEqual('P', m['movingPiece'])
+
+    def test_promote_bpawn_no_captures(self):
+        moves = self.listPsuedoMovesDetails('2k5/8/8/8/8/8/5p2/2K5 b - - 0 1')
+        desired = {'f2f1=q': 'promoteQueen', 'f2f1=n': 'promoteKnight', 'f2f1=r': 'promoteRook', 'f2f1=b': 'promoteBishop'}
+        for move, promote in desired.items():
+            m = self.getMoveFromDetails(move, moves)
+            self.assertEqual(promote, m['moveCode'])
+            self.assertEqual('-', m['capturedPiece'])
+            self.assertEqual('p', m['movingPiece'])
         
-    def test_promote_pawn_captures(self):
+    def test_promote_wpawn_captures(self):
         moves = self.listPsuedoMovesDetails('2k1brn1/5P2/8/8/8/8/8/2K5 w - c6 0 1')
         desired = {'f7g8=q': 'promoteQueen', 'f7g8=n': 'promoteKnight', 'f7g8=r': 'promoteRook', 'f7g8=b': 'promoteBishop'}
         for move, promote in desired.items():
@@ -186,26 +195,54 @@ class TestBasicMoveList(unittest.TestCase):
         # Make sure no f7f8 moves exist.
         self.assertEqual(0, len(list(filter(lambda m: m.startswith('f7f8'), moves.keys()))))
 
+    def test_promote_bpawn_captures(self):
+        moves = self.listPsuedoMovesDetails('2k5/8/8/8/8/8/5p2/2K1BRN1 b - c6 0 1')
+        desired = {'f2g1=q': 'promoteQueen', 'f2g1=n': 'promoteKnight', 'f2g1=r': 'promoteRook', 'f2g1=b': 'promoteBishop'}
+        for move, promote in desired.items():
+            m = self.getMoveFromDetails(move, moves)
+            self.assertEqual(promote, m['moveCode'])
+            self.assertEqual('N', m['capturedPiece'])
+            self.assertEqual('p', m['movingPiece'])
+
+        desired = {'f2e1=q': 'promoteQueen', 'f2e1=n': 'promoteKnight', 'f2e1=r': 'promoteRook', 'f2e1=b': 'promoteBishop'}
+        for move, promote in desired.items():
+            self.assertTrue(move in moves.keys(), move + ' not in move list.')
+            m = moves[move]
+            self.assertEqual(promote, m['moveCode'])
+            self.assertEqual('B', m['capturedPiece'])
+            self.assertEqual('p', m['movingPiece'])
+
+        # Make sure no f2f1 moves exist.
+        self.assertEqual(0, len(list(filter(lambda m: m.startswith('f2f1'), moves.keys()))))
+
     def test_white_castle_noproblems(self):
-        moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq c6 0 1')
+        moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1')
         for move in ['e1g1', 'e1c1']:
             castle = self.getMoveFromDetails(move, moves)
             self.assertEqual('none', castle['moveCode'])
             self.assertEqual('-', castle['capturedPiece'])
             self.assertEqual('K', castle['movingPiece'])
 
+    def test_black_castle_noproblems(self):
+        moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R b KQkq - 0 1')
+        for move in ['e8g8', 'e8c8']:
+            castle = self.getMoveFromDetails(move, moves)
+            self.assertEqual('none', castle['moveCode'])
+            self.assertEqual('-', castle['capturedPiece'])
+            self.assertEqual('k', castle['movingPiece'])
+
     def test_white_castle_blocked(self):
-        moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/RN2K1NR w KQkq c6 0 1')
+        moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/RN2K1NR w KQkq - 0 1')
         self.assertTrue('e1g1' not in moves.keys(), 'e1g1 incorrectly in move list.')
         self.assertTrue('e1c1' not in moves.keys(), 'e1c1 incorrectly in move list.')
 
     def test_white_castle_move_through_check(self):
-        moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/3q4/8/8/6n1/PPP1PPPP/R3K2R w KQkq c6 0 1')
+        moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/3q4/8/8/6n1/PPP1PPPP/R3K2R w KQkq - 0 1')
         self.assertTrue('e1g1' not in moves.keys(), 'e1g1 incorrectly in move list.')
         self.assertTrue('e1c1' not in moves.keys(), 'e1c1 incorrectly in move list.')
 
     def test_white_castle_rook_can_be_threatened(self):
-        moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/1q6/8/8/6n1/P1P1PPPP/R3K2R w KQkq c6 0 1')
+        moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/1q6/8/8/6n1/P1P1PPPP/R3K2R w KQkq - 0 1')
         self.getMoveFromDetails('e1c1', moves)
 
     def test_white_castle_no_castling(self):

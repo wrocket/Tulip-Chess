@@ -120,6 +120,20 @@ static void whitePawnEp(const int sq, const Piece** board, Move* moveBuffer, int
 	}
 }
 
+// TODO: Condense whitePawnEp and blackPawnEp in to a single method.
+static void blackPawnEp(const int sq, const Piece** board, Move* moveBuffer, int* count, int epFile) {
+	const int dF = epFile - FILE_IDX(sq);
+	if((dF == 1 || dF == -1) && RANK_IDX(sq) == RANK_4) {
+		Move* m = &moveBuffer[*count];
+		m->to = sq + (dF * OFFSET_E) + OFFSET_S; // Assumes OFFSET_E is -1 * OFFSET_W
+		m->from = sq;
+		m->movingPiece = &BPAWN;
+		m->captures = &WPAWN;
+		m->moveCode = CAPTURE_EP;
+		(*count)++;
+	}
+}
+
 static void pawnPromote(Move* moveBuff, const int from, const int to, const Piece* captures, int* count, const Piece* pawn) {
 		Move* m = &moveBuff[*count];
 
@@ -167,6 +181,20 @@ static void whitePawnPromote(const int sq, const Piece** board, Move* moveBuff, 
 	}
 }
 
+static void blackPawnPromote(const int sq, const Piece** board, Move* moveBuff, int* count) {
+	if(board[sq + OFFSET_S] == &EMPTY) {
+		pawnPromote(moveBuff, sq, sq + OFFSET_S, &EMPTY, count, &BPAWN);
+	}
+
+	if(board[sq + OFFSET_SE]->color == COLOR_WHITE) {
+		pawnPromote(moveBuff, sq, sq + OFFSET_SE, board[sq + OFFSET_SE], count, &BPAWN);
+	}
+
+	if(board[sq + OFFSET_SW]->color == COLOR_WHITE) {
+		pawnPromote(moveBuff, sq, sq + OFFSET_SW, board[sq + OFFSET_SW], count, &BPAWN);
+	}
+}
+
 static void whitePawn(const int sq, const Piece** board, Move* moveBuff, int* count) {
 	if(board[sq + OFFSET_N] == &EMPTY) {
 		Move* m = &moveBuff[*count];
@@ -210,8 +238,120 @@ static void whitePawn(const int sq, const Piece** board, Move* moveBuff, int* co
 	}
 }
 
+// TODO: Condense whitePawn() and backPawn() in to a single method...
+static void blackPawn(const int sq, const Piece** board, Move* moveBuff, int* count) {
+	if(board[sq + OFFSET_S] == &EMPTY) {
+		Move* m = &moveBuff[*count];
+		m->to = sq + OFFSET_N;
+		m->from = sq;
+		m->movingPiece = &BPAWN;
+		m->captures = &EMPTY;
+		m->moveCode = NO_MOVE_CODE;
+		(*count)++;
+	}
+
+	if(RANK_IDX(sq) == RANK_7
+		&& board[sq + (2 * OFFSET_S)] == &EMPTY) {
+		Move* m = &moveBuff[*count];
+		m->to = sq + (OFFSET_S * 2);
+		m->from = sq;
+		m->movingPiece = &BPAWN;
+		m->captures = &EMPTY;
+		m->moveCode = NO_MOVE_CODE;
+		(*count)++;
+	}
+
+	if(board[sq + OFFSET_SE]->color == COLOR_WHITE) {
+		Move* m = &moveBuff[*count];
+		m->to = sq + OFFSET_SE;
+		m->from = sq;
+		m->movingPiece = &BPAWN;
+		m->captures = board[sq + OFFSET_SE];
+		m->moveCode = NO_MOVE_CODE;
+		(*count)++;
+	}
+
+	if(board[sq + OFFSET_SW]->color == COLOR_WHITE) {
+		Move* m = &moveBuff[*count];
+		m->to = sq + OFFSET_SW;
+		m->from = sq;
+		m->movingPiece = &BPAWN;
+		m->captures = board[sq + OFFSET_SE];
+		m->moveCode = NO_MOVE_CODE;
+		(*count)++;
+	}
+}
+
 int generatePsuedoMovesBlack(GameState* gs, MoveBuffer* moveBuff) {
-	return 0; // TODO: implement
+	int count = 0;
+	const Piece** board = gs->board;
+	const int epFile = gs->current->epFile;
+	Move* moveArr = moveBuff->moves;
+
+	for(int i=0; i<64; i++) {
+		const int sq = BOARD_SQUARES[i];
+		const Piece* p = board[sq];
+
+		switch(p->ordinal) {
+			case ORD_BPAWN:
+				if(sq >= SQ_A2 && sq <= SQ_H2) {
+					blackPawnPromote(sq, board, moveArr, &count);
+				} else {
+					blackPawn(sq, board, moveArr, &count);
+					if(epFile != NO_EP_FILE) {
+						blackPawnEp(sq, board, moveArr, &count, epFile);
+					}
+				}
+				break;
+			case ORD_BKNIGHT:
+				knight(sq, board, moveArr, &count, COLOR_WHITE);
+				break;
+			case ORD_BBISHOP:
+				bishop(sq, board, moveArr, &count, COLOR_WHITE);
+				break;
+			case ORD_BROOK:
+				rook(sq, board, moveArr, &count, COLOR_WHITE);
+				break;
+			case ORD_BQUEEN:
+				bishop(sq, board, moveArr, &count, COLOR_WHITE);
+				rook(sq, board, moveArr, &count, COLOR_WHITE);
+				break;
+			case ORD_BKING:
+				king(sq, board, moveArr, &count, COLOR_WHITE);
+
+				if((gs->current->castleFlags & CASTLE_BK)
+					&& board[SQ_F8] == &EMPTY
+					&& board[SQ_G8] == &EMPTY
+					&& !canAttack(COLOR_WHITE, SQ_F8, gs)) {	// TODO: Expensive. Check for moving-through-check later?
+					Move* m = &moveArr[count];
+					m->to = SQ_G8;
+					m->from = SQ_E8;
+					m->movingPiece = &BKING;
+					m->captures = &EMPTY;
+					m->moveCode = NO_MOVE_CODE;
+					count++;
+				}
+
+				if((gs->current->castleFlags & CASTLE_BQ)
+					&& board[SQ_D8] == &EMPTY
+					&& board[SQ_C8] == &EMPTY
+					&& board[SQ_B8] == &EMPTY
+					&& !canAttack(COLOR_WHITE, SQ_D8, gs)) {
+					Move* m = &moveArr[count];
+					m->to = SQ_C8;
+					m->from = SQ_E8;
+					m->movingPiece = &BKING;
+					m->captures = &EMPTY;
+					m->moveCode = NO_MOVE_CODE;
+					count++;
+				}
+
+				break;
+		}
+	}
+
+	moveBuff->length = count;
+	return count;
 }
 
 int generatePsuedoMovesWhite(GameState* gs, MoveBuffer* moveBuff) {
