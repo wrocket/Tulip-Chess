@@ -88,6 +88,16 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertTrue('b6a4' in moves)
         self.assertTrue('b6c8' in moves)
 
+    def test_bking_01(self):
+        moves = self.listPsuedoMovesDetails('8/8/8/3p4/2k2K2/2P5/8/8 b - e3 0 1')
+        expected = ['c4c5', 'c4c3', 'c4b4', 'c4b3', 'c4b5', 'c4d3', 'c4d4']
+        self.assertEqual(len(expected), len(list(filter(lambda m: m.startswith('c4'), moves.keys()))))
+        for m in expected:
+            move = self.getMoveFromDetails(m, moves)
+            self.assertEqual('k', move['movingPiece'])
+        capture = self.getMoveFromDetails('c4c3', moves)
+        self.assertEqual('P', capture['capturedPiece'])
+
     def test_initial_position(self):
         moves = self.listPsuedoMoves('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
         self.assertEqual(20, len(moves))
@@ -112,6 +122,15 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertTrue('h2h3' in moves)
         self.assertTrue('h2h4' in moves)
 
+    def test_initial_position_after_e4(self):
+        moves = self.listPsuedoMoves('rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1')
+        for m in ['a7a6', 'b7b6', 'c7c6', 'd7d6', 'e7e6', 'f7f6', 'g7g6', 'h7h6']:
+            self.assertTrue(m in moves)
+        for m in ['a7a5', 'b7b5', 'c7c5', 'd7d5', 'e7e5', 'f7f5', 'g7g5', 'h7h5']:
+            self.assertTrue(m in moves)
+        for m in ['b8c6', 'b8a6', 'g8f6', 'g8h6']:
+            self.assertTrue(m in moves)
+        self.assertEqual(20, len(moves))
 
     def test_position_01(self):
         moves = self.listPsuedoMoves('5b1k/1pN4p/3P2p1/2pr1P2/Kp3p1P/5nn1/PPPB4/5RR1 w - - 1 41')
