@@ -236,14 +236,38 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertTrue('e1g1' not in moves.keys(), 'e1g1 incorrectly in move list.')
         self.assertTrue('e1c1' not in moves.keys(), 'e1c1 incorrectly in move list.')
 
+    def test_black_castle_blocked(self):
+        moves = self.listPsuedoMovesDetails('rn2k1nr/pppppppp/8/8/8/8/PPPPPPPP/R3K1NR b KQkq - 0 1')
+        self.assertTrue('e8g8' not in moves.keys(), 'e8g8 incorrectly in move list.')
+        self.assertTrue('e8c8' not in moves.keys(), 'e8c8 incorrectly in move list.')
+
     def test_white_castle_move_through_check(self):
         moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/3q4/8/8/6n1/PPP1PPPP/R3K2R w KQkq - 0 1')
         self.assertTrue('e1g1' not in moves.keys(), 'e1g1 incorrectly in move list.')
         self.assertTrue('e1c1' not in moves.keys(), 'e1c1 incorrectly in move list.')
 
+    def test_white_castle_move_out_of_check(self):
+        moves = self.listPsuedoMovesDetails('r3k2r/ppp1pppp/8/8/1b6/8/PPP1PPPP/R3K2R w KQkq - 0 1')
+        self.assertTrue('e1g1' not in moves.keys(), 'e1g1 incorrectly in move list.')
+        self.assertTrue('e1c1' not in moves.keys(), 'e1c1 incorrectly in move list.')
+
+    def test_black_castle_move_through_check(self):
+        moves = self.listPsuedoMovesDetails('r3k2r/ppp1pppp/6N1/8/8/8/PPPQPPPP/R3K2R b KQkq - 0 1')
+        self.assertTrue('e1g8' not in moves.keys(), 'e8g8 incorrectly in move list.')
+        self.assertTrue('e1c8' not in moves.keys(), 'e8c8 incorrectly in move list.')
+
+    def test_black_castle_move_out_of_check(self):
+        moves = self.listPsuedoMovesDetails('r3k2r/ppp1pppp/8/1B6/8/8/PPP1PPPP/R3K2R b KQkq - 0 1')
+        self.assertTrue('e1g8' not in moves.keys(), 'e8g8 incorrectly in move list.')
+        self.assertTrue('e1c8' not in moves.keys(), 'e8c8 incorrectly in move list.')
+
     def test_white_castle_rook_can_be_threatened(self):
         moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/1q6/8/8/6n1/P1P1PPPP/R3K2R w KQkq - 0 1')
         self.getMoveFromDetails('e1c1', moves)
+
+    def test_black_castle_rook_can_be_threatened(self):
+        moves = self.listPsuedoMovesDetails('r3k2r/p1pppppp/8/8/8/1Q4n1/PPP1PPPP/R3K2R b KQkq - 0 1')
+        self.getMoveFromDetails('e8c8', moves)
 
     def test_white_castle_no_castling(self):
         moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w kq c6 0 1')
