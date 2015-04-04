@@ -30,6 +30,6 @@
 // not only if) you ignore rules around moving into check. The assumption
 // is that the caller will check the actual legality of the move before
 // playing the move to a game state.
-int generatePsuedoMoves(GameState* gameState, MoveBuffer* destination);
+int generatePseudoMoves(GameState* gameState, MoveBuffer* destination);
 
 #endif

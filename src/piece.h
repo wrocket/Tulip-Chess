@@ -35,6 +35,9 @@
 // This is the "color" that off-board "squares" have.
 #define COLOR_OFFBOARD	3
 
+// Turns COLOR_WHITE to COLOR_BLACK and vice versa.
+#define INVERT_COLOR(color)	((color) ^ 1)
+
 #define ORD_WPAWN	0
 #define ORD_BPAWN	1
 #define ORD_WKNIGHT	2

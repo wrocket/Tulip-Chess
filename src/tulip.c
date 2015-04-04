@@ -109,7 +109,7 @@ void listMoves(int argc, char** argv) {
 	createMoveBuffer(&buffer);
 	
 	if(0 == strcmp("pseudo", argv[1])) {
-		generatePsuedoMoves(&gs, &buffer);
+		generatePseudoMoves(&gs, &buffer);
 	} else {
 		fprintf(stderr, "Move list mode \"%s\" not supported (yet).\n", argv[1]);
 		exit(EXIT_FAILURE);
