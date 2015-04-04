@@ -78,6 +78,15 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertTrue('b6a4' in moves)
         self.assertTrue('b6c8' in moves)
 
+    def test_knight_03(self):
+        moves = self.listPsuedoMoves('7K/8/1n6/3p4/2P5/8/8/k7 b - - 0 1')
+        knight_moves = list(filter(lambda m: m.startswith('b6'), moves))
+        self.assertEqual(5, len(knight_moves))
+        self.assertTrue('b6a8' in moves)
+        self.assertTrue('b6d7' in moves)
+        self.assertTrue('b6c4' in moves)
+        self.assertTrue('b6a4' in moves)
+        self.assertTrue('b6c8' in moves)
 
     def test_initial_position(self):
         moves = self.listPsuedoMoves('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
@@ -156,6 +165,20 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('epCapture', m['moveCode'])
         self.assertEqual('p', m['capturedPiece'])
         self.assertEqual('P', m['movingPiece'])
+
+    def test_ep_black_01(self):
+        moves = self.listPsuedoMovesDetails('4k3/8/8/8/4Pp2/8/8/4K3 b - e3 0 1')
+        m = self.getMoveFromDetails('f4e3', moves)
+        self.assertEqual('epCapture', m['moveCode'])
+        self.assertEqual('P', m['capturedPiece'])
+        self.assertEqual('p', m['movingPiece'])
+
+    def test_ep_black_02(self):
+        moves = self.listPsuedoMovesDetails('4k3/8/8/8/3pP3/8/8/4K3 b - e3 0 1')
+        m = self.getMoveFromDetails('d4e3', moves)
+        self.assertEqual('epCapture', m['moveCode'])
+        self.assertEqual('P', m['capturedPiece'])
+        self.assertEqual('p', m['movingPiece'])
 
     def test_promote_wpawn_no_captures(self):
         moves = self.listPsuedoMovesDetails('2k5/5P2/8/8/8/8/8/2K5 w - - 0 1')
