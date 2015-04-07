@@ -22,11 +22,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "gamestate.h"
 #include "board.h"
 #include "move.h"
 #include "json.h"
+
+#define __STDC_FORMAT_MACROS
 
 static const char* maskBooleanToStrU(unsigned int value, unsigned int mask) {
 	return (value & mask) ? "true" : "false";
@@ -206,7 +209,7 @@ void printGameState(char* position, GameState* state) {
 		}
 
 		const Piece* p = ALL_PIECES[i];
-		printf("\"%c\": \"%016llX\"", p->name, state->bitboards[p->ordinal]);
+		printf("\"%c\": \"%016"PRIX64"\"", p->name, state->bitboards[p->ordinal]);
 	}
 	printf("}");
 	printf("}\n");

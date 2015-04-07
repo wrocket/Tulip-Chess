@@ -26,7 +26,7 @@
 
 #include "tulip.h"
 #include "piece.h"
-#include "stateData.h"
+#include "statedata.h"
 #include "board.h"
 
 void createStateData(StateData * data) {
