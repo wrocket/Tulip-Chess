@@ -39,7 +39,7 @@
 #define _FEN_MAX_TOKENS     16
 #define _FEN_MAX_TOKEN_LEN  64
 
-static int parseToMove(char * t, int* result) {
+static bool parseToMove(char * t, int* result) {
     if(strlen(t) != 1) {
         fprintf(stderr, "Invalid to-move string: %s\n", t);
         return false;
@@ -79,7 +79,7 @@ static bool parseFiftyMove(char* t, int* result) {
     return true;
 }
 
-static int parseEpFile(char* t, int* result) {
+static bool parseEpFile(char* t, int* result) {
     int len = strlen(t);
     bool valid = true;
 
@@ -100,7 +100,7 @@ static int parseEpFile(char* t, int* result) {
     return valid;
 }
 
-static int parseCastleFlags(char* t, int* result) {
+static bool parseCastleFlags(char* t, int* result) {
     int flags = 0;
 
     if(strstr(t, "K")) {
@@ -123,7 +123,7 @@ static int parseCastleFlags(char* t, int* result) {
     return true;
 }
 
-static int parseBoard(char* t, GameState* gs) {
+static bool parseBoard(char* t, GameState* gs) {
     const Piece** board = gs->board;
 
     bool result = true;
