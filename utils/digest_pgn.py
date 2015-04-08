@@ -41,7 +41,7 @@ def is_move_token(str):
 
 def parse_moves(game_lines):
 	joined_lines = ' '.join(game_lines)
-	comments_removed = re.sub(r'{.*}', '', joined_lines)
+	comments_removed = re.sub(r'{.*?}', '', joined_lines)
 	split = re.split('\s+', comments_removed)
 	move_strs = filter(lambda s: is_move_token(s), split)
 	return list(move_strs)[:_max_moves]
@@ -53,13 +53,10 @@ def parse_pgn_lines(line_source):
 	game_lines = []
 	for line in line_source:
 		line = line.strip()
-		if len(line) == 0:
+		if len(line) == 0 or line.startswith('['):
 			if inside_game and len(game_lines):
 				results.append(parse_moves(game_lines))
-			inside_game = False
-			game_lines = []
-			continue
-		if line.startswith('['):
+				game_lines = []
 			inside_game = False
 			continue
 		elif inside_game:
@@ -82,9 +79,11 @@ def read_pgn_file(file_name):
 
 def write_digest_file(results):
 	flattened = chain.from_iterable(results)
-	for r in sorted(filter(lambda r: len(r) > 0, flattened)):
-		print(' '.join(r))
-
+	lines = set()
+	for r in filter(lambda r: len(r) > 0, flattened):
+		lines.add(' '.join(r))
+	for l in sorted(lines):
+		print(l)
 
 all_games = [read_pgn_file(f) for f in sys.argv[1:]]
 write_digest_file(all_games)
