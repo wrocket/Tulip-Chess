@@ -36,6 +36,7 @@ void createStateData(StateData * data) {
     data->castleFlags = 0;
     data->hash = 0;
     data->epFile = 0;
+    data->fiftyMoveCount = 0;
 }
 
 void copyStateData(StateData* from, StateData* to) {
@@ -45,5 +46,6 @@ void copyStateData(StateData* from, StateData* to) {
     to->blackKingSquare = from->blackKingSquare;
     to->hash = from->hash;
     to->epFile = from->epFile;
+    to->fiftyMoveCount = from->fiftyMoveCount;
 }
 

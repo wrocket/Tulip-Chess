@@ -102,8 +102,12 @@ class TestBasicStateParse(unittest.TestCase):
         self.assertTrue(state['castleBlackKingside'])
         self.assertTrue(state['castleWhiteQueenside'])
         self.assertTrue(state['castleBlackQueenside'])
-        
+        self.assertEqual(0, state['fiftyMoveCount'])
         self.assertEqual('none', state['epFile'])
+
+    def test_fiftyMove(self):
+        state = self.parseState('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 123 1')
+        self.assertEqual(123, state['fiftyMoveCount'])
 
 if __name__ == '__main__':
     unittest.main()

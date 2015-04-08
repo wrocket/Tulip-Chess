@@ -24,6 +24,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdbool.h>
+#include <limits.h>
+#include <errno.h>
 
 #include "tulip.h"
 #include "string.h"
@@ -49,6 +51,31 @@ static int parseToMove(char * t, int* result) {
     }
 
     *result = (t[0] == 'b' ? COLOR_BLACK : COLOR_WHITE);
+    return true;
+}
+
+static bool parseFiftyMove(char* t, int* result) {
+    char* endToken;
+    long parsed = strtol(t, &endToken, 10);
+
+    if(endToken == t) {
+        fprintf(stderr, "Missing fifty-move token.\n");
+        return false;
+    }
+
+    if(parsed < 0
+        || parsed > INT_MAX
+        || errno != 0) {
+        fprintf(stderr, "Invalid fifty-move token \"%s\"", t);
+        if(errno != 0) {
+            fprintf(stderr, ": %s\n", strerror(errno));
+        } else {
+            fprintf(stderr, ".\n");
+        }
+        return false;
+    }
+
+    *result = parsed;
     return true;
 }
 
@@ -184,6 +211,7 @@ int parseFen(GameState* state, char* fenStr) {
     int toMove = COLOR_WHITE;
     int castleFlags = 0;
     int epFile = NO_EP_FILE;
+    int fiftyMove = 0;
 
     tokenBuffer = createTokenBuffer(_FEN_MAX_TOKENS, _FEN_MAX_TOKEN_LEN);
 
@@ -215,9 +243,15 @@ int parseFen(GameState* state, char* fenStr) {
         goto clean_tokens;
     }
 
+    if(!parseFiftyMove(tokenBuffer[4], &fiftyMove)) {
+        result = false;
+        goto clean_tokens;
+    }
+
     state->current->castleFlags = castleFlags;
     state->current->toMove = toMove;
     state->current->epFile = epFile;
+    state->current->fiftyMoveCount = fiftyMove;
 
     reinitBitboards(state);
 

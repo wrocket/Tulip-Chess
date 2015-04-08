@@ -158,6 +158,8 @@ void printGameState(char* position, GameState* state) {
     printSq(squareStr, stateData->blackKingSquare);
     printf("\"blackKingSquare\": \"%s\", ", squareStr);
 
+    printf("\"fiftyMoveCount\": %i, ", stateData->fiftyMoveCount);
+
     const int flags = stateData->castleFlags;
     printf("\"castleWhiteKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
     printf("\"castleWhiteQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
