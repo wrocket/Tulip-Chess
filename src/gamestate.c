@@ -32,10 +32,10 @@
 #include "bitboard.h"
 
 void initializeGamestate(GameState* gs) {
-	gs->bitboards = ALLOC_ZERO(ORD_MAX, uint64_t, gs->bitboards, "Unable to allocate bitboards.");
+	gs->bitboards = ALLOC_ZERO(ORD_MAX + 1, uint64_t, gs->bitboards, "Unable to allocate bitboards.");
 	gs->dataStack = ALLOC(_GS_STACK_SIZE, StateData, gs->dataStack, "Unable to allocate state data stack.");
 	gs->board = ALLOC(144, Piece*, gs->board, "Error allocating board array.");
-	gs->pieceCounts = ALLOC_ZERO(ORD_MAX, int, gs->pieceCounts, "Error allocating piece count array.");
+	gs->pieceCounts = ALLOC_ZERO(ORD_MAX + 1, int, gs->pieceCounts, "Error allocating piece count array.");
 
 	for(int i=0; i<_GS_STACK_SIZE; i++) {
 		createStateData(&gs->dataStack[i]);
@@ -57,7 +57,7 @@ void initializeGamestate(GameState* gs) {
 }
 
 void reinitBitboards(GameState* gs) {
-	for(int i=0; i<ORD_MAX; i++) {
+	for(int i=0; i<=ORD_MAX; i++) {
 		gs->bitboards[i] = 0;
 	}
 
