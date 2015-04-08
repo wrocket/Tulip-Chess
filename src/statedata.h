@@ -51,9 +51,6 @@ typedef struct {
 // Allocate memory for an new state data object.
 void createStateData(StateData *);
 
-// Destroy an existing state data object.
-void destroyStateData(StateData *);
-
 // Copy data from one state data object "from" to another "to".
 void copyStateData(StateData* from, StateData* to);
 

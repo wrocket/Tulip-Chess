@@ -32,16 +32,14 @@
 #include "bitboard.h"
 
 void initializeGamestate(GameState* gs) {
+	gs->bitboards = ALLOC_ZERO(ORD_MAX, uint64_t, gs->bitboards, "Unable to allocate bitboards.");
 	gs->dataStack = ALLOC(_GS_STACK_SIZE, StateData, gs->dataStack, "Unable to allocate state data stack.");
+	gs->board = ALLOC(144, Piece*, gs->board, "Error allocating board array.");
+	gs->pieceCounts = ALLOC_ZERO(ORD_MAX, int, gs->pieceCounts, "Error allocating piece count array.");
 
 	for(int i=0; i<_GS_STACK_SIZE; i++) {
 		createStateData(&gs->dataStack[i]);
 	}
-
-	gs->bitboards = ALLOC_ZERO(ORD_MAX, uint64_t, gs->bitboards, "Unable to allocate bitboards.");
-
-	gs->board = ALLOC(144, Piece*, gs->board, "Error allocating board array.");
-	gs->pieceCounts = ALLOC_ZERO(ORD_MAX, int, gs->pieceCounts, "Error allocating piece count array.");
 
 	gs->stackPtr = 0;
 	gs->current = &(gs->dataStack[0]);
@@ -56,9 +54,6 @@ void initializeGamestate(GameState* gs) {
 			gs->board[B_IDX(file, rank)] = &EMPTY;
 		}
 	}
-
-	// memcpy(to->board, from->board, 144 * sizeof(Piece*));
-	// memcpy(to->pieceCounts, from->pieceCounts, ORD_MAX * sizeof(int));
 }
 
 void reinitBitboards(GameState* gs) {
@@ -76,12 +71,8 @@ void reinitBitboards(GameState* gs) {
 }
 
 void destroyGamestate(GameState* gs) {
-	if(!gs->created) {
+	if(!(gs->created)) {
 		fprintf(stderr, "Attempting to destroy gamestate that isn't created (or already destroyed)");
-	}
-
-	for(int i=0; i<_GS_STACK_SIZE; i++) {
-		destroyStateData(&gs->dataStack[i]);
 	}
 
 	free(gs->bitboards);

@@ -47,5 +47,3 @@ void copyStateData(StateData* from, StateData* to) {
 	to->epFile = from->epFile;
 }
 
-void destroyStateData(StateData * data) {
-}

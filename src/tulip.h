@@ -29,6 +29,6 @@
 #define ALLOC(qty, type, ptr, msg)	malloc((qty) * sizeof(type)); if(!(ptr)) {fprintf(stderr, (msg)); exit(EXIT_FAILURE);}
 
 // Same as ALLOC(), but also sets the allocated memory to zero.
-#define ALLOC_ZERO(qty, type, ptr, msg) ALLOC(qty, type, ptr, msg); memset(ptr, 0, (qty) * sizeof(type))
+#define ALLOC_ZERO(qty, type, ptr, msg) ALLOC((qty), type, (ptr), (msg)); memset((ptr), 0, (qty) * sizeof(type))
 
 #endif
