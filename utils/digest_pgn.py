@@ -1,5 +1,32 @@
+# The MIT License (MIT)
+#
+# Copyright (c) 2015 Brian Wray (brian@wrocket.org)
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+# Script to digest a series of PGN files in to a simple list of move strings.
+# The output can be used to easily build up transposition tables or opening
+# books in the main C code.
+
 import sys
 import re
+from itertools import chain
 
 _max_moves = 20
 
@@ -54,10 +81,10 @@ def read_pgn_file(file_name):
 
 
 def write_digest_file(results):
-	for r in filter(lambda r: len(r) > 0, results):
+	flattened = chain.from_iterable(results)
+	for r in sorted(filter(lambda r: len(r) > 0, flattened)):
 		print(' '.join(r))
 
-all_games = [read_pgn_file(f) for f in sys.argv[1:]]
 
-for g in all_games:
-	write_digest_file(g)
+all_games = [read_pgn_file(f) for f in sys.argv[1:]]
+write_digest_file(all_games)
