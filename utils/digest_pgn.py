@@ -30,8 +30,8 @@ from itertools import chain
 
 _max_moves = 20
 
-if len(sys.argv) <= 1:
-	print('Usage: %s [pgn file 1] [pgn file 2] ...' % sys.argv[0])
+if len(sys.argv) <= 2:
+	print('Usage: %s [output file] [pgn file 1] [pgn file 2] ...' % sys.argv[0])
 	exit(-1)
 
 
@@ -79,11 +79,14 @@ def read_pgn_file(file_name):
 
 def write_digest_file(results):
 	flattened = chain.from_iterable(results)
-	lines = set()
-	for r in filter(lambda r: len(r) > 0, flattened):
-		lines.add(' '.join(r))
-	for l in sorted(lines):
-		print(l)
+	non_empty = filter(lambda r: len(r) > 0, flattened)
+	lines = set([' '.join(r) for r in non_empty])
+	with open(sys.argv[1], 'w') as output_file:
+		print('Writing %i distinct game line(s) to %s...' % (len(lines), sys.argv[1]))
+		for l in sorted(lines):
+			output_file.write('%s\n' % l)
+	print('\t...done.')
 
-all_games = [read_pgn_file(f) for f in sys.argv[1:]]
+print('Limiting line length to %i move(s)' % _max_moves)
+all_games = [read_pgn_file(f) for f in sys.argv[2:]]
 write_digest_file(all_games)
