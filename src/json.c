@@ -32,185 +32,185 @@
 #define __STDC_FORMAT_MACROS
 
 static const char* maskBooleanToStrU(unsigned int value, unsigned int mask) {
-	return (value & mask) ? "true" : "false";
+    return (value & mask) ? "true" : "false";
 }
 
 static void printSq(char* buff, int sq) {
-	int idx = printSquareIndex(sq, buff);
-	buff[idx] = '\0';
+    int idx = printSquareIndex(sq, buff);
+    buff[idx] = '\0';
 }
 
 static void printMoveDetail(Move* m) {
-	char strBuff[16];
-	printMoveCoordinate(m, strBuff);
-	printf("{");
-	printf("\"move\": \"%s\", ", strBuff);
-	printf("\"movingPiece\": \"%c\", ", m->movingPiece->name);
-	printf("\"capturedPiece\": \"%c\", ", m->captures->name);
+    char strBuff[16];
+    printMoveCoordinate(m, strBuff);
+    printf("{");
+    printf("\"move\": \"%s\", ", strBuff);
+    printf("\"movingPiece\": \"%c\", ", m->movingPiece->name);
+    printf("\"capturedPiece\": \"%c\", ", m->captures->name);
 
-	const char* codeStr;
+    const char* codeStr;
 
-	switch(m->moveCode) {
-		case NO_MOVE_CODE:
-			codeStr = "none";
-			break;
-		case PROMOTE_R:
-			codeStr = "promoteRook";
-			break;
-		case PROMOTE_B:
-			codeStr = "promoteBishop";
-			break;
-		case PROMOTE_N:
-			codeStr = "promoteKnight";
-			break;
-		case PROMOTE_Q:
-			codeStr = "promoteQueen";
-			break;
-		case CAPTURE_EP:
-			codeStr = "epCapture";
-			break;
-		default:
-			codeStr = "unknown";
-			break;
-	}
+    switch(m->moveCode) {
+        case NO_MOVE_CODE:
+            codeStr = "none";
+            break;
+        case PROMOTE_R:
+            codeStr = "promoteRook";
+            break;
+        case PROMOTE_B:
+            codeStr = "promoteBishop";
+            break;
+        case PROMOTE_N:
+            codeStr = "promoteKnight";
+            break;
+        case PROMOTE_Q:
+            codeStr = "promoteQueen";
+            break;
+        case CAPTURE_EP:
+            codeStr = "epCapture";
+            break;
+        default:
+            codeStr = "unknown";
+            break;
+    }
 
-	printf("\"moveCode\": \"%s\"", codeStr);
-	printf("}");
+    printf("\"moveCode\": \"%s\"", codeStr);
+    printf("}");
 }
 
 static const char* printColor(int color) {
-	switch(color) {
-		case COLOR_WHITE: return "white";
-		case COLOR_BLACK: return "black";
-		default: return "unknown";
-	}
+    switch(color) {
+        case COLOR_WHITE: return "white";
+        case COLOR_BLACK: return "black";
+        default: return "unknown";
+    }
 }
 
 void printMovelistJson(char* position, char* listType, MoveBuffer* buffer) {
-	char strBuff[16];
+    char strBuff[16];
 
-	printf("{");
+    printf("{");
 
-	printf("\"fenString\": \"%s\", ", position);
+    printf("\"fenString\": \"%s\", ", position);
 
-	printf("\"moveListType\": \"%s\", ", listType);
+    printf("\"moveListType\": \"%s\", ", listType);
 
-	printf("\"moveList\": [");
-	for(int i=0; i<buffer->length; i++) {
-		if(i > 0) {
-			printf(", ");
-		}
+    printf("\"moveList\": [");
+    for(int i=0; i<buffer->length; i++) {
+        if(i > 0) {
+            printf(", ");
+        }
 
-		printMoveCoordinate(&(buffer->moves[i]), strBuff);
-		printf("\"%s\"", strBuff);
-	}
-	printf("], ");
-	printf("\"moveDetails\": [");
-	for(int i=0; i<buffer->length; i++) {
-		if(i > 0) {
-			printf(", ");
-		}
+        printMoveCoordinate(&(buffer->moves[i]), strBuff);
+        printf("\"%s\"", strBuff);
+    }
+    printf("], ");
+    printf("\"moveDetails\": [");
+    for(int i=0; i<buffer->length; i++) {
+        if(i > 0) {
+            printf(", ");
+        }
 
-		printMoveDetail(&(buffer->moves[i]));
-	}
-	printf("]");
-	printf("}\n");
+        printMoveDetail(&(buffer->moves[i]));
+    }
+    printf("]");
+    printf("}\n");
 }
 
 void printAttackList(char* position, bool* attackGrid, GameState* state) {
-	printf("{");
-	printf("\"fenString\": \"%s\", ", position);
-	printf("\"attackedSquares\": [");
+    printf("{");
+    printf("\"fenString\": \"%s\", ", position);
+    printf("\"attackedSquares\": [");
 
-	char strBuff[4];
+    char strBuff[4];
 
-	bool atLeastOne = false;
-	for(int i=0; i<64; i++) {
-		int idx = BOARD_SQUARES[i];
-		if(attackGrid[idx]) {
-			if(atLeastOne) {
-				printf(", ");
-			}
+    bool atLeastOne = false;
+    for(int i=0; i<64; i++) {
+        int idx = BOARD_SQUARES[i];
+        if(attackGrid[idx]) {
+            if(atLeastOne) {
+                printf(", ");
+            }
 
-			atLeastOne = true;
-			strBuff[printSquareIndex(idx, strBuff)] = '\0';
-			printf("\"%s\"", strBuff);
-		}
-	}
+            atLeastOne = true;
+            strBuff[printSquareIndex(idx, strBuff)] = '\0';
+            printf("\"%s\"", strBuff);
+        }
+    }
 
-	printf("]}\n");
+    printf("]}\n");
 }
 
 void printGameState(char* position, GameState* state) {
-	char squareStr[8];
-	StateData* stateData;
+    char squareStr[8];
+    StateData* stateData;
 
-	stateData = state->current;
+    stateData = state->current;
 
-	printf("{");
-	printf("\"fenString\": \"%s\", ", position);
+    printf("{");
+    printf("\"fenString\": \"%s\", ", position);
 
-	printf("\"toMove\": \"%s\", ", printColor(stateData->toMove));
+    printf("\"toMove\": \"%s\", ", printColor(stateData->toMove));
 
-	printSq(squareStr, stateData->whiteKingSquare);
-	printf("\"whiteKingSquare\": \"%s\", ", squareStr);
+    printSq(squareStr, stateData->whiteKingSquare);
+    printf("\"whiteKingSquare\": \"%s\", ", squareStr);
 
-	printSq(squareStr, stateData->blackKingSquare);
-	printf("\"blackKingSquare\": \"%s\", ", squareStr);
+    printSq(squareStr, stateData->blackKingSquare);
+    printf("\"blackKingSquare\": \"%s\", ", squareStr);
 
-	const int flags = stateData->castleFlags;
-	printf("\"castleWhiteKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
-	printf("\"castleWhiteQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
-	printf("\"castleBlackKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
-	printf("\"castleBlackQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
+    const int flags = stateData->castleFlags;
+    printf("\"castleWhiteKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
+    printf("\"castleWhiteQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
+    printf("\"castleBlackKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
+    printf("\"castleBlackQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
 
-	printf("\"epFile\": ");
+    printf("\"epFile\": ");
 
-	if(stateData->epFile == NO_EP_FILE) {
-		printf("\"none\", ");
-	} else {
-		printf("\"%c\", ", fileToChar(stateData->epFile));
-	}
+    if(stateData->epFile == NO_EP_FILE) {
+        printf("\"none\", ");
+    } else {
+        printf("\"%c\", ", fileToChar(stateData->epFile));
+    }
 
-	printf("\"board\": {");
-	for(int i=0; i<64; i++) {
-		const int sq = BOARD_SQUARES[i];
-		const Piece* p = state->board[sq];
-		if(p != &EMPTY) {
-			if(i > 0) {
-				printf(", ");
-			}
+    printf("\"board\": {");
+    for(int i=0; i<64; i++) {
+        const int sq = BOARD_SQUARES[i];
+        const Piece* p = state->board[sq];
+        if(p != &EMPTY) {
+            if(i > 0) {
+                printf(", ");
+            }
 
-			printSq(squareStr, sq);
-			printf("\"%s\": \"%c\"", squareStr, p->name);
-		}
-	}
+            printSq(squareStr, sq);
+            printf("\"%s\": \"%c\"", squareStr, p->name);
+        }
+    }
 
-	printf("}, ");
+    printf("}, ");
 
-	printf("\"pieceCounts\": {");
-	const Piece* pieces[] = {&WPAWN, &BPAWN, &WKNIGHT, &BKNIGHT, &WBISHOP,
-							 &BBISHOP, &WROOK, &BROOK, &WQUEEN, &BQUEEN, 
-							 &WKING, &BKING, &EMPTY, &OFF_BOARD};
+    printf("\"pieceCounts\": {");
+    const Piece* pieces[] = {&WPAWN, &BPAWN, &WKNIGHT, &BKNIGHT, &WBISHOP,
+                             &BBISHOP, &WROOK, &BROOK, &WQUEEN, &BQUEEN, 
+                             &WKING, &BKING, &EMPTY, &OFF_BOARD};
 
-	for(int i=0; i<14; i++) {
-		if(i > 0) {
-			printf(", ");
-		}
+    for(int i=0; i<14; i++) {
+        if(i > 0) {
+            printf(", ");
+        }
 
-		printf("\"%c\": %i", (pieces[i])->name, state->pieceCounts[pieces[i]->ordinal]);
+        printf("\"%c\": %i", (pieces[i])->name, state->pieceCounts[pieces[i]->ordinal]);
 
-	}
-	printf("},");
-	printf(" \"bitboards\" : {");
-	for(int i=0; i<ALL_PIECES_LEN; i++) {
-		if(i > 0) {
-			printf(", ");
-		}
+    }
+    printf("},");
+    printf(" \"bitboards\" : {");
+    for(int i=0; i<ALL_PIECES_LEN; i++) {
+        if(i > 0) {
+            printf(", ");
+        }
 
-		const Piece* p = ALL_PIECES[i];
-		printf("\"%c\": \"%016"PRIX64"\"", p->name, state->bitboards[p->ordinal]);
-	}
-	printf("}");
-	printf("}\n");
+        const Piece* p = ALL_PIECES[i];
+        printf("\"%c\": \"%016"PRIX64"\"", p->name, state->bitboards[p->ordinal]);
+    }
+    printf("}");
+    printf("}\n");
 }

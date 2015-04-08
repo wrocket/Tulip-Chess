@@ -30,20 +30,20 @@
 #include "board.h"
 
 void createStateData(StateData * data) {
-	data->toMove = COLOR_WHITE;
-	data->whiteKingSquare = 0;
-	data->blackKingSquare = 0;
-	data->castleFlags = 0;
-	data->hash = 0;
-	data->epFile = 0;
+    data->toMove = COLOR_WHITE;
+    data->whiteKingSquare = 0;
+    data->blackKingSquare = 0;
+    data->castleFlags = 0;
+    data->hash = 0;
+    data->epFile = 0;
 }
 
 void copyStateData(StateData* from, StateData* to) {
-	to->toMove = from->toMove;
-	to->whiteKingSquare = from->whiteKingSquare;
-	to->castleFlags = from->castleFlags;
-	to->blackKingSquare = from->blackKingSquare;
-	to->hash = from->hash;
-	to->epFile = from->epFile;
+    to->toMove = from->toMove;
+    to->whiteKingSquare = from->whiteKingSquare;
+    to->castleFlags = from->castleFlags;
+    to->blackKingSquare = from->blackKingSquare;
+    to->hash = from->hash;
+    to->epFile = from->epFile;
 }
 

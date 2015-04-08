@@ -30,60 +30,60 @@
 #include "move.h"
 
 void createMoveBuffer(MoveBuffer* buff) {
-	Move* moves = ALLOC(MOVE_BUFFER_LENGTH, Move, moves, "Moves not allocated.");
-	buff->moves = moves;
-	buff->length = 0;
-	buff->created = true;
+    Move* moves = ALLOC(MOVE_BUFFER_LENGTH, Move, moves, "Moves not allocated.");
+    buff->moves = moves;
+    buff->length = 0;
+    buff->created = true;
 }
 
 void destroyMoveBuffer(MoveBuffer* buff) {
-	if(!(buff->created)) {
-		fprintf(stderr, "Attempting to destroy move buffer that hasn't been created (or was already destroyed)\n");
-		return;
-	}
+    if(!(buff->created)) {
+        fprintf(stderr, "Attempting to destroy move buffer that hasn't been created (or was already destroyed)\n");
+        return;
+    }
 
-	free(buff->moves);
-	buff->length = 0;
-	buff->created = false;
+    free(buff->moves);
+    buff->length = 0;
+    buff->created = false;
 }
 
 void printMovelist(MoveBuffer* buffer) {
-	char strBuff[16];
+    char strBuff[16];
 
-	printf("%i move(s)\n", buffer->length);
-	printf("----------\n");
-	for(int i=0; i<buffer->length; i++) {
-		printMoveCoordinate(&(buffer->moves[i]), strBuff);
-		printf("%i\t%s\n", i, strBuff);
-	}
+    printf("%i move(s)\n", buffer->length);
+    printf("----------\n");
+    for(int i=0; i<buffer->length; i++) {
+        printMoveCoordinate(&(buffer->moves[i]), strBuff);
+        printf("%i\t%s\n", i, strBuff);
+    }
 }
 
 int printMoveCoordinate(Move* move, char* buffer) {
-	int index = 0;
+    int index = 0;
 
-	index += printSquareIndex(move->from, buffer);
-	index += printSquareIndex(move->to, buffer + index);
+    index += printSquareIndex(move->from, buffer);
+    index += printSquareIndex(move->to, buffer + index);
 
-	switch(move->moveCode) {
-		case PROMOTE_N:
-			buffer[index++] = '=';
-			buffer[index++] = 'n';
-			break;
-		case PROMOTE_R:
-			buffer[index++] = '=';
-			buffer[index++] = 'r';
-			break;
-		case PROMOTE_B:
-			buffer[index++] = '=';
-			buffer[index++] = 'b';
-			break;
-		case PROMOTE_Q:
-			buffer[index++] = '=';
-			buffer[index++] = 'q';
-			break;
-	}
+    switch(move->moveCode) {
+        case PROMOTE_N:
+            buffer[index++] = '=';
+            buffer[index++] = 'n';
+            break;
+        case PROMOTE_R:
+            buffer[index++] = '=';
+            buffer[index++] = 'r';
+            break;
+        case PROMOTE_B:
+            buffer[index++] = '=';
+            buffer[index++] = 'b';
+            break;
+        case PROMOTE_Q:
+            buffer[index++] = '=';
+            buffer[index++] = 'q';
+            break;
+    }
 
-	buffer[index++] = '\0';
+    buffer[index++] = '\0';
 
-	return index;
+    return index;
 }

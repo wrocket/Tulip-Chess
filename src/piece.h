@@ -24,41 +24,41 @@
 #define PIECE_H
 
 // This is the color white pieces have.
-#define COLOR_WHITE		0
+#define COLOR_WHITE     0
 
 // This is the color black piece have.
-#define COLOR_BLACK		1
+#define COLOR_BLACK     1
 
 // This is the "color" the empty squares have.
-#define COLOR_NEITHER	2
+#define COLOR_NEITHER   2
 
 // This is the "color" that off-board "squares" have.
-#define COLOR_OFFBOARD	3
+#define COLOR_OFFBOARD  3
 
 // Turns COLOR_WHITE to COLOR_BLACK and vice versa.
-#define INVERT_COLOR(color)	((color) ^ 1)
+#define INVERT_COLOR(color) ((color) ^ 1)
 
-#define ORD_WPAWN	0
-#define ORD_BPAWN	1
-#define ORD_WKNIGHT	2
-#define ORD_BKNIGHT	3
-#define ORD_WBISHOP	4
-#define ORD_BBISHOP	5
-#define ORD_WROOK	6
-#define ORD_BROOK	7
-#define ORD_WQUEEN	8
-#define ORD_BQUEEN	9
-#define ORD_WKING	10
-#define ORD_BKING	11
-#define ORD_OFFB	12
-#define ORD_EMPTY	13
-#define ORD_MAX		13
+#define ORD_WPAWN   0
+#define ORD_BPAWN   1
+#define ORD_WKNIGHT 2
+#define ORD_BKNIGHT 3
+#define ORD_WBISHOP 4
+#define ORD_BBISHOP 5
+#define ORD_WROOK   6
+#define ORD_BROOK   7
+#define ORD_WQUEEN  8
+#define ORD_BQUEEN  9
+#define ORD_WKING   10
+#define ORD_BKING   11
+#define ORD_OFFB    12
+#define ORD_EMPTY   13
+#define ORD_MAX     13
 
 // Structure describing a piece on the board.
 typedef struct {
-	int ordinal;	// A unique positive integer for this piece.
-	int color;		// The color of this piece.
-	char name;		// The human-readable character for this piece.
+    int ordinal;    // A unique positive integer for this piece.
+    int color;      // The color of this piece.
+    char name;      // The human-readable character for this piece.
 } Piece;
 
 extern const Piece WPAWN;
@@ -76,7 +76,7 @@ extern const Piece BKING;
 extern const Piece EMPTY;
 extern const Piece OFF_BOARD;
 
-#define ALL_PIECES_LEN	13
+#define ALL_PIECES_LEN  13
 extern const Piece* ALL_PIECES[13];
 
 // Given a human-readable piece character, return a pointer to the relevant piece.

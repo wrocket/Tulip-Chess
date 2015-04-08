@@ -29,51 +29,51 @@
 #include "tulip.h"
 
 int tokenize(const char* str, char** tokenBuffers, const int maxTokens) {
-	char* currentBuffer = tokenBuffers[0];
-	int currentBufferIdx = -1;
-	int currentBufferStrIdx = 0;
-	int len = strlen(str);
-	int isInToken = false;
+    char* currentBuffer = tokenBuffers[0];
+    int currentBufferIdx = -1;
+    int currentBufferStrIdx = 0;
+    int len = strlen(str);
+    int isInToken = false;
 
-	for(int idx = 0; idx < len && currentBufferIdx < maxTokens; idx++) {
-		const char c = str[idx];
-		if(isspace(c)) {
-			if(isInToken) {
-				isInToken = false;
-				currentBuffer[currentBufferStrIdx++] = '\0';
-			}
-		} else {
-			if(!isInToken) {
-				isInToken = true;
-				currentBuffer = tokenBuffers[++currentBufferIdx];
-				currentBufferStrIdx = 0;
-			}
+    for(int idx = 0; idx < len && currentBufferIdx < maxTokens; idx++) {
+        const char c = str[idx];
+        if(isspace(c)) {
+            if(isInToken) {
+                isInToken = false;
+                currentBuffer[currentBufferStrIdx++] = '\0';
+            }
+        } else {
+            if(!isInToken) {
+                isInToken = true;
+                currentBuffer = tokenBuffers[++currentBufferIdx];
+                currentBufferStrIdx = 0;
+            }
 
-			currentBuffer[currentBufferStrIdx++] = c;
-		}
-	}
+            currentBuffer[currentBufferStrIdx++] = c;
+        }
+    }
 
-	if(currentBufferStrIdx > 0 && currentBufferIdx < maxTokens) {
-		currentBuffer[currentBufferStrIdx++] = '\0';
-		currentBufferIdx++;
-	}
+    if(currentBufferStrIdx > 0 && currentBufferIdx < maxTokens) {
+        currentBuffer[currentBufferStrIdx++] = '\0';
+        currentBufferIdx++;
+    }
 
-	return currentBufferIdx;
+    return currentBufferIdx;
 }
 
 char** createTokenBuffer(const int tokens, const int maxLength) {
-	char** buffer = ALLOC_ZERO(tokens, char*, buffer, "Unable to allocate token buffer");
-	for(int i=0; i<tokens; i++) {
-		buffer[i] = ALLOC_ZERO(maxLength, char, buffer[i], "Unable to allocate token buffer]");
-	}
-	return buffer;
+    char** buffer = ALLOC_ZERO(tokens, char*, buffer, "Unable to allocate token buffer");
+    for(int i=0; i<tokens; i++) {
+        buffer[i] = ALLOC_ZERO(maxLength, char, buffer[i], "Unable to allocate token buffer]");
+    }
+    return buffer;
 }
 
 void freeTokenBuffer(char** buffer, const int length) {
-	for(int i=0; i<length; i++) {
-		free(buffer[i]);
-	}
+    for(int i=0; i<length; i++) {
+        free(buffer[i]);
+    }
 
-	free(buffer);
+    free(buffer);
 }
 

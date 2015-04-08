@@ -38,109 +38,108 @@
 #include "json.h"
 
 void printBanner() {
-	printf("Tulip Chess Engine 0.001\n");
-	printf("Size of uint64: %lu bits\n", CHAR_BIT * sizeof(uint64_t));
+    printf("Tulip Chess Engine 0.001\n");
+    printf("Size of uint64: %lu bits\n", CHAR_BIT * sizeof(uint64_t));
 }
 
 void printState(int argc, char** argv) {
-	if(argc != 2) {
-		fprintf(stderr, "Usage: -printstate \"[FEN string]\"\n");
-		exit(EXIT_FAILURE);
-	}
+    if(argc != 2) {
+        fprintf(stderr, "Usage: -printstate \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
 
-	GameState gs;
-	initializeGamestate(&gs);
+    GameState gs;
+    initializeGamestate(&gs);
 
-	if(!parseFen(&gs, argv[1])) {
-		fprintf(stderr, "Unable to parse FEN \"%s\"\n", argv[2]);
-		destroyGamestate(&gs);
-		exit(EXIT_FAILURE);
-	}
+    if(!parseFen(&gs, argv[1])) {
+        fprintf(stderr, "Unable to parse FEN \"%s\"\n", argv[2]);
+        destroyGamestate(&gs);
+        exit(EXIT_FAILURE);
+    }
 
-	printGameState(argv[1], &gs);
-	destroyGamestate(&gs);
+    printGameState(argv[1], &gs);
+    destroyGamestate(&gs);
 }
 
 void listAttacks(int argc, char** argv) {
-	if(argc != 2) {
-		fprintf(stderr, "Usage: -listattacks \"[FEN string]\"\n");
-		exit(EXIT_FAILURE);
-	}
+    if(argc != 2) {
+        fprintf(stderr, "Usage: -listattacks \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
 
-	GameState gs;
-	initializeGamestate(&gs);
+    GameState gs;
+    initializeGamestate(&gs);
 
-	if(!parseFen(&gs, argv[1])) {
-		fprintf(stderr, "Unable to parse FEN \"%s\"\n", argv[2]);
-		destroyGamestate(&gs);
-		exit(EXIT_FAILURE);
-	}
+    if(!parseFen(&gs, argv[1])) {
+        fprintf(stderr, "Unable to parse FEN \"%s\"\n", argv[2]);
+        destroyGamestate(&gs);
+        exit(EXIT_FAILURE);
+    }
 
-	bool* attackGrid = ALLOC(144, bool, attackGrid, "Unable to allocate attack grid.");
-	for(int rank=RANK_1; rank <= RANK_8; rank++) {
-		for(int file=FILE_A; file <= FILE_H; file++) {
-			int idx = B_IDX(file, rank);
-			attackGrid[idx] = canAttack(gs.current->toMove, idx, &gs);
-		}
-	}
+    bool* attackGrid = ALLOC(144, bool, attackGrid, "Unable to allocate attack grid.");
+    for(int rank=RANK_1; rank <= RANK_8; rank++) {
+        for(int file=FILE_A; file <= FILE_H; file++) {
+            int idx = B_IDX(file, rank);
+            attackGrid[idx] = canAttack(gs.current->toMove, idx, &gs);
+        }
+    }
 
-	printAttackList(argv[1], attackGrid, &gs);
+    printAttackList(argv[1], attackGrid, &gs);
 
-	free(attackGrid);
-	destroyGamestate(&gs);
+    free(attackGrid);
+    destroyGamestate(&gs);
 }
 
 void listMoves(int argc, char** argv) {
-	if(argc != 3) {
-		fprintf(stderr, "Usage: -listmoves [pseudo/legal] \"[FEN string]\"\n");
-		exit(EXIT_FAILURE);
-	}
+    if(argc != 3) {
+        fprintf(stderr, "Usage: -listmoves [pseudo/legal] \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
 
-	GameState gs;
-	initializeGamestate(&gs);
+    GameState gs;
+    initializeGamestate(&gs);
 
-	if(!parseFen(&gs, argv[2])) {
-		fprintf(stderr, "Unable to parse FEN \"%s\"\n", argv[2]);
-		destroyGamestate(&gs);
-		exit(EXIT_FAILURE);
-	}
+    if(!parseFen(&gs, argv[2])) {
+        fprintf(stderr, "Unable to parse FEN \"%s\"\n", argv[2]);
+        destroyGamestate(&gs);
+        exit(EXIT_FAILURE);
+    }
 
-	MoveBuffer buffer;
-	createMoveBuffer(&buffer);
-	
-	if(0 == strcmp("pseudo", argv[1])) {
-		generatePseudoMoves(&gs, &buffer);
-	} else {
-		fprintf(stderr, "Move list mode \"%s\" not supported (yet).\n", argv[1]);
-		exit(EXIT_FAILURE);
-	}
+    MoveBuffer buffer;
+    createMoveBuffer(&buffer);
+    
+    if(0 == strcmp("pseudo", argv[1])) {
+        generatePseudoMoves(&gs, &buffer);
+    } else {
+        fprintf(stderr, "Move list mode \"%s\" not supported (yet).\n", argv[1]);
+        exit(EXIT_FAILURE);
+    }
 
-	printMovelistJson(argv[2], argv[1], &buffer);
+    printMovelistJson(argv[2], argv[1], &buffer);
 
-	destroyMoveBuffer(&buffer);
-	destroyGamestate(&gs);
+    destroyMoveBuffer(&buffer);
+    destroyGamestate(&gs);
 }
 
 int main(int argc, char** argv) {
+    argc--;
+    argv++;
 
-	argc--;
-	argv++;
+    if(argc >= 1) {
+        if(0 == strcmp("-listmoves", argv[0])) {
+            listMoves(argc, argv);
+        } else if(0 == strcmp("-printstate", argv[0])) {
+            printState(argc, argv);
+        } else if(0 == strcmp("-listattacks", argv[0])) {
+            listAttacks(argc, argv);
+        } else {
+            printBanner();
+            printf("Unknown command \"%s\"\n", argv[0]);
+        }
+    } else {
+        printBanner();
+        printf("No operation mode specified, quitting.\n");
+    }
 
-	if(argc >= 1) {
-		if(0 == strcmp("-listmoves", argv[0])) {
-			listMoves(argc, argv);
-		} else if(0 == strcmp("-printstate", argv[0])) {
-			printState(argc, argv);
-		} else if(0 == strcmp("-listattacks", argv[0])) {
-			listAttacks(argc, argv);
-		} else {
-			printBanner();
-			printf("Unknown command \"%s\"\n", argv[0]);
-		}
-	} else {
-		printBanner();
-		printf("No operation mode specified, quitting.\n");
-	}
-
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
