@@ -38,7 +38,7 @@
 #include "fen.h"
 #include "json.h"
 
-void printBanner() {
+static void printBanner() {
     printf("Tulip Chess Engine 0.001\n");
     printf("Size of uint64: %lu bits\n", CHAR_BIT * sizeof(uint64_t));
 }
@@ -56,39 +56,25 @@ static GameState parseFenOrQuit(char* str) {
     return gs;
 }
 
-void printState(int argc, char** argv) {
+static void printState(int argc, char** argv) {
     if(argc != 2) {
         fprintf(stderr, "Usage: -printstate \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs;
-    initializeGamestate(&gs);
-
-    if(!parseFen(&gs, argv[1])) {
-        fprintf(stderr, "Unable to parse FEN \"%s\"\n", argv[2]);
-        destroyGamestate(&gs);
-        exit(EXIT_FAILURE);
-    }
+    GameState gs = parseFenOrQuit(argv[1]);
 
     printGameState(argv[1], &gs);
     destroyGamestate(&gs);
 }
 
-void listAttacks(int argc, char** argv) {
+static void listAttacks(int argc, char** argv) {
     if(argc != 2) {
         fprintf(stderr, "Usage: -listattacks \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs;
-    initializeGamestate(&gs);
-
-    if(!parseFen(&gs, argv[1])) {
-        fprintf(stderr, "Unable to parse FEN \"%s\"\n", argv[2]);
-        destroyGamestate(&gs);
-        exit(EXIT_FAILURE);
-    }
+    GameState gs = parseFenOrQuit(argv[1]);
 
     bool* attackGrid = ALLOC(144, bool, attackGrid, "Unable to allocate attack grid.");
     for(int rank=RANK_1; rank <= RANK_8; rank++) {
@@ -104,20 +90,13 @@ void listAttacks(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-void listMoves(int argc, char** argv) {
+static void listMoves(int argc, char** argv) {
     if(argc != 3) {
         fprintf(stderr, "Usage: -listmoves [pseudo/legal] \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs;
-    initializeGamestate(&gs);
-
-    if(!parseFen(&gs, argv[2])) {
-        fprintf(stderr, "Unable to parse FEN \"%s\"\n", argv[2]);
-        destroyGamestate(&gs);
-        exit(EXIT_FAILURE);
-    }
+    GameState gs = parseFenOrQuit(argv[2]);
 
     MoveBuffer buffer;
     createMoveBuffer(&buffer);
