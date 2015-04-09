@@ -21,6 +21,8 @@
 // THE SOFTWARE.
 
 #include "tulip.h"
+#include "piece.h"
+#include "board.h"
 #include "makemove.h"
 #include "statedata.h"
 
@@ -30,9 +32,25 @@ void makeMove(GameState* gameState, Move* move) {
     copyStateData(gameState->current, nextData);
     gameState->current = nextData;
 
+    const Piece** board = gameState->board;
+
     // Adjust half-move, flip to-move
     nextData->halfMoveCount++;
     nextData->toMove = INVERT_COLOR(nextData->toMove);
+
+    const Piece* movingPiece = move->movingPiece;
+
+    // Update fifty move count.
+    if (movingPiece == &WPAWN 
+        || movingPiece == &BPAWN
+        || move->captures != &EMPTY) {
+        nextData->fiftyMoveCount = 0;
+    } else {
+        nextData->fiftyMoveCount++;
+    }
+
+    board[move->to] = movingPiece;
+    board[move->from] = &EMPTY;
 }
 
 void unmakeMove(GameState* gameState, Move* move) {

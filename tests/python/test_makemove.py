@@ -39,10 +39,25 @@ class TestBasicMoveList(unittest.TestCase):
         parsed_output = json.loads(result)
         return parsed_output['resultingState']
 
+    def test_initial_position_nf3(self):
+        result = self.make_move('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'g1f3')
+        self.assertEqual('black', result['toMove'])
+        self.assertEqual(1, result['halfMoveCount'])
+        self.assertEqual(1, result['fiftyMoveCount'])
+        board = result['board']
+        self.assertEqual(32, len(board.keys()))
+        self.assertTrue('g1' not in board.keys())
+        self.assertEqual('N', board['f3'])
+
     def test_initial_position_e2e4(self):
         result = self.make_move('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'e2e4')
         self.assertEqual('black', result['toMove'])
         self.assertEqual(1, result['halfMoveCount'])
+        self.assertEqual(0, result['fiftyMoveCount'])
+        board = result['board']
+        self.assertEqual(32, len(board.keys()))
+        self.assertTrue('e2' not in board.keys())
+        self.assertEqual('P', board['e4'])
 
 if __name__ == '__main__':
     unittest.main()
