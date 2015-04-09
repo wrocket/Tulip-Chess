@@ -66,10 +66,11 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('e', result['epFile'])
 
     def test_basic_capture_01(self):
-        result = self.make_move('8/4k3/2r5/8/1N2K3/8/8/8 w - - 0 1', 'b4c6')
+        result = self.make_move('8/4k3/2r5/8/1N2K3/8/8/8 w - - 13 1', 'b4c6') # note the fifty-move count of 13
         board = result['board']
         bitboards = result['bitboards']
         piece_counts = result['pieceCounts']
+        self.assertEqual(0, result['fiftyMoveCount'])   # reset the fifty-move count on capture
         self.assertEqual(3, len(board))
         self.assertTrue('b4' not in board.keys())
         self.assertEqual('N', board['c6'])
@@ -81,6 +82,10 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('0000040000000000', bitboards['N'])
         self.assertEqual('FFEFFBFFEFFFFFFF', bitboards['-'])
         self.assertEqual('none', result['epFile'])
+
+    def test_move_pawn_resets_counter(self):
+        result = self.make_move('8/4k3/2r5/8/1P2K3/8/8/8 w - - 26 1', 'b4b5')
+        self.assertEqual(0, result['fiftyMoveCount'])
 
     def test_white_castle_kingside(self):
         result = self.make_move('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1', 'e1g1')
