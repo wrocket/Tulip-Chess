@@ -23,9 +23,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <strings.h>
 
 #include "tulip.h"
-
+#include "gamestate.h"
+#include "movegen.h"
 #include "board.h"
 #include "move.h"
 
@@ -56,6 +58,31 @@ void printMovelist(MoveBuffer* buffer) {
         printMoveCoordinate(&(buffer->moves[i]), strBuff);
         printf("%i\t%s\n", i, strBuff);
     }
+}
+
+bool matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m) {
+    MoveBuffer moveBuff;
+    int moveCount;
+    bool result = false;
+    char moveStrBuff[8];
+
+    createMoveBuffer(&moveBuff);
+    moveCount = generatePseudoMoves(gameState, &moveBuff);
+
+    for (int i=0; i<moveCount; i++) {
+        Move current = moveBuff.moves[i];
+        printMoveCoordinate(&current, moveStrBuff);
+
+        if (strcasecmp(moveStrBuff, moveStr) == 0) {
+            result = true;
+            *m = current;
+            break;
+        }
+    }
+
+    destroyMoveBuffer(&moveBuff);
+
+    return result;
 }
 
 int printMoveCoordinate(Move* move, char* buffer) {

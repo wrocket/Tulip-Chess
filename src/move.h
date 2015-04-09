@@ -70,4 +70,7 @@ void destroyMoveBuffer(MoveBuffer*);
 int printMoveCoordinate(Move*, char*);
 void printMovelist(MoveBuffer*);
 
+// Matches a *pseudo*move in coordinate algebraic form to a Move object for
+// the given game state. Returns false if no such move exists.
+bool matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m);
 #endif

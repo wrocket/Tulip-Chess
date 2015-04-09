@@ -141,6 +141,18 @@ void printAttackList(char* position, bool* attackGrid, GameState* state) {
     printf("]}\n");
 }
 
+void printMakeMoveResult(char* position, Move* m, GameState* state) {
+    char moveStr[8];
+    printMoveCoordinate(m, moveStr);
+
+    printf("{");
+    printf("\"move\": \"%s\", ", moveStr);
+    printf("\"originalState\": \"%s\", ", position);
+    printf("\"resultingState\": ");
+    printGameState("", state);
+    printf("}\n");
+}
+
 void printGameState(char* position, GameState* state) {
     char squareStr[8];
     StateData* stateData;
@@ -159,6 +171,7 @@ void printGameState(char* position, GameState* state) {
     printf("\"blackKingSquare\": \"%s\", ", squareStr);
 
     printf("\"fiftyMoveCount\": %i, ", stateData->fiftyMoveCount);
+    printf("\"halfMoveCount\": %i, ", stateData->halfMoveCount);
 
     const int flags = stateData->castleFlags;
     printf("\"castleWhiteKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));

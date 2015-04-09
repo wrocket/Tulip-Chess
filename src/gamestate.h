@@ -36,7 +36,6 @@ typedef struct {
     int* pieceCounts;       // The current piece counts, indexed by the piece ordinal.
     const Piece** board;    // A 144 element array that corresponds to a 12x12 board.
     StateData* dataStack;
-    int stackPtr;
     StateData* current;
     bool created;
     uint64_t* bitboards;

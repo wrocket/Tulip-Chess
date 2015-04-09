@@ -22,9 +22,17 @@
 
 #include "tulip.h"
 #include "makemove.h"
+#include "statedata.h"
 
 void makeMove(GameState* gameState, Move* move) {
+    // Copy the state data to the next item in the stack, move the pointer to the next element.
+    StateData* nextData = (gameState->current) + 1;
+    copyStateData(gameState->current, nextData);
+    gameState->current = nextData;
 
+    // Adjust half-move, flip to-move
+    nextData->halfMoveCount++;
+    nextData->toMove = INVERT_COLOR(nextData->toMove);
 }
 
 void unmakeMove(GameState* gameState, Move* move) {

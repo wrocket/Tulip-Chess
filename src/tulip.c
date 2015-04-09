@@ -34,12 +34,26 @@
 #include "movegen.h"
 #include "move.h"
 #include "util.h"
+#include "makemove.h"
 #include "fen.h"
 #include "json.h"
 
 void printBanner() {
     printf("Tulip Chess Engine 0.001\n");
     printf("Size of uint64: %lu bits\n", CHAR_BIT * sizeof(uint64_t));
+}
+
+static GameState parseFenOrQuit(char* str) {
+    GameState gs;
+    initializeGamestate(&gs);
+
+    if(!parseFen(&gs, str)) {
+        fprintf(stderr, "Unable to parse FEN \"%s\"\n", str);
+        destroyGamestate(&gs);
+        exit(EXIT_FAILURE);
+    }
+
+    return gs;
 }
 
 void printState(int argc, char** argv) {
@@ -121,6 +135,26 @@ void listMoves(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
+static void printMoveResult(int argc, char** argv) {
+    if(argc != 3) {
+        fprintf(stderr, "Usage: -makemove [moveString] \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    GameState gs = parseFenOrQuit(argv[2]);
+    Move m;
+
+    // TODO: Switch this to use the "real" moves once that's implemented
+    if (!matchPseudoMoveCoord(&gs, argv[1], &m)) {
+        fprintf(stderr, "Unknown move \"%s\" for position %s\n", argv[1], argv[2]);
+        exit(EXIT_FAILURE);
+    }
+
+    makeMove(&gs, &m);
+    printMakeMoveResult(argv[2], &m, &gs);
+    destroyGamestate(&gs);
+}
+
 int main(int argc, char** argv) {
     argc--;
     argv++;
@@ -132,6 +166,8 @@ int main(int argc, char** argv) {
             printState(argc, argv);
         } else if(0 == strcmp("-listattacks", argv[0])) {
             listAttacks(argc, argv);
+        } else if(0 == strcmp("-makemove", argv[0])) {
+            printMoveResult(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);

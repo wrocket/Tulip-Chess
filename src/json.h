@@ -28,5 +28,6 @@
 
 void printMovelistJson(char*, char*, MoveBuffer*);
 void printGameState(char*, GameState*);
+void printMakeMoveResult(char* position, Move* m, GameState* state);
 void printAttackList(char* position, bool* attackGrid, GameState* state);
 #endif

@@ -41,7 +41,6 @@ void initializeGamestate(GameState* gs) {
         createStateData(&gs->dataStack[i]);
     }
 
-    gs->stackPtr = 0;
     gs->current = &(gs->dataStack[0]);
     gs->created = true;
 
