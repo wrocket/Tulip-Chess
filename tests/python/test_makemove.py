@@ -227,5 +227,100 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('1000000000000000', bitboards['k'])
         self.assertEqual('6D00FFFFFFFF006E', bitboards['-'])
 
+    def test_promote_pawn_white_q_no_capture(self):
+        result = self.make_move('8/5P2/8/8/1k6/8/2K5/8 w - - 0 1', 'f7f8=q')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+        self.assertEqual(3, len(board))
+        self.assertEqual('Q', board['f8'])
+        self.assertEqual('k', board['b4'])
+        self.assertEqual('K', board['c2'])
+        self.assertEqual('2000000000000000', bitboards['Q'])
+        self.assertEqual('0000000000000000', bitboards['P'])
+        self.assertEqual('DFFFFFFFFDFFFBFF', bitboards['-'])
+        self.assertEqual(0, piece_counts['P'])
+        self.assertEqual(1, piece_counts['Q'])
+
+    def test_promote_pawn_white_n_no_capture(self):
+        result = self.make_move('8/5P2/8/8/1k6/8/2K5/8 w - - 0 1', 'f7f8=n')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+        self.assertEqual(3, len(board))
+        self.assertEqual('N', board['f8'])
+        self.assertEqual('k', board['b4'])
+        self.assertEqual('K', board['c2'])
+        self.assertEqual('2000000000000000', bitboards['N'])
+        self.assertEqual('0000000000000000', bitboards['P'])
+        self.assertEqual('0000000000000000', bitboards['Q'])
+        self.assertEqual('DFFFFFFFFDFFFBFF', bitboards['-'])
+        self.assertEqual(0, piece_counts['P'])
+        self.assertEqual(1, piece_counts['N'])
+
+    def test_promote_pawn_white_q_with_capture(self):
+        result = self.make_move('5r2/6P1/8/8/1k6/8/2K5/8 w - - 0 1', 'g7f8=q')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+        self.assertEqual(3, len(board))
+        self.assertEqual('Q', board['f8'])
+        self.assertEqual('k', board['b4'])
+        self.assertEqual('K', board['c2'])
+        self.assertEqual('2000000000000000', bitboards['Q'])
+        self.assertEqual('0000000000000000', bitboards['P'])
+        self.assertEqual('0000000000000000', bitboards['n'])
+        self.assertEqual('DFFFFFFFFDFFFBFF', bitboards['-'])
+        self.assertEqual(0, piece_counts['P'])
+        self.assertEqual(0, piece_counts['r'])
+        self.assertEqual(1, piece_counts['Q'])
+
+    def test_promote_pawn_black_q_no_capture(self):
+        result = self.make_move('8/8/8/8/1k6/8/2K2p2/8 b - - 0 1', 'f2f1=q')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+        self.assertEqual(3, len(board))
+        self.assertEqual('q', board['f1'])
+        self.assertEqual('k', board['b4'])
+        self.assertEqual('K', board['c2'])
+        self.assertEqual('0000000000000020', bitboards['q'])
+        self.assertEqual('0000000000000000', bitboards['p'])
+        self.assertEqual('FFFFFFFFFDFFFBDF', bitboards['-'])
+        self.assertEqual(0, piece_counts['p'])
+        self.assertEqual(1, piece_counts['q'])
+
+    def test_promote_pawn_black_n_no_capture(self):
+        result = self.make_move('8/8/8/8/1k6/8/2K2p2/8 b - - 0 1', 'f2f1=n')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+        self.assertEqual(3, len(board))
+        self.assertEqual('n', board['f1'])
+        self.assertEqual('k', board['b4'])
+        self.assertEqual('K', board['c2'])
+        self.assertEqual('0000000000000020', bitboards['n'])
+        self.assertEqual('0000000000000000', bitboards['p'])
+        self.assertEqual('FFFFFFFFFDFFFBDF', bitboards['-'])
+        self.assertEqual(0, piece_counts['p'])
+        self.assertEqual(1, piece_counts['n'])
+
+    def test_promote_pawn_black_q_with_capture(self):
+        result = self.make_move('8/8/8/8/1k6/8/2K3p1/5R2 b - - 0 1', 'g2f1=q')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+        self.assertEqual(3, len(board))
+        self.assertEqual('q', board['f1'])
+        self.assertEqual('k', board['b4'])
+        self.assertEqual('K', board['c2'])
+        self.assertEqual('0000000000000020', bitboards['q'])
+        self.assertEqual('0000000000000000', bitboards['p'])
+        self.assertEqual('0000000000000000', bitboards['R'])
+        self.assertEqual('FFFFFFFFFDFFFBDF', bitboards['-'])
+        self.assertEqual(0, piece_counts['p'])
+        self.assertEqual(0, piece_counts['R'])
+        self.assertEqual(1, piece_counts['q'])
+
 if __name__ == '__main__':
     unittest.main()

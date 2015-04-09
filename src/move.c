@@ -114,3 +114,27 @@ int printMoveCoordinate(Move* move, char* buffer) {
 
     return index;
 }
+
+const Piece* getPromotePiece(const int color, const int moveCode) {
+    if (color == COLOR_WHITE) {
+        switch (moveCode) {
+            case PROMOTE_Q: return &WQUEEN;
+            case PROMOTE_N: return &WKNIGHT;
+            case PROMOTE_B: return &WBISHOP;
+            case PROMOTE_R: return &WROOK;
+            default:
+                fprintf(stderr, "Inside getPromotePiece() (white) with an invalid move code: %i\n", moveCode);
+                return &WPAWN;
+        }
+    } else {
+        switch (moveCode) {
+            case PROMOTE_Q: return &BQUEEN;
+            case PROMOTE_N: return &BKNIGHT;
+            case PROMOTE_B: return &BBISHOP;
+            case PROMOTE_R: return &BROOK;
+            default:
+                fprintf(stderr, "Inside getPromotePiece() (black) with an invalid move code: %i\n", moveCode);
+                return &BPAWN;
+        }
+    }
+}

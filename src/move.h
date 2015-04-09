@@ -75,4 +75,6 @@ void printMovelist(MoveBuffer*);
 // Matches a *pseudo*move in coordinate algebraic form to a Move object for
 // the given game state. Returns false if no such move exists.
 bool matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m);
+
+const Piece* getPromotePiece(const int color, const int moveCode);
 #endif

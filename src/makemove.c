@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <stdio.h>
+
 #include "tulip.h"
 #include "piece.h"
 #include "bitboard.h"
@@ -61,6 +63,27 @@ static void blackKingCastle(Move* move, GameState* gs) {
         *rb = (*rb & ~BIT_SQ_A8) | BIT_SQ_D8;
         *eb = (*eb & ~BIT_SQ_D8) | BIT_SQ_A8;
     }
+}
+
+static void promotePawn(Move* move, GameState* gs, const int color, const int pawnOrdinal) {
+    const Piece* promotePiece = getPromotePiece(color, move->moveCode);
+
+    // Delete pawn from board
+    uint64_t* pawnBb = &gs->bitboards[pawnOrdinal];
+    *pawnBb &= ~BITS_SQ[move->from];
+    gs->pieceCounts[pawnOrdinal]--;
+
+    // Add the new piece
+    uint64_t* promoteBb = &gs->bitboards[promotePiece->ordinal];
+    *promoteBb |= BITS_SQ[move->to];
+
+    // Delete captured piece from dest square
+    uint64_t* captureBb = &gs->bitboards[move->captures->ordinal];
+    *captureBb &= ~BITS_SQ[move->to];
+
+    // Place new piece
+    gs->board[move->to] = promotePiece;
+    gs->pieceCounts[promotePiece->ordinal]++;
 }
 
 void makeMove(GameState* gameState, Move* move) {
@@ -139,10 +162,20 @@ void makeMove(GameState* gameState, Move* move) {
             }
             break;
         case ORD_BROOK:
-            if(move->from == SQ_H8) {
+            if (move->from == SQ_H8) {
                 nextData->castleFlags &= ~(CASTLE_BK);
             } else if (move->from == SQ_A8) {
                 nextData->castleFlags &= ~(CASTLE_BQ);
+            }
+            break;
+        case ORD_WPAWN:
+            if (IS_PROMOTE(move->moveCode)) {
+                promotePawn(move, gameState, COLOR_WHITE, ORD_WPAWN);
+            }
+            break;
+        case ORD_BPAWN:
+            if (IS_PROMOTE(move->moveCode)) {
+                promotePawn(move, gameState, COLOR_BLACK, ORD_BPAWN);
             }
             break;
     }
