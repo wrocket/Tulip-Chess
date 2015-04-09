@@ -20,26 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#ifndef MAKEMOVE_H
+#define MAKEMOVE_H
 
-#include "tulip.h"
-#include "piece.h"
-#include "statedata.h"
-#include "board.h"
+#include "gamestate.h"
+#include "move.h"
 
-void createStateData(StateData * data) {
-    data->toMove = COLOR_WHITE;
-    data->whiteKingSquare = 0;
-    data->blackKingSquare = 0;
-    data->castleFlags = 0;
-    data->hash = 0;
-    data->epFile = 0;
-    data->fiftyMoveCount = 0;
-}
+void makeMove(GameState* gameState, Move* move);
+void unmakeMove(GameState* gameState, Move* move);
 
-void copyStateData(StateData* from, StateData* to) {
-    *to = *from;
-}
-
+#endif
