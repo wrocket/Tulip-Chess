@@ -24,15 +24,17 @@
 #define MOVE_H
 
 #include <stdbool.h>
-
+#include "gamestate.h"
 #include "piece.h"
 
 #define NO_MOVE_CODE	0	// Indicates nothing special about this move.
-#define	PROMOTE_R		1	// Indicates that a move is a rook promotion.
-#define PROMOTE_B		2	// Indicates that a move is a bishop promotion.
-#define PROMOTE_N		3	// Indicates that a move is a knight promotion.
-#define PROMOTE_Q		4	// Indicates that a move is a queen promotion.
-#define	CAPTURE_EP		5	// Indicates that a move is an en passant capture.
+#define	CAPTURE_EP		1	// Indicates that a move is an en passant capture.
+#define	PROMOTE_R		2	// Indicates that a move is a rook promotion.
+#define PROMOTE_B		3	// Indicates that a move is a bishop promotion.
+#define PROMOTE_N		4	// Indicates that a move is a knight promotion.
+#define PROMOTE_Q		5	// Indicates that a move is a queen promotion.
+
+#define IS_PROMOTE(code) ((code) >= PROMOTE_R)
 
 // This describes the maximum number of moves that could be in a move buffer.
 // This should be greater than the maximum number of psuedo-moves possible

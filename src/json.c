@@ -175,9 +175,9 @@ void printGameState(char* position, GameState* state) {
 
     const int flags = stateData->castleFlags;
     printf("\"castleWhiteKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
-    printf("\"castleWhiteQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
-    printf("\"castleBlackKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
-    printf("\"castleBlackQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
+    printf("\"castleWhiteQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_WQ));
+    printf("\"castleBlackKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_BK));
+    printf("\"castleBlackQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_BQ));
 
     printf("\"epFile\": ");
 
@@ -188,16 +188,18 @@ void printGameState(char* position, GameState* state) {
     }
 
     printf("\"board\": {");
+    bool printedSq = false;
     for(int i=0; i<64; i++) {
         const int sq = BOARD_SQUARES[i];
         const Piece* p = state->board[sq];
         if(p != &EMPTY) {
-            if(i > 0) {
+            if(printedSq) {
                 printf(", ");
             }
 
             printSq(squareStr, sq);
             printf("\"%s\": \"%c\"", squareStr, p->name);
+            printedSq = true;
         }
     }
 

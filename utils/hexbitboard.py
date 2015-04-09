@@ -51,5 +51,5 @@ if zeros > 0:
 print("Board is viewed from white's perspective");
 start = 0;
 while start < len(as_bin):
-	print(as_bin[start:start + 8])
+	print(as_bin[start:start + 8][::-1])
 	start += 8
