@@ -159,5 +159,73 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('e1', result['whiteKingSquare'])
         self.assertEqual('g8', result['blackKingSquare'])
 
+    def test_white_move_rook_kingside(self):
+        result = self.make_move('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1', 'h1g1')
+        board = result['board']
+        bitboards = result['bitboards']
+        self.assertEqual(22, len(board))
+        self.assertEqual('R', board['g1'])
+        self.assertEqual('R', board['a1'])
+        self.assertEqual('K', board['e1'])
+        self.assertTrue('h1' not in board.keys())
+        self.assertFalse(result['castleWhiteKingside'])
+        self.assertTrue(result['castleWhiteQueenside'])
+        self.assertTrue(result['castleBlackKingside'])
+        self.assertTrue(result['castleBlackQueenside'])
+        self.assertEqual('0000000000000041', bitboards['R'])
+        self.assertEqual('0000000000000010', bitboards['K'])
+        self.assertEqual('6E00FFFFFFFF00AE', bitboards['-'])
+
+    def test_white_move_rook_queenside(self):
+        result = self.make_move('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1', 'a1b1')
+        board = result['board']
+        bitboards = result['bitboards']
+        self.assertEqual(22, len(board))
+        self.assertEqual('R', board['h1'])
+        self.assertEqual('R', board['b1'])
+        self.assertEqual('K', board['e1'])
+        self.assertTrue('a1' not in board.keys())
+        self.assertTrue(result['castleWhiteKingside'])
+        self.assertFalse(result['castleWhiteQueenside'])
+        self.assertTrue(result['castleBlackKingside'])
+        self.assertTrue(result['castleBlackQueenside'])
+        self.assertEqual('0000000000000082', bitboards['R'])
+        self.assertEqual('0000000000000010', bitboards['K'])
+        self.assertEqual('6E00FFFFFFFF006D', bitboards['-'])
+
+    def test_black_move_rook_kingside(self):
+        result = self.make_move('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R b KQkq - 0 1', 'h8g8')
+        board = result['board']
+        bitboards = result['bitboards']
+        self.assertEqual(22, len(board))
+        self.assertEqual('r', board['g8'])
+        self.assertEqual('r', board['a8'])
+        self.assertEqual('k', board['e8'])
+        self.assertTrue('h8' not in board.keys())
+        self.assertTrue(result['castleWhiteKingside'])
+        self.assertTrue(result['castleWhiteQueenside'])
+        self.assertFalse(result['castleBlackKingside'])
+        self.assertTrue(result['castleBlackQueenside'])
+        self.assertEqual('4100000000000000', bitboards['r'])
+        self.assertEqual('1000000000000000', bitboards['k'])
+        self.assertEqual('AE00FFFFFFFF006E', bitboards['-'])
+
+    def test_black_move_rook_queenside(self):
+        result = self.make_move('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R b KQkq - 0 1', 'a8b8')
+        board = result['board']
+        bitboards = result['bitboards']
+        self.assertEqual(22, len(board))
+        self.assertEqual('r', board['b8'])
+        self.assertEqual('r', board['h8'])
+        self.assertEqual('k', board['e8'])
+        self.assertTrue('a8' not in board.keys())
+        self.assertTrue(result['castleWhiteKingside'])
+        self.assertTrue(result['castleWhiteQueenside'])
+        self.assertTrue(result['castleBlackKingside'])
+        self.assertFalse(result['castleBlackQueenside'])
+        self.assertEqual('8200000000000000', bitboards['r'])
+        self.assertEqual('1000000000000000', bitboards['k'])
+        self.assertEqual('6D00FFFFFFFF006E', bitboards['-'])
+
 if __name__ == '__main__':
     unittest.main()

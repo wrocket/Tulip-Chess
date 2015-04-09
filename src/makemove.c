@@ -131,6 +131,20 @@ void makeMove(GameState* gameState, Move* move) {
                 blackKingCastle(move, gameState);
             }
             break;
+        case ORD_WROOK:
+            if (move->from == SQ_H1) {
+                nextData->castleFlags &= ~(CASTLE_WK);
+            } else if (move->from == SQ_A1) {
+                nextData->castleFlags &= ~(CASTLE_WQ);
+            }
+            break;
+        case ORD_BROOK:
+            if(move->from == SQ_H8) {
+                nextData->castleFlags &= ~(CASTLE_BK);
+            } else if (move->from == SQ_A8) {
+                nextData->castleFlags &= ~(CASTLE_BQ);
+            }
+            break;
     }
 }
 
