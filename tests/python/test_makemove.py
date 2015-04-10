@@ -339,6 +339,7 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('0000100000000000', bitboards['P'])
         self.assertEqual('EFFFEFFFFFFFFFEF', bitboards['-'])
         self.assertEqual('none', result['epFile'])
+        self.assertEqual(61, piece_counts['-'])
 
     def test_enpassant_black(self):
         result = self.make_move('4k3/8/8/8/3pP3/8/8/4K3 b - e3 0 1', 'd4e3')
@@ -352,6 +353,8 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('0000000000000000', bitboards['P'])
         self.assertEqual('EFFFFFFFFFEFFFEF', bitboards['-'])
         self.assertEqual('none', result['epFile'])
+        self.assertEqual(61, piece_counts['-'])
+
 
 if __name__ == '__main__':
     unittest.main()
