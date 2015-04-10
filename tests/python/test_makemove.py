@@ -327,5 +327,31 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual(0, piece_counts['R'])
         self.assertEqual(1, piece_counts['q'])
 
+    def test_enpassant_white(self):
+        result = self.make_move('4k3/8/8/3Pp3/8/8/8/4K3 w - e6 0 1', 'd5e6')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+        self.assertEqual(3, len(board))
+        self.assertEqual(0, piece_counts['p'])
+        self.assertEqual(1, piece_counts['P'])
+        self.assertEqual('0000000000000000', bitboards['p'])
+        self.assertEqual('0000100000000000', bitboards['P'])
+        self.assertEqual('EFFFEFFFFFFFFFEF', bitboards['-'])
+        self.assertEqual('none', result['epFile'])
+
+    def test_enpassant_black(self):
+        result = self.make_move('4k3/8/8/8/3pP3/8/8/4K3 b - e3 0 1', 'd4e3')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+        self.assertEqual(3, len(board))
+        self.assertEqual(0, piece_counts['P'])
+        self.assertEqual(1, piece_counts['p'])
+        self.assertEqual('0000000000100000', bitboards['p'])
+        self.assertEqual('0000000000000000', bitboards['P'])
+        self.assertEqual('EFFFFFFFFFEFFFEF', bitboards['-'])
+        self.assertEqual('none', result['epFile'])
+
 if __name__ == '__main__':
     unittest.main()

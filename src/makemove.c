@@ -84,6 +84,19 @@ static void promotePawn(Move* move, GameState* gs, const int color, const int pa
     gs->pieceCounts[promotePiece->ordinal]++;
 }
 
+static void enPassant(GameState* gs, Move* move, const int attackSq) {
+    // Delete the captured piece
+    uint64_t* captureBb = &gs->bitboards[move->captures->ordinal];
+    *captureBb &= ~BITS_SQ[attackSq];
+    uint64_t* emptyBb = &gs->bitboards[ORD_EMPTY];
+    *emptyBb = (~BITS_SQ[move->to] & *emptyBb) | BITS_SQ[attackSq];
+    gs->board[attackSq] = &EMPTY;
+
+    // Put attacking pawn in new place
+    uint64_t* movingBb = &gs->bitboards[move->movingPiece->ordinal];
+    *movingBb = (~(BITS_SQ[move->from]) & *movingBb) | BITS_SQ[move->to];
+}
+
 void makeMove(GameState* gameState, Move* move) {
     // Copy the state data to the next item in the stack, move the pointer to the next element.
     StateData* nextData = (gameState->current) + 1;
@@ -169,11 +182,15 @@ void makeMove(GameState* gameState, Move* move) {
         case ORD_WPAWN:
             if (IS_PROMOTE(move->moveCode)) {
                 promotePawn(move, gameState, COLOR_WHITE, ORD_WPAWN);
+            } else if (move->moveCode == CAPTURE_EP) {
+                enPassant(gameState, move, move->to + OFFSET_S);
             }
             break;
         case ORD_BPAWN:
             if (IS_PROMOTE(move->moveCode)) {
                 promotePawn(move, gameState, COLOR_BLACK, ORD_BPAWN);
+            } else if (move->moveCode == CAPTURE_EP) {
+                enPassant(gameState, move, move->to + OFFSET_N);
             }
             break;
     }
