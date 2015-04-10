@@ -45,6 +45,13 @@ static bool slide(const int startSq, const int offset, const Piece** board, cons
     return p == slider || p == queen;
 }
 
+bool isCheck(GameState* state) {
+    StateData* data = state->current;
+    return data->toMove == COLOR_WHITE ?
+                canAttack(COLOR_BLACK, data->whiteKingSquare, state) :
+                canAttack(COLOR_WHITE, data->blackKingSquare, state);
+}
+
 bool canAttack(const int color, const int sq, GameState* state) {
     uint64_t mask;
     const Piece* knight;

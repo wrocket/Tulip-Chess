@@ -231,3 +231,10 @@ void printGameState(char* position, GameState* state) {
     printf("}");
     printf("}\n");
 }
+
+void printCheckStatus(char* position, bool isCheck) {
+    printf("{");
+    printf("\"fenString\": \"%s\", ", position);
+    printf("\"isCheck\": %s", isCheck ? "true" : "false");
+    printf("}\n");
+}

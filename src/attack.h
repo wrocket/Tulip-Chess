@@ -29,4 +29,6 @@
 // This determination ignores rules around moving into check.
 bool canAttack(const int color, const int sq, GameState* state);
 
+// Determine if the current gamestate represents a checking position.
+bool isCheck(GameState* state);
 #endif

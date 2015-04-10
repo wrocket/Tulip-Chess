@@ -134,6 +134,21 @@ static void printMoveResult(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
+static void checkStatus(int argc, char** argv) {
+    if(argc != 2) {
+        fprintf(stderr, "Usage: -checkstatus \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    GameState gs = parseFenOrQuit(argv[1]);
+
+    bool posCheck = isCheck(&gs);
+
+    printCheckStatus(argv[1], posCheck);
+
+    destroyGamestate(&gs);
+}
+
 int main(int argc, char** argv) {
     argc--;
     argv++;
@@ -147,6 +162,8 @@ int main(int argc, char** argv) {
             listAttacks(argc, argv);
         } else if(0 == strcmp("-makemove", argv[0])) {
             printMoveResult(argc, argv);
+        } else if(0 == strcmp("-checkstatus", argv[0])) {
+            checkStatus(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);
