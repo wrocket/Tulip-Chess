@@ -149,6 +149,28 @@ static void checkStatus(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
+static void printMakeUnmakeMoveResult(int argc, char** argv) {
+    if(argc != 3) {
+        fprintf(stderr, "Usage: -makeunmake [moveString] \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    GameState gs = parseFenOrQuit(argv[2]);
+    Move m;
+
+    // TODO: Switch this to use the "real" moves once that's implemented
+    if (!matchPseudoMoveCoord(&gs, argv[1], &m)) {
+        fprintf(stderr, "Unknown move \"%s\" for position %s\n", argv[1], argv[2]);
+        exit(EXIT_FAILURE);
+    }
+
+    makeMove(&gs, &m);
+    unmakeMove(&gs, &m);
+    printGameState(argv[2], &gs);
+
+    destroyGamestate(&gs);
+}
+
 int main(int argc, char** argv) {
     argc--;
     argv++;
@@ -164,6 +186,8 @@ int main(int argc, char** argv) {
             printMoveResult(argc, argv);
         } else if(0 == strcmp("-checkstatus", argv[0])) {
             checkStatus(argc, argv);
+        } else if(0 == strcmp("-makeunmake", argv[0])) {
+            printMakeUnmakeMoveResult(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);

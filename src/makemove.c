@@ -197,5 +197,49 @@ void makeMove(GameState* gameState, Move* move) {
 }
 
 void unmakeMove(GameState* gameState, Move* move) {
+    const Piece** board = gameState->board;
+    const Piece* moving = move->movingPiece;
+    const Piece* captured = move->captures;
+    uint64_t fromBb = BITS_SQ[move->from];
+    uint64_t toBb = BITS_SQ[move->to];
 
+    // Source square no longer empty
+    uint64_t* emptyBb = &gameState->bitboards[ORD_EMPTY];
+    *emptyBb &= ~fromBb;
+
+    // Move the piece back to where it started
+    uint64_t* movingBb = &gameState->bitboards[moving->ordinal];
+    *movingBb = (*movingBb & ~toBb) | fromBb;
+    board[move->from] = moving;
+
+    if (move->moveCode != CAPTURE_EP) {
+        // Put the captured piece back on the board
+        uint64_t* capturedBb = &gameState->bitboards[captured->ordinal];
+        *capturedBb |= toBb;
+        board[move->to] = captured;
+    } else {
+        // TODO: EP Captures
+    }
+
+    if(captured != &EMPTY) {
+        int* pc = gameState->pieceCounts;
+        pc[captured->ordinal]++;
+        pc[ORD_EMPTY]--;
+    }
+
+    if (moving == &WKING && move->from == SQ_E1) {
+        if (move->to == SQ_G1) {
+            // TODO: White kingside castle
+        } else if (move->to == SQ_C1) {
+            // TODO: White queenside castle
+        }
+    } else if (moving == &BKING && move->from == SQ_E8) {
+        if (move->to == SQ_G8) {
+            // TODO: Black kingside castle
+        } else if (move->to == SQ_C8) {
+            // TODO: Black queenside castle
+        }
+    }
+
+    gameState->current--;
 }
