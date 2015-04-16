@@ -91,7 +91,7 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('0000000002000000', bitboards['N'])
         self.assertEqual('FFEFFBFFEDFFFFFF', bitboards['-'])
 
-    def test_castleWhiteKingside(self):
+    def test_castle_white_kingside(self):
         result = self.make_unmake_move('4k3/8/8/8/8/8/8/4K2R w K - 0 1', 'e1g1')
         board = result['board']
         bitboards = result['bitboards']
@@ -110,7 +110,7 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('e8', result['blackKingSquare'])
         self.assertEqual('e1', result['whiteKingSquare'])
 
-    def test_castleWhiteQueenside(self):
+    def test_castle_white_queenside(self):
         result = self.make_unmake_move('4k3/8/8/8/8/8/8/R3K3 w Q - 0 1', 'e1c1')
         board = result['board']
         bitboards = result['bitboards']
@@ -129,7 +129,7 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('e8', result['blackKingSquare'])
         self.assertEqual('e1', result['whiteKingSquare'])
 
-    def test_castleBlackKingside(self):
+    def test_castle_black_kingside(self):
         result = self.make_unmake_move('4k2r/8/8/8/8/8/8/4K3 b k - 0 1', 'e8g8')
         board = result['board']
         bitboards = result['bitboards']
@@ -148,7 +148,7 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('e8', result['blackKingSquare'])
         self.assertEqual('e1', result['whiteKingSquare'])
 
-    def test_castleBlackQueenside(self):
+    def test_castle_black_queenside(self):
         result = self.make_unmake_move('r3k3/8/8/8/8/8/8/4K3 b q - 0 1', 'e8c8')
         board = result['board']
         bitboards = result['bitboards']
@@ -166,6 +166,62 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('black', result['toMove'])
         self.assertEqual('e8', result['blackKingSquare'])
         self.assertEqual('e1', result['whiteKingSquare'])
+
+    def test_white_promote_no_captures(self):
+        result = self.make_unmake_move('4k3/1P6/8/8/8/8/8/4K3 w - - 0 1', 'b7b8=q')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+
+        self.assertEqual(0, piece_counts['Q'])
+        self.assertEqual(1, piece_counts['P'])
+
+        self.assertEqual('0002000000000000', bitboards['P'])
+        self.assertEqual('0000000000000000', bitboards['Q'])
+        self.assertEqual('EFFDFFFFFFFFFFEF', bitboards['-'])
+
+    def test_black_promote_no_captures(self):
+        result = self.make_unmake_move('4k3/8/8/8/8/8/1p6/4K3 b - - 0 1', 'b2b1=q')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+
+        self.assertEqual(0, piece_counts['q'])
+        self.assertEqual(1, piece_counts['p'])
+
+        self.assertEqual('0000000000000200', bitboards['p'])
+        self.assertEqual('0000000000000000', bitboards['q'])
+        self.assertEqual('EFFFFFFFFFFFFDEF', bitboards['-'])
+
+    def test_white_promote_with_captures(self):
+        result = self.make_unmake_move('2b1k3/1P6/8/8/8/8/8/4K3 w KQkq - 0 1', 'b7c8=q')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+
+        self.assertEqual(1, piece_counts['b'])
+        self.assertEqual(0, piece_counts['Q'])
+        self.assertEqual(1, piece_counts['P'])
+
+        self.assertEqual('0400000000000000', bitboards['b'])
+        self.assertEqual('0002000000000000', bitboards['P'])
+        self.assertEqual('0000000000000000', bitboards['Q'])
+        self.assertEqual('EBFDFFFFFFFFFFEF', bitboards['-'])
+
+    def test_black_promote_with_captures(self):
+        result = self.make_unmake_move('4k3/8/8/8/8/8/1p6/2B1K3 b - - 0 1', 'b2c1=q')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+
+        self.assertEqual(1, piece_counts['B'])
+        self.assertEqual(0, piece_counts['q'])
+        self.assertEqual(1, piece_counts['p'])
+
+        self.assertEqual('0000000000000004', bitboards['B'])
+        self.assertEqual('0000000000000200', bitboards['p'])
+        self.assertEqual('0000000000000000', bitboards['q'])
+        self.assertEqual('EFFFFFFFFFFFFDEB', bitboards['-'])
 
 if __name__ == '__main__':
     unittest.main()

@@ -231,6 +231,17 @@ void unmakeMove(GameState* gameState, Move* move) {
         // TODO: EP Captures
     }
 
+    if (IS_PROMOTE(move->moveCode)) {
+        const Piece* pawn = move->movingPiece;
+        const Piece* promotePiece = getPromotePiece(pawn->color, move->moveCode);
+
+        gameState->pieceCounts[pawn->ordinal]++;
+        gameState->pieceCounts[promotePiece->ordinal]--;
+
+        uint64_t* promoteBb = &gameState->bitboards[promotePiece->ordinal];
+        *promoteBb &= ~BITS_SQ[move->to];
+    }
+
     if(captured != &EMPTY) {
         int* pc = gameState->pieceCounts;
         pc[captured->ordinal]++;
