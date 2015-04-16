@@ -228,7 +228,13 @@ void unmakeMove(GameState* gameState, Move* move) {
         *capturedBb |= toBb;
         board[move->to] = captured;
     } else {
-        // TODO: EP Captures
+        const int epSquare = move->to + (move->movingPiece == &WPAWN ? OFFSET_S : OFFSET_N);
+        const uint64_t epSqBits = BITS_SQ[epSquare];
+        uint64_t* capturedBb = &gameState->bitboards[captured->ordinal];
+        board[epSquare] = move->captures;
+        *capturedBb |= epSqBits;
+        *emptyBb &= ~epSqBits;
+        *emptyBb |= BITS_SQ[move->to];
     }
 
     if (IS_PROMOTE(move->moveCode)) {
@@ -242,7 +248,7 @@ void unmakeMove(GameState* gameState, Move* move) {
         *promoteBb &= ~BITS_SQ[move->to];
     }
 
-    if(captured != &EMPTY) {
+    if (captured != &EMPTY) {
         int* pc = gameState->pieceCounts;
         pc[captured->ordinal]++;
         pc[ORD_EMPTY]--;

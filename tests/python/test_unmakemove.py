@@ -173,6 +173,8 @@ class TestBasicMoveList(unittest.TestCase):
         bitboards = result['bitboards']
         piece_counts = result['pieceCounts']
 
+        self.assertEqual('P', board['b7'])
+
         self.assertEqual(0, piece_counts['Q'])
         self.assertEqual(1, piece_counts['P'])
 
@@ -186,6 +188,8 @@ class TestBasicMoveList(unittest.TestCase):
         bitboards = result['bitboards']
         piece_counts = result['pieceCounts']
 
+        self.assertEqual('p', board['b2'])
+
         self.assertEqual(0, piece_counts['q'])
         self.assertEqual(1, piece_counts['p'])
 
@@ -198,6 +202,8 @@ class TestBasicMoveList(unittest.TestCase):
         board = result['board']
         bitboards = result['bitboards']
         piece_counts = result['pieceCounts']
+
+        self.assertEqual('P', board['b7'])
 
         self.assertEqual(1, piece_counts['b'])
         self.assertEqual(0, piece_counts['Q'])
@@ -214,6 +220,8 @@ class TestBasicMoveList(unittest.TestCase):
         bitboards = result['bitboards']
         piece_counts = result['pieceCounts']
 
+        self.assertEqual('p', board['b2'])
+
         self.assertEqual(1, piece_counts['B'])
         self.assertEqual(0, piece_counts['q'])
         self.assertEqual(1, piece_counts['p'])
@@ -222,6 +230,41 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('0000000000000200', bitboards['p'])
         self.assertEqual('0000000000000000', bitboards['q'])
         self.assertEqual('EFFFFFFFFFFFFDEB', bitboards['-'])
+
+    def test_white_ep_capture(self):
+        result = self.make_unmake_move('4k3/8/8/4pP2/8/8/8/4K3 w KQkq e6 0 1', 'f5e6')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+
+        self.assertEqual('p', board['e5'])
+        self.assertEqual('P', board['f5'])
+
+        self.assertEqual(1, piece_counts['p'])
+        self.assertEqual(1, piece_counts['P'])
+
+        self.assertEqual('e', result['epFile'])
+        self.assertEqual('0000001000000000', bitboards['p'])
+        self.assertEqual('0000002000000000', bitboards['P'])
+        self.assertEqual('EFFFFFCFFFFFFFEF', bitboards['-'])
+
+    def test_black_ep_capture(self):
+        result = self.make_unmake_move('4k3/8/8/8/4pP2/8/8/4K3 b KQkq f3 0 1', 'e4f3')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+
+        self.assertEqual('p', board['e4'])
+        self.assertEqual('P', board['f4'])
+
+        self.assertEqual(1, piece_counts['p'])
+        self.assertEqual(1, piece_counts['P'])
+
+        self.assertEqual('f', result['epFile'])
+        self.assertEqual('0000000010000000', bitboards['p'])
+        self.assertEqual('0000000020000000', bitboards['P'])
+        self.assertEqual('EFFFFFFFCFFFFFEF', bitboards['-'])
+
 
 if __name__ == '__main__':
     unittest.main()
