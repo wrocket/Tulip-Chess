@@ -20,15 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef JSON_H
-#define JSON_H
+#ifndef NOTATION_H
+#define NOTATION_H
 
-#include "move.h"
+#include "tulip.h"
+#include "piece.h"
 #include "gamestate.h"
+#include "move.h"
 
-void printMovelistJson(char*, char*, GameState*, MoveBuffer*);
-void printGameState(char*, GameState*);
-void printCheckStatus(char*, bool isCheck);
-void printMakeMoveResult(char* position, Move* m, GameState* state);
-void printAttackList(char* position, bool* attackGrid, GameState* state);
+// Prints the given move in the given game state to the given char buffer.
+// Returns the number of characters printed, not including the null char.
+int printShortAlg(Move* move, GameState* gameState, char* buffer);
+
 #endif

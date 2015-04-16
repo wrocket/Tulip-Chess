@@ -26,6 +26,7 @@
 
 #include "gamestate.h"
 #include "board.h"
+#include "notation.h"
 #include "move.h"
 #include "json.h"
 
@@ -86,7 +87,7 @@ static const char* printColor(int color) {
     }
 }
 
-void printMovelistJson(char* position, char* listType, MoveBuffer* buffer) {
+void printMovelistJson(char* position, char* listType, GameState* gameState, MoveBuffer* buffer) {
     char strBuff[16];
 
     printf("{");
@@ -105,6 +106,19 @@ void printMovelistJson(char* position, char* listType, MoveBuffer* buffer) {
         printf("\"%s\"", strBuff);
     }
     printf("], ");
+
+    printf("\"shortAlgebraicMoves\":[");
+    for(int i=0; i<buffer->length; i++) {
+        if(i > 0) {
+            printf(", ");
+        }
+
+        printShortAlg(&(buffer->moves[i]), gameState, strBuff);
+        printf("\"%s\"", strBuff);
+    }
+
+    printf("], ");
+
     printf("\"moveDetails\": [");
     for(int i=0; i<buffer->length; i++) {
         if(i > 0) {
@@ -207,7 +221,7 @@ void printGameState(char* position, GameState* state) {
 
     printf("\"pieceCounts\": {");
     const Piece* pieces[] = {&WPAWN, &BPAWN, &WKNIGHT, &BKNIGHT, &WBISHOP,
-                             &BBISHOP, &WROOK, &BROOK, &WQUEEN, &BQUEEN, 
+                             &BBISHOP, &WROOK, &BROOK, &WQUEEN, &BQUEEN,
                              &WKING, &BKING, &EMPTY, &OFF_BOARD};
 
     for(int i=0; i<14; i++) {

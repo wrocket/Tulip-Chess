@@ -100,7 +100,7 @@ static void listMoves(int argc, char** argv) {
 
     MoveBuffer buffer;
     createMoveBuffer(&buffer);
-    
+
     if(0 == strcmp("pseudo", argv[1])) {
         generatePseudoMoves(&gs, &buffer);
     } else {
@@ -108,7 +108,7 @@ static void listMoves(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
-    printMovelistJson(argv[2], argv[1], &buffer);
+    printMovelistJson(argv[2], argv[1], &gs, &buffer);
 
     destroyMoveBuffer(&buffer);
     destroyGamestate(&gs);
