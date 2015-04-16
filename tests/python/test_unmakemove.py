@@ -1,17 +1,17 @@
 # The MIT License (MIT)
 #
 # Copyright (c) 2015 Brian Wray (brian@wrocket.org)
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -91,6 +91,81 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual('0000000002000000', bitboards['N'])
         self.assertEqual('FFEFFBFFEDFFFFFF', bitboards['-'])
 
+    def test_castleWhiteKingside(self):
+        result = self.make_unmake_move('4k3/8/8/8/8/8/8/4K2R w K - 0 1', 'e1g1')
+        board = result['board']
+        bitboards = result['bitboards']
+
+        self.assertTrue('K', board['e1'])
+        self.assertTrue('R', board['h1'])
+        self.assertEqual('0000000000000080', bitboards['R'])
+        self.assertEqual('0000000000000010', bitboards['K'])
+        self.assertEqual('EFFFFFFFFFFFFF6F', bitboards['-'])
+
+        self.assertTrue(result['castleWhiteKingside'])
+        self.assertFalse(result['castleBlackKingside'])
+        self.assertFalse(result['castleWhiteQueenside'])
+        self.assertFalse(result['castleBlackQueenside'])
+        self.assertEqual('white', result['toMove'])
+        self.assertEqual('e8', result['blackKingSquare'])
+        self.assertEqual('e1', result['whiteKingSquare'])
+
+    def test_castleWhiteQueenside(self):
+        result = self.make_unmake_move('4k3/8/8/8/8/8/8/R3K3 w Q - 0 1', 'e1c1')
+        board = result['board']
+        bitboards = result['bitboards']
+
+        self.assertTrue('K', board['e1'])
+        self.assertTrue('R', board['a1'])
+        self.assertEqual('0000000000000001', bitboards['R'])
+        self.assertEqual('0000000000000010', bitboards['K'])
+        self.assertEqual('EFFFFFFFFFFFFFEE', bitboards['-'])
+
+        self.assertFalse(result['castleWhiteKingside'])
+        self.assertFalse(result['castleBlackKingside'])
+        self.assertTrue(result['castleWhiteQueenside'])
+        self.assertFalse(result['castleBlackQueenside'])
+        self.assertEqual('white', result['toMove'])
+        self.assertEqual('e8', result['blackKingSquare'])
+        self.assertEqual('e1', result['whiteKingSquare'])
+
+    def test_castleBlackKingside(self):
+        result = self.make_unmake_move('4k2r/8/8/8/8/8/8/4K3 b k - 0 1', 'e8g8')
+        board = result['board']
+        bitboards = result['bitboards']
+
+        self.assertTrue('k', board['e8'])
+        self.assertTrue('r', board['h8'])
+        self.assertEqual('8000000000000000', bitboards['r'])
+        self.assertEqual('1000000000000000', bitboards['k'])
+        self.assertEqual('6FFFFFFFFFFFFFEF', bitboards['-'])
+
+        self.assertFalse(result['castleWhiteKingside'])
+        self.assertTrue(result['castleBlackKingside'])
+        self.assertFalse(result['castleWhiteQueenside'])
+        self.assertFalse(result['castleBlackQueenside'])
+        self.assertEqual('black', result['toMove'])
+        self.assertEqual('e8', result['blackKingSquare'])
+        self.assertEqual('e1', result['whiteKingSquare'])
+
+    def test_castleBlackQueenside(self):
+        result = self.make_unmake_move('r3k3/8/8/8/8/8/8/4K3 b q - 0 1', 'e8c8')
+        board = result['board']
+        bitboards = result['bitboards']
+
+        self.assertTrue('k', board['e8'])
+        self.assertTrue('r', board['a8'])
+        self.assertEqual('0100000000000000', bitboards['r'])
+        self.assertEqual('1000000000000000', bitboards['k'])
+        self.assertEqual('EEFFFFFFFFFFFFEF', bitboards['-'])
+
+        self.assertFalse(result['castleWhiteKingside'])
+        self.assertFalse(result['castleBlackKingside'])
+        self.assertFalse(result['castleWhiteQueenside'])
+        self.assertTrue(result['castleBlackQueenside'])
+        self.assertEqual('black', result['toMove'])
+        self.assertEqual('e8', result['blackKingSquare'])
+        self.assertEqual('e1', result['whiteKingSquare'])
 
 if __name__ == '__main__':
     unittest.main()

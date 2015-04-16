@@ -27,6 +27,16 @@
 #include "makemove.h"
 #include "statedata.h"
 
+static void unCastleRook(GameState* gameState, const int homeSq, const int rookCastledSq, const int rookOrdinal, const Piece* rook) {
+        const Piece** board = gameState->board;
+        uint64_t* emptyBb = &gameState->bitboards[ORD_EMPTY];
+        uint64_t* rookBb = &gameState->bitboards[rookOrdinal];
+        *rookBb = (*rookBb & ~BITS_SQ[rookCastledSq]) | BITS_SQ[homeSq];
+        *emptyBb = (*emptyBb & ~BITS_SQ[homeSq]) | BITS_SQ[rookCastledSq];
+        board[homeSq] = rook;
+        board[rookCastledSq] = &EMPTY;
+}
+
 static void whiteKingCastle(Move* move, GameState* gs) {
     if (move->to == SQ_G1) {
         gs->board[SQ_H1] = &EMPTY;
@@ -145,7 +155,7 @@ void makeMove(GameState* gameState, Move* move) {
     board[move->from] = &EMPTY;
 
     // Update EP file
-    int newEpFile = isPawn && abs(move->to - move->from) == (2 * OFFSET_N) 
+    int newEpFile = isPawn && abs(move->to - move->from) == (2 * OFFSET_N)
                         ? FILE_IDX(move->to) : NO_EP_FILE;
     nextData->epFile = newEpFile;
 
@@ -229,17 +239,18 @@ void unmakeMove(GameState* gameState, Move* move) {
 
     if (moving == &WKING && move->from == SQ_E1) {
         if (move->to == SQ_G1) {
-            // TODO: White kingside castle
+            unCastleRook(gameState, SQ_H1, SQ_F1, ORD_WROOK, &WROOK);
         } else if (move->to == SQ_C1) {
-            // TODO: White queenside castle
+            unCastleRook(gameState, SQ_A1, SQ_D1, ORD_WROOK, &WROOK);
         }
     } else if (moving == &BKING && move->from == SQ_E8) {
         if (move->to == SQ_G8) {
-            // TODO: Black kingside castle
+            unCastleRook(gameState, SQ_H8, SQ_F8, ORD_BROOK, &BROOK);
         } else if (move->to == SQ_C8) {
-            // TODO: Black queenside castle
+            unCastleRook(gameState, SQ_A8, SQ_D8, ORD_BROOK, &BROOK);
         }
     }
 
     gameState->current--;
 }
+
