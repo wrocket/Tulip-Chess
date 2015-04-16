@@ -88,8 +88,8 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertEqual(1, piece_counts['N'])
         self.assertEqual(60, piece_counts['-'])
         self.assertEqual('0000000000000000', bitboards['n'])
-        self.assertEqual('0000040000000000', bitboards['N'])
-        self.assertEqual('FFEFFBFFEFFFFFFF', bitboards['-'])
+        self.assertEqual('0000000002000000', bitboards['N'])
+        self.assertEqual('FFEFFBFFEDFFFFFF', bitboards['-'])
 
 
 if __name__ == '__main__':
