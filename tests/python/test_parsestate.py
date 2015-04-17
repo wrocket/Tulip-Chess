@@ -1,17 +1,17 @@
 # The MIT License (MIT)
 #
 # Copyright (c) 2015 Brian Wray (brian@wrocket.org)
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,7 +42,7 @@ class TestBasicStateParse(unittest.TestCase):
     def test_initial_position_board_position(self):
         state = self.parseState('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
         board = state['board']
-        
+
         for sq in ['a2', 'b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2']:
             self.assertEqual('P', board[sq])
         self.assertEqual('R', board['a1'])
@@ -102,6 +102,33 @@ class TestBasicStateParse(unittest.TestCase):
         self.assertTrue(state['castleBlackKingside'])
         self.assertTrue(state['castleWhiteQueenside'])
         self.assertTrue(state['castleBlackQueenside'])
+        self.assertEqual(0, state['fiftyMoveCount'])
+        self.assertEqual('none', state['epFile'])
+
+    def test_invalid_castle_flags_kings_not_on_square(self):
+        state = self.parseState('r6r/4k3/8/8/8/8/4K3/R6R w KQkq - 0 1')
+        self.assertFalse(state['castleWhiteKingside'])
+        self.assertFalse(state['castleBlackKingside'])
+        self.assertFalse(state['castleWhiteQueenside'])
+        self.assertFalse(state['castleBlackQueenside'])
+        self.assertEqual(0, state['fiftyMoveCount'])
+        self.assertEqual('none', state['epFile'])
+
+    def test_invalid_castle_flags_rooks_not_present_queenside(self):
+        state = self.parseState('r3k3/8/8/8/8/8/8/R3K3 w KQkq - 0 1')
+        self.assertFalse(state['castleWhiteKingside'])
+        self.assertFalse(state['castleBlackKingside'])
+        self.assertTrue(state['castleWhiteQueenside'])
+        self.assertTrue(state['castleBlackQueenside'])
+        self.assertEqual(0, state['fiftyMoveCount'])
+        self.assertEqual('none', state['epFile'])
+
+    def test_invalid_castle_flags_rooks_not_present_kingside(self):
+        state = self.parseState('4k2r/8/8/8/8/8/8/4K2R w KQkq - 0 1')
+        self.assertTrue(state['castleWhiteKingside'])
+        self.assertTrue(state['castleBlackKingside'])
+        self.assertFalse(state['castleWhiteQueenside'])
+        self.assertFalse(state['castleBlackQueenside'])
         self.assertEqual(0, state['fiftyMoveCount'])
         self.assertEqual('none', state['epFile'])
 

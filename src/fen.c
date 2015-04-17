@@ -248,6 +248,32 @@ int parseFen(GameState* state, char* fenStr) {
         goto clean_tokens;
     }
 
+    // Do additional validation on castle flags.
+    // Some FEN producers send castle flags that don't match positions.
+    if (state->current->whiteKingSquare != SQ_E1) {
+        castleFlags &= ~(CASTLE_WK | CASTLE_WQ);
+    }
+
+    if (state->current->blackKingSquare != SQ_E8) {
+        castleFlags &= ~(CASTLE_BK | CASTLE_BQ);
+    }
+
+    if (state->board[SQ_H1] != &WROOK) {
+        castleFlags &= ~CASTLE_WK;
+    }
+
+    if (state->board[SQ_A1] != &WROOK) {
+        castleFlags &= ~CASTLE_WQ;
+    }
+
+    if (state->board[SQ_H8] != &BROOK) {
+        castleFlags &= ~CASTLE_BK;
+    }
+
+    if (state->board[SQ_A8] != &BROOK) {
+        castleFlags &= ~CASTLE_BQ;
+    }
+
     state->current->castleFlags = castleFlags;
     state->current->toMove = toMove;
     state->current->epFile = epFile;
