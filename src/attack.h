@@ -31,4 +31,7 @@ bool canAttack(const int color, const int sq, GameState* state);
 
 // Determine if the current gamestate represents a checking position.
 bool isCheck(GameState* state);
+
+// Determine if the current position is a legal position.
+bool isLegalPosition(GameState* state);
 #endif

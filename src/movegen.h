@@ -26,10 +26,18 @@
 #include "move.h"
 
 // Fills a given move buffer with pseudolegal moves, returning the number of
-// moves generated. A psuedolegal move is a move that can be made if (but 
+// moves generated. A psuedolegal move is a move that can be made if (but
 // not only if) you ignore rules around moving into check. The assumption
 // is that the caller will check the actual legality of the move before
 // playing the move to a game state.
 int generatePseudoMoves(GameState* gameState, MoveBuffer* destination);
+
+// Fills a given move buffer with legal moves. This checks the validity
+// of every resulting gamestate from each pseudolegal move, so it has
+// substantial runtime cost.
+int generateLegalMoves(GameState* gameState, MoveBuffer* destination);
+
+// Counts the number of legal moves.
+int countLegalMoves(GameState* gameState);
 
 #endif

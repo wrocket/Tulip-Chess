@@ -31,6 +31,7 @@
 #include "board.h"
 #include "makemove.h"
 #include "move.h"
+#include "movegen.h"
 
 int printShortAlg(Move* move, GameState* gameState, char* buffer) {
 	int count = 0;
@@ -79,8 +80,8 @@ add_check:
 
 	makeMove(gameState, move);
 	if (isCheck(gameState)) {
-		// TODO: Checkmate
-		buffer[count++] = '+';
+		int legalMoves = countLegalMoves(gameState);
+		buffer[count++] = legalMoves == 0 ? '#' : '+';
 	}
 	unmakeMove(gameState, move);
 

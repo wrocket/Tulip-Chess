@@ -26,7 +26,9 @@
 #include "tulip.h"
 #include "move.h"
 #include "gamestate.h"
+#include "attack.h"
 #include "board.h"
+#include "makemove.h"
 #include "piece.h"
 #include "attack.h"
 
@@ -255,7 +257,7 @@ static void blackKingCastle(GameState* gs, const Piece** board, Move* moveArr, i
         && !canAttack(COLOR_WHITE, SQ_D8, gs)) {
         PUSH_MOVE(m, SQ_E8, SQ_C8, &BKING, &EMPTY, NO_MOVE_CODE);
         (*count)++;
-    }   
+    }
 }
 
 static void whiteKingCastle(GameState* gs, const Piece** board, Move* moveArr, int* count) {
@@ -317,7 +319,7 @@ int generatePseudoMovesBlack(GameState* gs, MoveBuffer* moveBuff) {
                 break;
             case ORD_BKING:
                 king(sq, board, moveArr, &count, COLOR_WHITE);
-                if ((gs->current->castleFlags & (CASTLE_BK | CASTLE_BQ)) 
+                if ((gs->current->castleFlags & (CASTLE_BK | CASTLE_BQ))
                         && !canAttack(COLOR_WHITE, SQ_E8, gs)) {
                     blackKingCastle(gs, board, moveArr, &count);
                 }
@@ -387,6 +389,47 @@ int generatePseudoMoves(GameState* gs, MoveBuffer* moveBuff) {
         fprintf(stderr, "Invalid to-move: %d\n", toMove);
         return 0;
     }
+}
+
+int generateLegalMoves(GameState* gameState, MoveBuffer* destination) {
+    MoveBuffer pseudoMoves;
+    createMoveBuffer(&pseudoMoves);
+    generatePseudoMoves(gameState, &pseudoMoves);
+    int count = 0;
+
+    for (int i=0; i<pseudoMoves.length; i++) {
+        Move* m = &pseudoMoves.moves[i];
+        makeMove(gameState, m);
+        if (isLegalPosition(gameState)) {
+            destination->moves[count++] = *m;
+        }
+        unmakeMove(gameState, m);
+    }
+
+    destroyMoveBuffer(&pseudoMoves);
+
+    destination->length = count;
+    return count;
+}
+
+int countLegalMoves(GameState* gameState, MoveBuffer* destination) {
+    MoveBuffer pseudoMoves;
+    createMoveBuffer(&pseudoMoves);
+    generatePseudoMoves(gameState, &pseudoMoves);
+    int count = 0;
+
+    for (int i=0; i<pseudoMoves.length; i++) {
+        Move* m = &pseudoMoves.moves[i];
+        makeMove(gameState, m);
+        if (isLegalPosition(gameState)) {
+            count++;
+        }
+        unmakeMove(gameState, m);
+    }
+
+    destroyMoveBuffer(&pseudoMoves);
+
+    return count;
 }
 
 #undef PUSH_MOVE

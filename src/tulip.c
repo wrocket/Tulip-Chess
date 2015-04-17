@@ -103,8 +103,10 @@ static void listMoves(int argc, char** argv) {
 
     if(0 == strcmp("pseudo", argv[1])) {
         generatePseudoMoves(&gs, &buffer);
+    } else if (0 == strcmp("legal", argv[1])) {
+        generateLegalMoves(&gs, &buffer);
     } else {
-        fprintf(stderr, "Move list mode \"%s\" not supported (yet).\n", argv[1]);
+        fprintf(stderr, "Move list mode \"%s\" unknown.\n", argv[1]);
         exit(EXIT_FAILURE);
     }
 

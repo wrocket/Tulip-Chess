@@ -28,6 +28,7 @@
 #include "tulip.h"
 #include "bitboard.h"
 #include "attack.h"
+#include "movegen.h"
 #include "piece.h"
 
 #define BITS(p) state->bitboards[(p)->ordinal]
@@ -128,3 +129,12 @@ bool canAttack(const int color, const int sq, GameState* state) {
     // Guess they can't attack.
     return false;
 }
+
+bool isLegalPosition(GameState* state) {
+    if (state->current->toMove == COLOR_WHITE) {
+        return !canAttack(COLOR_WHITE, state->current->blackKingSquare, state);
+    } else {
+        return !canAttack(COLOR_BLACK, state->current->whiteKingSquare, state);
+    }
+}
+

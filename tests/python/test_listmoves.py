@@ -1,17 +1,17 @@
 # The MIT License (MIT)
 #
 # Copyright (c) 2015 Brian Wray (brian@wrocket.org)
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,13 +34,19 @@ class TestBasicMoveList(unittest.TestCase):
     def setUp(self):
         None
 
-    def listPsuedoMoves(self, fen):
-        result = call_tulip(['-listmoves', 'pseudo', fen])
+    def get_moves(self, fen, mode):
+        result = call_tulip(['-listmoves', mode, fen])
         parsed_output = json.loads(result)
         moves = parsed_output['moveList']
         # Make sure there are no duplicates
         self.assertEqual(len(moves), len(set(moves)))
         return moves
+
+    def listPsuedoMoves(self, fen):
+        return self.get_moves(fen, 'pseudo')
+
+    def listLegalMoves(self, fen):
+        return self.get_moves(fen, 'legal')
 
     def getMoveFromDetails(self, move_str, moves):
         self.assertTrue(move_str in moves, move_str + ' not in move list: ' + str(', '.join(sorted(moves.keys()))))
@@ -216,7 +222,7 @@ class TestBasicMoveList(unittest.TestCase):
             self.assertEqual(promote, m['moveCode'])
             self.assertEqual('-', m['capturedPiece'])
             self.assertEqual('p', m['movingPiece'])
-        
+
     def test_promote_wpawn_captures(self):
         moves = self.listPsuedoMovesDetails('2k1brn1/5P2/8/8/8/8/8/2K5 w - c6 0 1')
         desired = {'f7g8=q': 'promoteQueen', 'f7g8=n': 'promoteKnight', 'f7g8=r': 'promoteRook', 'f7g8=b': 'promoteBishop'}
@@ -315,6 +321,12 @@ class TestBasicMoveList(unittest.TestCase):
         moves = self.listPsuedoMovesDetails('r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w kq c6 0 1')
         self.assertTrue('e1g1' not in moves.keys(), 'e1g1 incorrectly in move list.')
         self.assertTrue('e1c1' not in moves.keys(), 'e1c1 incorrectly in move list.')
+
+    def test_legal_moves_01(self):
+        moves = self.listLegalMoves('5k2/8/5K2/8/8/1Q6/8/8 w - - 0 1')
+        self.assertFalse('f6f7' in moves)
+        self.assertFalse('f7e7' in moves)
+        self.assertFalse('f6g7' in moves)
 
 if __name__ == '__main__':
     unittest.main()
