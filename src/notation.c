@@ -23,49 +23,94 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include "tulip.h"
-#include "piece.h"
-#include "notation.h"
-#include "gamestate.h"
 #include "attack.h"
 #include "board.h"
+#include "gamestate.h"
 #include "makemove.h"
 #include "move.h"
 #include "movegen.h"
+#include "notation.h"
+#include "piece.h"
+#include "tulip.h"
+
+static bool doMoveCollide(Move* legalMove, Move* candidate) {
+    return legalMove->from != candidate->from
+        && legalMove->movingPiece == candidate->movingPiece
+        && legalMove->to == candidate->to;
+}
+
+static int printMoveDisambiguation(GameState* g, Move* move, char* buffer) {
+	int c = 0;
+	MoveBuffer legalMoves;
+	int* collidingMoves;
+	int collidingMoveCnt = 0;
+
+	createMoveBuffer(&legalMoves);
+	generateLegalMoves(g, &legalMoves);
+
+	collidingMoves = ALLOC(legalMoves.length, int, collidingMoves, "Unable to allocate ambiguous move buffer.");
+
+	for (int i=0; i < legalMoves.length; i++) {
+		Move* candidate = &legalMoves.moves[i];
+		if (doMoveCollide(move, candidate)) {
+			collidingMoves[collidingMoveCnt++] = candidate->from;
+		}
+	}
+
+	if (collidingMoveCnt > 0) {
+		bool sameRank = false;
+		bool sameFile = false;
+
+		int fromRank = RANK_IDX(move->from);
+		int fromFile = FILE_IDX(move->from);
+
+		for (int i = 0; i < collidingMoveCnt; i++) {
+			int ambigSq = collidingMoves[i];
+			sameRank |= fromRank == RANK_IDX(ambigSq);
+			sameFile |= fromFile == FILE_IDX(ambigSq);
+		}
+
+		if (sameFile && sameRank) {
+			c = printSquareIndex(move->from, buffer);
+		} else if (sameRank || !sameFile) {
+			buffer[c++] = fileToChar(fromFile);
+		} else if(sameFile) {
+			buffer[c++] = rankToChar(fromRank);
+		}
+	}
+
+	free(collidingMoves);
+	destroyMoveBuffer(&legalMoves);
+
+	return c;
+}
 
 int printShortAlg(Move* move, GameState* gameState, char* buffer) {
 	int count = 0;
-	bool isPawn = move->movingPiece == &WPAWN || move->movingPiece == &BPAWN;
+	const Piece* movingPiece = move->movingPiece;
+	bool isPawn = movingPiece == &WPAWN || movingPiece == &BPAWN;
 
-	if (move->movingPiece == &WKING && move->from == SQ_E1) {
-		if(move->to == SQ_G1) {
-			count = sprintf(buffer, "O-O");
-			goto add_check;
-		} else if(move->to == SQ_C1) {
+	if (movingPiece == &WKING || movingPiece == &BKING) {
+		int moveOffset = move->from - move->to;
+		if (moveOffset == 2) {
 			count = sprintf(buffer, "O-O-O");
 			goto add_check;
-		}
-	} else if (move->movingPiece == &BKING && move->from == SQ_E8) {
-		if(move->to == SQ_G8) {
+		} else if (moveOffset == -2) {
 			count = sprintf(buffer, "O-O");
-			goto add_check;
-		} else if(move->to == SQ_C8) {
-			count = sprintf(buffer, "O-O-O");
 			goto add_check;
 		}
 	}
 
-	const Piece* movingPiece = move->movingPiece;
-
-	// TODO: Origin square disambiguation
 	if (!isPawn) {
 		buffer[count++] = toupper(movingPiece->name);
+		count += printMoveDisambiguation(gameState, move, &buffer[count]);
 	}
 
 	if (move->captures != &EMPTY) {
 		if (isPawn) {
 			buffer[count++] = indexToFileChar(move->from);
 		}
+
 		buffer[count++] = 'x';
 	}
 
@@ -80,12 +125,11 @@ add_check:
 
 	makeMove(gameState, move);
 	if (isCheck(gameState)) {
-		int legalMoves = countLegalMoves(gameState);
-		buffer[count++] = legalMoves == 0 ? '#' : '+';
+		buffer[count++] = countLegalMoves(gameState) == 0 ? '#' : '+';
 	}
+
 	unmakeMove(gameState, move);
 
-	buffer[count++] = '\0';
-
-	return count - 1;
+	buffer[count] = '\0';
+	return count;
 }

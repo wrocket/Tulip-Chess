@@ -66,9 +66,9 @@
 // flat array, where the square at (file, rank) is found by:
 //
 // array_index(file, rank) = 12 * (rank + 2) + (file + 2).
-// 
+//
 // All ranks and files are zero-indexed, so rank 1 = file A = 0.
-// 
+//
 // Given one of these indexes, squares relative to that square can be found
 // using simple and fast addition. For example, to find the index of square S'
 // F files and R ranks away from a square S, you have:
@@ -208,6 +208,10 @@ int parseFileChar(const char c);
 // Given a zero-based file index, return a human-readable respresentation.
 // E.g.: an input of FILE_C returns 'c'.
 char fileToChar(const int);
+
+// Given a zero-based rank index, return a human-readable respresentation.
+// E.g.: an input of RANK_3 returns '3'.
+char rankToChar(const int rankIndex);
 
 // Given a board index and a character buffer of at least two characters,
 // print a human-readable representation of the square, and return the

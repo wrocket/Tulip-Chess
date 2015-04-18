@@ -96,5 +96,28 @@ class TestBasicMoveList(unittest.TestCase):
         moves = self.get_moves('r3k3/8/8/8/8/8/2P1P3/2RKR3 b q - 0 1')
         self.assertTrue('O-O-O#' in moves)
 
+    def test_ambiguous_moves_file_only(self):
+        moves = self.get_moves('8/R7/4k3/8/8/8/2R1K3/8 w - - 0 1')
+        self.assertTrue('Rcc7' in moves)
+        self.assertTrue('Rca2' in moves)
+        self.assertTrue('Rac7' in moves)
+        self.assertTrue('Raa2' in moves)
+
+    def test_ambiguous_moves_rank_only(self):
+        moves = self.get_moves('8/5k2/R7/8/8/R4K2/8/8 w - - 0 1')
+        self.assertTrue('R3a5' in moves)
+        self.assertTrue('R3a4' in moves)
+        self.assertTrue('R6a5' in moves)
+        self.assertTrue('R6a4' in moves)
+
+    def test_ambiguous_moves_rank_and_file(self):
+        moves = self.get_moves('8/5k2/N3N3/8/N7/5K2/8/8 w - - 0 1')
+        self.assertTrue('Na6c5' in moves)
+        self.assertTrue('N4c5' in moves)
+        self.assertTrue('Nec7' in moves)
+        self.assertTrue('Nac7' in moves)
+        self.assertTrue('Nec5' in moves)
+
+
 if __name__ == '__main__':
     unittest.main()
