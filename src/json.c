@@ -32,6 +32,7 @@
 
 #define __STDC_FORMAT_MACROS
 
+// TODO: Use a real JSON library for this.
 static const char* maskBooleanToStrU(unsigned int value, unsigned int mask) {
     return (value & mask) ? "true" : "false";
 }
@@ -129,6 +130,10 @@ void printMovelistJson(char* position, char* listType, GameState* gameState, Mov
     }
     printf("]");
     printf("}\n");
+}
+
+void printHashResult(char* input, uint64_t result) {
+    printf("{\"input\":\"%s\", \"hashResult\":\"%016"PRIX64"\"}\n", input, result);
 }
 
 void printAttackList(char* position, bool* attackGrid, GameState* state) {
