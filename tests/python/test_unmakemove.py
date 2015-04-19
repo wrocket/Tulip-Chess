@@ -30,7 +30,7 @@ def call_tulip(args):
     out = subprocess.check_output(cmd)
     return out.decode('utf-8')
 
-class TestBasicMoveList(unittest.TestCase):
+class TestMakeUnmakeMove(unittest.TestCase):
     def setUp(self):
         None
 

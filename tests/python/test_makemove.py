@@ -1,17 +1,17 @@
 # The MIT License (MIT)
 #
 # Copyright (c) 2015 Brian Wray (brian@wrocket.org)
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,7 +30,7 @@ def call_tulip(args):
     out = subprocess.check_output(cmd)
     return out.decode('utf-8')
 
-class TestBasicMoveList(unittest.TestCase):
+class TestBasicMoveApplication(unittest.TestCase):
     def setUp(self):
         None
 
@@ -47,7 +47,7 @@ class TestBasicMoveList(unittest.TestCase):
         board = result['board']
         self.assertEqual(32, len(board.keys()))
         self.assertTrue('g1' not in board.keys())
-        self.assertEqual('N', board['f3']) 
+        self.assertEqual('N', board['f3'])
         self.assertEqual('0000000000200002', result['bitboards']['N'])
         self.assertEqual('0000FFFFFFDF0040', result['bitboards']['-'])
         self.assertEqual('none', result['epFile'])
