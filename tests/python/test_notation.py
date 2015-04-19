@@ -118,6 +118,34 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertTrue('Nac7' in moves)
         self.assertTrue('Nec5' in moves)
 
+    def test_pawn_moves_normal_white(self):
+        moves = self.get_moves('8/4k3/8/5p2/4P3/8/4K3/8 w - - 0 1')
+        self.assertTrue('e5' in moves)
+        self.assertTrue('exf5' in moves)
+
+    def test_pawn_moves_normal_black(self):
+        moves = self.get_moves('8/4k3/8/5p2/4P3/8/4K3/8 b - - 0 1')
+        self.assertTrue('f4' in moves)
+        self.assertTrue('fxe4' in moves)
+
+    def test_pawn_moves_ep_white(self):
+        moves = self.get_moves('4k3/8/8/4Pp2/8/8/8/4K3 w - f6 0 1')
+        self.assertTrue('exf6' in moves)
+
+    def test_pawn_moves_ep_black(self):
+        moves = self.get_moves('4k3/8/8/8/4Pp2/8/8/4K3 b - e3 0 1')
+        self.assertTrue('fxe3' in moves)
+
+    def test_pawn_move_capture_mate(self):
+        moves = self.get_moves('3bkr2/3qpp2/1NP5/8/8/8/8/4K3 w - - 0 1')
+        self.assertTrue('cxd7#' in moves)
+
+    def test_pawn_promote(self):
+        moves = self.get_moves('4k3/8/8/8/8/8/1p6/4K3 b - - 0 1')
+        self.assertTrue('b1=Q+' in moves)
+        self.assertTrue('b1=R+' in moves)
+        self.assertTrue('b1=B' in moves)
+        self.assertTrue('b1=N' in moves)
 
 if __name__ == '__main__':
     unittest.main()
