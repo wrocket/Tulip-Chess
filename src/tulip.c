@@ -30,7 +30,6 @@
 #include "board.h"
 #include "fen.h"
 #include "gamestate.h"
-#include "hash.h"
 
 #include "json.h"
 #include "makemove.h"
@@ -57,17 +56,6 @@ static GameState parseFenOrQuit(char* str) {
     }
 
     return gs;
-}
-
-static void printHash(int argc, char** argv) {
-    if(argc != 2) {
-        fprintf(stderr, "Usage: -hash \"thing to hash\"\n");
-        exit(EXIT_FAILURE);
-    }
-
-    char* inputStr = argv[1];
-    uint64_t result = hashStr(inputStr, strlen(inputStr));
-    printHashResult(inputStr, result);
 }
 
 static void printState(int argc, char** argv) {
@@ -204,8 +192,6 @@ int main(int argc, char** argv) {
             checkStatus(argc, argv);
         } else if(0 == strcmp("-makeunmake", argv[0])) {
             printMakeUnmakeMoveResult(argc, argv);
-        } else if(0 == strcmp("-hash", argv[0])) {
-            printHash(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);

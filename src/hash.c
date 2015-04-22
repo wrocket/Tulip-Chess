@@ -22,48 +22,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
 
 #include "hash.h"
 #include "tulip.h"
 
-#define HASH_BUFF_LEN 128
-
-uint64_t hashStr(char* str, const int strLen) {
-    // TODO: Add support for GNU md5sum in addition to BSD's md5
-    // TODO: Better error handling if the "md5" application doesn't respond as expected.
-
-    char* buffer = ALLOC(HASH_BUFF_LEN, char, buffer, "Unable to allocate input buffer for hashing.");
-    const char* cmd = "md5 -q -s ";
-    char* commandStr = ALLOC(strLen + strlen(cmd), char, commandStr, "Unable to allocate command string for hashing.");
-    strcat(commandStr, cmd);
-    strncat(commandStr, str, strLen);
-    uint64_t result = 0;
-
-    FILE* pipe = popen(commandStr, "r");
-    if (!pipe) {
-        fprintf(stderr, "Unable to execute command: %s\n", commandStr);
-        fprintf(stderr, "Got error: %s\n", strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-
-    if(fgets(buffer, HASH_BUFF_LEN, pipe) != NULL) {
-        char* endPtr;
-        buffer[16] = '\0';
-        result = strtoull(buffer, &endPtr, 16);
-
-        if (endPtr == buffer || errno != 0) {
-            fprintf(stderr, "Error executing \"%s\": %s\n", commandStr, strerror(errno));
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    pclose(pipe);
-    free(buffer);
-    free(commandStr);
-    return result;
+uint64_t computeHash(GameState* gameState) {
+    return 0; // TODO: implement
 }
-
-#undef HASH_BUFF_LEN
