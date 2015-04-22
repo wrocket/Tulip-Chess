@@ -1,4 +1,5 @@
 import hashlib
+import itertools
 
 def hash_str(some_str):
 	return hashlib.md5(bytes(some_str, 'utf-8')).hexdigest()[:16]
@@ -41,18 +42,15 @@ def generate_piece_square_hashes():
 	files = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 	ranks = ['1', '2', '3', '4', '5', '6', '7', '8']
 	pieces = ['EMPTY', 'WPAWN', 'BPAWN', 'WKNIGHT', 'BKNIGHT', 'WBISHOP', 'BBISHOP', 'WROOK', 'BROOK', 'WQUEEN', 'BQUEEN', 'WKING', 'BKING']
-
-	for f in files:
-		for r in ranks:
-			for p in pieces:
-				hash_key = p + '_' + f + r
-				hash_val = hash_str(hash_key)
-				check_hash(hash_key, hash_val)
-				print('HASH_PIECE_SQ[&%s->ordinal][SQ_%s%s] = %s; // %s' % (p, f, r, hash_val, hash_key))
+	for (f, r, p) in itertools.product(files, ranks, pieces):
+		hash_key = p + '_' + f + r
+		hash_val = hash_str(hash_key)
+		check_hash(hash_key, hash_val)
+		print('HASH_PIECE_SQ[&%s->ordinal][SQ_%s%s] = %s; // %s' % (p, f, r, hash_val, hash_key))
 
 declare_array_hashes()
 generate_single_hash_values()
 generate_castle_flag_hash()
 generate_ep_hash()
 print()
-#generate_piece_square_hashes()
+generate_piece_square_hashes()
