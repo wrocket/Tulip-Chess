@@ -132,10 +132,6 @@ void printMovelistJson(char* position, char* listType, GameState* gameState, Mov
     printf("}\n");
 }
 
-void printHashResult(char* input, uint64_t result) {
-    printf("{\"input\":\"%s\", \"hashResult\":\"%016"PRIX64"\"}\n", input, result);
-}
-
 void printAttackList(char* position, bool* attackGrid, GameState* state) {
     printf("{");
     printf("\"fenString\": \"%s\", ", position);

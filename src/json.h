@@ -31,5 +31,4 @@ void printGameState(char*, GameState*);
 void printCheckStatus(char*, bool isCheck);
 void printMakeMoveResult(char* position, Move* m, GameState* state);
 void printAttackList(char* position, bool* attackGrid, GameState* state);
-void printHashResult(char* input, uint64_t result);
 #endif

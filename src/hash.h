@@ -23,6 +23,10 @@
 #ifndef HASH_H
 #define HASH_H
 
-uint64_t hashStr(char* str, int strLen);
+#include "gamestate.h"
+
+// Computes the hash of the given state.
+// SLOW. Do not use in tight loops.
+uint64_t computeHash(GameState* gameState);
 
 #endif
