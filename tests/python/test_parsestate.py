@@ -34,10 +34,56 @@ class TestBasicStateParse(unittest.TestCase):
     def setUp(self):
         None
 
+    def print_hex(self, n):
+        h = hex(n)
+        zeros = '0' * (16 - len(h))
+        return h.replace('0x', zeros).upper()
+
     def parseState(self, fen):
         result = call_tulip(['-printstate', fen])
         parsed_output = json.loads(result)
         return parsed_output
+
+    def test_initial_position_hash(self):
+        state = self.parseState('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+        self.assertEqual('4AD833CD51D9088F', state['hash'])
+
+    def test_castle_flags_all(self):
+        state = self.parseState('r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1')
+        self.assertEqual('B527CC32876B4F57', state['hash'])
+
+    def test_castle_flags_none(self):
+        state = self.parseState('r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1')
+        # This is the same position with all castle flags enabled.
+        orig = 0xB527CC32876B4F57
+        # This is the "all castle flags" mask from hashconsts.c XORed with "no castle flags" from the same file.
+        # Basically, we're "removing" the "all" mask and "adding" the "none" mask.
+        bit_mask = 0x08a9bc2c9127f308 ^ 0xdc0b25e9f28ae0dd
+        no_castle_flags = orig ^ bit_mask
+        self.assertEqual(self.print_hex(no_castle_flags), state['hash'])
+
+    def test_castle_flags_just_kings(self):
+        state = self.parseState('r3k2r/8/8/8/8/8/8/R3K2R w Kk - 0 1')
+        orig = 0xB527CC32876B4F57
+        bit_mask = 0x08a9bc2c9127f308 ^ 0xca97ccc0ddec42ae
+        no_castle_flags = orig ^ bit_mask
+        self.assertEqual(self.print_hex(no_castle_flags), state['hash'])
+
+    def test_to_move_hash(self):
+        hash_1 = int(self.parseState('4k3/8/8/8/4P3/8/8/4K3 w - e3 0 1')['hash'], 16)
+        hash_2 = int(self.parseState('4k3/8/8/8/4P3/8/8/4K3 b - e3 0 1')['hash'], 16)
+
+        # White-to-move mask from hashconsts.h
+        white_to_move_mask = 0x77e554c3ddafb8c6
+        self.assertEqual(hash_1, hash_2 ^ white_to_move_mask)
+
+    def test_hash_ep_file(self):
+        hash_1 = int(self.parseState('4k3/8/8/8/4P3/8/8/4K3 w - e3 0 1')['hash'], 16)
+        hash_2 = int(self.parseState('4k3/8/8/8/4P3/8/8/4K3 w - - 0 1')['hash'], 16)
+
+        # E-file EP mask from hashconsts.h XORed with "no ep" mask
+        white_to_move_mask = 0x95f7f76baac0573f ^ 0x3594db2244a20ea3
+        self.assertEqual(hash_1, hash_2 ^ white_to_move_mask)
 
     def test_initial_position_board_position(self):
         state = self.parseState('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')

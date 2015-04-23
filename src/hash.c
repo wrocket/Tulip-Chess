@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "hash.h"
 #include "hashconsts.h"
@@ -31,8 +32,21 @@ uint64_t computeHash(GameState* gameState) {
     uint64_t h = 0;
 
     if (gameState->current->toMove == COLOR_WHITE) {
-        h |= HASH_WHITE_TO_MOVE;
+        h ^= HASH_WHITE_TO_MOVE;
     }
+
+    for (int i=0; i<64; i++) {
+        const int sq = BOARD_SQUARES[i];
+        const Piece* piece = gameState->board[sq];
+        const int pieceSq = HASH_PIECE_SQ[sq][piece->ordinal];
+
+        h ^= pieceSq;
+    }
+
+    h ^= HASH_EP_FILE[gameState->current->epFile];
+    h ^= HASH_PIECE_CASTLE[gameState->current->castleFlags];
+
+    // TODO: Fifty-move count?
 
     return h;
 }

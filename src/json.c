@@ -202,6 +202,8 @@ void printGameState(char* position, GameState* state) {
         printf("\"%c\", ", fileToChar(stateData->epFile));
     }
 
+    printf("\"hash\": \"%016"PRIX64"\", ", state->current->hash);
+
     printf("\"board\": {");
     bool printedSq = false;
     for(int i=0; i<64; i++) {

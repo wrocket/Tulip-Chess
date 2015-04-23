@@ -31,6 +31,7 @@
 #include "string.h"
 #include "board.h"
 #include "piece.h"
+#include "hash.h"
 #include "gamestate.h"
 #include "statedata.h"
 #include "piece.h"
@@ -280,6 +281,7 @@ int parseFen(GameState* state, char* fenStr) {
     state->current->fiftyMoveCount = fiftyMove;
 
     reinitBitboards(state);
+    state->current->hash = computeHash(state);
 
 clean_tokens:
     freeTokenBuffer(tokenBuffer, _FEN_MAX_TOKENS);
