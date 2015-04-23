@@ -46,16 +46,16 @@ class TestBasicStateParse(unittest.TestCase):
 
     def test_initial_position_hash(self):
         state = self.parseState('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
-        self.assertEqual('4AD833CD51D9088F', state['hash'])
+        self.assertEqual('4AD833CD27336703', state['hash'])
 
     def test_castle_flags_all(self):
         state = self.parseState('r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1')
-        self.assertEqual('B527CC32876B4F57', state['hash'])
+        self.assertEqual('4AD833CD0C7BE911', state['hash'])
 
     def test_castle_flags_none(self):
         state = self.parseState('r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1')
         # This is the same position with all castle flags enabled.
-        orig = 0xB527CC32876B4F57
+        orig = 0x4AD833CD0C7BE911
         # This is the "all castle flags" mask from hashconsts.c XORed with "no castle flags" from the same file.
         # Basically, we're "removing" the "all" mask and "adding" the "none" mask.
         bit_mask = 0x08a9bc2c9127f308 ^ 0xdc0b25e9f28ae0dd
@@ -64,7 +64,7 @@ class TestBasicStateParse(unittest.TestCase):
 
     def test_castle_flags_just_kings(self):
         state = self.parseState('r3k2r/8/8/8/8/8/8/R3K2R w Kk - 0 1')
-        orig = 0xB527CC32876B4F57
+        orig = 0x4AD833CD0C7BE911
         bit_mask = 0x08a9bc2c9127f308 ^ 0xca97ccc0ddec42ae
         no_castle_flags = orig ^ bit_mask
         self.assertEqual(self.print_hex(no_castle_flags), state['hash'])

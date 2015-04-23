@@ -46,7 +46,8 @@ def generate_castle_flag_hash():
 def generate_piece_square_hashes():
 	files = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
 	ranks = ['1', '2', '3', '4', '5', '6', '7', '8']
-	pieces = ['EMPTY', 'WPAWN', 'BPAWN', 'WKNIGHT', 'BKNIGHT', 'WBISHOP', 'BBISHOP', 'WROOK', 'BROOK', 'WQUEEN', 'BQUEEN', 'WKING', 'BKING', 'OFF_BOARD']
+	pieces = ['WPAWN', 'BPAWN', 'WKNIGHT', 'BKNIGHT', 'WBISHOP', 'BBISHOP', 'WROOK', 'BROOK', 'WQUEEN', 'BQUEEN', 'WKING', 'BKING', 'EMPTY', 'OFF_BOARD']
+	abbrev = {'WPAWN': 'P', 'BPAWN': 'p', 'WKNIGHT': 'N', 'BKNIGHT': 'n', 'WBISHOP': 'B', 'BBISHOP': 'b', 'WROOK': 'R', 'BROOK': 'r', 'WQUEEN': 'Q', 'BQUEEN': 'q', 'WKING': 'K', 'BKING': 'k', 'EMPTY': '-', 'OFF_BOARD': '?'}
 	print('const uint64_t HASH_PIECE_SQ[144][ORD_MAX + 1] = {')
 
 	for sq_idx in range(144):
@@ -60,7 +61,7 @@ def generate_piece_square_hashes():
 				hash_key = piece + '_' + sq_str
 				hash_val = hash_str(hash_key)
 				check_hash(hash_key, hash_val)
-				stuff.append('0x' + hash_val)
+				stuff.append('/* %s%s */ 0x%s' % (abbrev[piece], sq_str, hash_val))
 			else:
 				stuff.append('0x0')
 		print('\t/* %s */ {%s},' % (sq_str, ', '.join(stuff)))

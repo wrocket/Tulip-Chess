@@ -34,6 +34,11 @@ class TestBasicMoveApplication(unittest.TestCase):
     def setUp(self):
         None
 
+    def print_hex(self, n):
+        h = hex(n)
+        zeros = '0' * (16 - len(h))
+        return h.replace('0x', zeros).upper()
+
     def make_move(self, fen, move):
         result = call_tulip(['-makemove', move, fen])
         parsed_output = json.loads(result)
@@ -355,6 +360,16 @@ class TestBasicMoveApplication(unittest.TestCase):
         self.assertEqual('none', result['epFile'])
         self.assertEqual(61, piece_counts['-'])
 
+    def test_hash_simple_move(self):
+        result = self.make_move('4k3/8/8/8/8/1Q6/8/4K3 w - - 0 1', 'b3c4')
+        orig_hash = 0x618555F7C07711F8
+        wqueen_b3 = 0xb23fe2851af11c0b
+        wqueen_c4 = 0x4cf17ca889590e6e
+        empty_b3 = 0x577f452b5eb3fc01
+        empty_c4 = 0x620a3972d8fd6daf
+        white_to_move = 0x77e554c3ddafb8c6
+        mask = wqueen_c4 ^ wqueen_b3 ^ empty_c4 ^ empty_b3 ^ white_to_move
+        self.assertEqual(self.print_hex(orig_hash ^ mask), result['hash'])
 
 if __name__ == '__main__':
     unittest.main()

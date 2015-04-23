@@ -50,8 +50,8 @@
 #define ORD_BQUEEN  9
 #define ORD_WKING   10
 #define ORD_BKING   11
-#define ORD_OFFB    12
-#define ORD_EMPTY   13
+#define ORD_EMPTY   12
+#define ORD_OFFB    13
 #define ORD_MAX     13
 
 // Structure describing a piece on the board.

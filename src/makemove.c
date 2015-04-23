@@ -23,9 +23,13 @@
 #include "tulip.h"
 #include "piece.h"
 #include "bitboard.h"
+#include "hashconsts.h"
 #include "board.h"
 #include "makemove.h"
 #include "statedata.h"
+
+// Useful to debug what's being hashed in to the position
+#define APPLY_MASK(mask) /*printf("applying mask: %016"PRIX64"\n", (uint64_t) (mask));*/ hash ^= (mask);
 
 static void unCastleRook(GameState* gameState, const int homeSq, const int rookCastledSq, const int rookOrdinal, const Piece* rook) {
         const Piece** board = gameState->board;
@@ -124,9 +128,12 @@ void makeMove(GameState* gameState, Move* move) {
 
     const Piece** board = gameState->board;
 
+    uint64_t hash = nextData->hash;
+
     // Adjust half-move, flip to-move
     nextData->halfMoveCount++;
     nextData->toMove = INVERT_COLOR(nextData->toMove);
+    APPLY_MASK(HASH_WHITE_TO_MOVE);
 
     // Update fifty move count.
     if (isPawn || isCapture) {
@@ -150,14 +157,22 @@ void makeMove(GameState* gameState, Move* move) {
 
     // Place "empty" at the source square
     gameState->bitboards[ORD_EMPTY] |= bitboardSqFrom;
-
+    APPLY_MASK(HASH_PIECE_SQ[move->from][movingPiece->ordinal]);
+    APPLY_MASK(HASH_PIECE_SQ[move->from][ORD_EMPTY]);
+    APPLY_MASK(HASH_PIECE_SQ[move->to][capturedPiece->ordinal]);
+    APPLY_MASK(HASH_PIECE_SQ[move->to][movingPiece->ordinal]);
     board[move->to] = movingPiece;
     board[move->from] = &EMPTY;
 
     // Update EP file
+    int oldEpFile = nextData->epFile;
     int newEpFile = isPawn && abs(move->to - move->from) == (2 * OFFSET_N)
                         ? FILE_IDX(move->to) : NO_EP_FILE;
-    nextData->epFile = newEpFile;
+    if (oldEpFile != newEpFile) {
+        APPLY_MASK(HASH_EP_FILE[oldEpFile])
+        APPLY_MASK(HASH_EP_FILE[newEpFile])
+        nextData->epFile = newEpFile;
+    }
 
     // Piece-specific special moves: EP captures, promotions, castling.
     switch (movingPiece->ordinal) {
@@ -204,6 +219,8 @@ void makeMove(GameState* gameState, Move* move) {
             }
             break;
     }
+
+    nextData->hash = hash;
 }
 
 void unmakeMove(GameState* gameState, Move* move) {
@@ -271,3 +288,4 @@ void unmakeMove(GameState* gameState, Move* move) {
     gameState->current--;
 }
 
+#undef APPLY_MASK
