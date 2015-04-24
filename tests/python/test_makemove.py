@@ -45,7 +45,7 @@ class TestBasicMoveApplication(unittest.TestCase):
         state = parsed_output['resultingState']
         adjusted_hash = state['hash']
         calculated_hash = state['recalculatedHash']
-        self.assertEqual(adjusted_hash, calculated_hash)
+        self.assertEqual(adjusted_hash, calculated_hash, 'Hash value computed from the move and the value computed "from scratch" differ.')
         return state
 
     def test_initial_position_nf3(self):
@@ -366,7 +366,7 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def test_hash_simple_move(self):
         result = self.make_move('4k3/8/8/8/8/1Q6/8/4K3 w - - 0 1', 'b3c4')
-        orig_hash = 0x618555f7c07711f8
+        orig_hash = 0x41E9B629C07711F8
         wqueen_b3 = 0xb23fe2851af11c0b
         wqueen_c4 = 0x4cf17ca889590e6e
         empty_b3 = 0x577f452b5eb3fc01
@@ -377,7 +377,7 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def test_hash_white_kingside_castle(self):
         result = self.make_move('4k3/8/8/8/8/8/8/4K2R w K - 0 1', 'e1g1')
-        orig_hash = 0xc74d8add75536c23
+        orig_hash = 0xD3841F3775536C23
 
         mask = 0xc8df942dcdd9d3e3 # K on e1
         mask ^= 0x5165bdb57f3e5d48 # K on g1
@@ -396,7 +396,7 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def test_hash_white_queenside_castle(self):
         result = self.make_move('4k3/8/8/8/8/8/8/R3K3 w Q - 0 1', 'e1c1')
-        orig_hash = 0x8bc0657deb4b3031
+        orig_hash = 0x3020CDC8EB4B3031
 
         mask = 0xc8df942dcdd9d3e3 # K on E1
         mask ^= 0x63dab1c7ac4a2570 # K on C1
@@ -415,7 +415,7 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def test_hash_black_kingside_castle(self):
         result = self.make_move('4k2r/8/8/8/8/8/8/4K3 b k - 0 1', 'e8g8')
-        orig_hash = 0xc0a922018b2ed9e9
+        orig_hash = 0xB87D98648B2ED9E9
 
         mask = 0x79ab469f2417a80c # K on e8
         mask ^= 0x498757567d0304f6 # K on g8
@@ -434,7 +434,7 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def test_hash_black_queenside_castle(self):
         result = self.make_move('r3k3/8/8/8/8/8/8/4K3 b q - 0 1', 'e8c8')
-        orig_hash = 0xcc8a5b5f6d786956
+        orig_hash = 0xFD3E3E716D786956
 
         mask = 0x79ab469f2417a80c # K on e8
         mask ^= 0x2c09faad8766ee13 # K on c8
@@ -453,7 +453,7 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def test_hash_white_kingside_rookmove(self):
         result = self.make_move('4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1', 'h1h2')
-        orig_hash = 0x429E537F81C378CC
+        orig_hash = 0x289B2A5081C378CC
 
         mask = 0xe9f98801eded53f7 # R on h1
         mask ^= 0x381c599bd1a38fd8 # empty on h1
@@ -468,7 +468,7 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def test_hash_white_queenside_rookmove(self):
         result = self.make_move('4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1', 'a1a2')
-        orig_hash = 0x429E537F81C378CC
+        orig_hash = 0x289B2A5081C378CC
 
         mask = 0xfc0f0e854e8a0fcf # R on a1
         mask ^= 0x82c3e240217eb87c # empty on a1
@@ -483,7 +483,7 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def test_hash_black_kingside_rookmove(self):
         result = self.make_move('r3k2r/8/8/8/8/8/8/4K3 b kq - 0 1', 'h8h7')
-        orig_hash = 0x53DA454DA42F81CD
+        orig_hash = 0xDF96DE76A42F81CD
 
         mask = 0x1c8a15dfafd8d934 # R on h8
         mask ^= 0x5e8d1435579d024a # empty on h8
@@ -498,7 +498,7 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def test_hash_black_queenside_rookmove(self):
         result = self.make_move('r3k2r/8/8/8/8/8/8/4K3 b kq - 0 1', 'a8a7')
-        orig_hash = 0x53DA454DA42F81CD
+        orig_hash = 0xDF96DE76A42F81CD
 
         mask = 0x04325c381abf132e # R on a8
         mask ^= 0xf0aa7d665aa3a8fa # empty on a8

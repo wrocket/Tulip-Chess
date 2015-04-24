@@ -25,8 +25,6 @@
 #include "board.h"
 #include "piece.h"
 
-const uint64_t HASH_WHITE_TO_MOVE = 0x77e554c3ddafb8c6;
-
 const uint64_t HASH_PIECE_CASTLE[16] = {
     0xdc0b25e9f28ae0dd,     // CASTLE_FLAG_0
     0x7ac3fac33fa2a123,     // CASTLE_FLAG_1

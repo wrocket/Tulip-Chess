@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 
 CC=gcc
-CFLAGS=-Wall -Werror -Wshorten-64-to-32 -Wconversion -pedantic -std=c99
+CFLAGS=-Wall -Werror -Wconversion -pedantic -std=c99
 OBJ_FILES = tulip.o board.o piece.o statedata.o movegen.o move.o util.o gamestate.o json.o fen.o bitboard.o attack.o makemove.o notation.o hash.o hashconsts.o
 
 all: tulip

@@ -32,6 +32,6 @@ extern const uint64_t HASH_PIECE_CASTLE[16];
 extern const uint64_t HASH_EP_FILE[9];
 
 // WHITE_TO_MOVE
-extern const uint64_t HASH_WHITE_TO_MOVE;
+#define HASH_WHITE_TO_MOVE ((uint64_t) 0x77e554c3ddafb8c6)
 
 #endif

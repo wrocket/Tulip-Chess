@@ -101,17 +101,21 @@ static void blackKingCastle(Move* move, GameState* gs, uint64_t* runningHash) {
     *runningHash = hash;
 }
 
-static void promotePawn(Move* move, GameState* gs, const int color, const int pawnOrdinal) {
+static void promotePawn(Move* move, GameState* gs, const int color, const int pawnOrdinal, uint64_t* runningHash) {
     const Piece* promotePiece = getPromotePiece(color, move->moveCode);
+
+    uint64_t hash = *runningHash;
 
     // Delete pawn from board
     uint64_t* pawnBb = &gs->bitboards[pawnOrdinal];
     *pawnBb &= ~BITS_SQ[move->from];
     gs->pieceCounts[pawnOrdinal]--;
+    APPLY_MASK(HASH_PIECE_SQ[move->to][pawnOrdinal])
 
     // Add the new piece
     uint64_t* promoteBb = &gs->bitboards[promotePiece->ordinal];
     *promoteBb |= BITS_SQ[move->to];
+    APPLY_MASK(HASH_PIECE_SQ[move->to][promotePiece->ordinal]);
 
     // Delete captured piece from dest square
     uint64_t* captureBb = &gs->bitboards[move->captures->ordinal];
@@ -120,19 +124,25 @@ static void promotePawn(Move* move, GameState* gs, const int color, const int pa
     // Place new piece
     gs->board[move->to] = promotePiece;
     gs->pieceCounts[promotePiece->ordinal]++;
+
+    *runningHash = hash;
 }
 
-static void enPassant(GameState* gs, Move* move, const int attackSq) {
+static void enPassant(GameState* gs, Move* move, const int attackSq, uint64_t* runningHash) {
+    uint64_t hash = *runningHash;
     // Delete the captured piece
     uint64_t* captureBb = &gs->bitboards[move->captures->ordinal];
     *captureBb &= ~BITS_SQ[attackSq];
     uint64_t* emptyBb = &gs->bitboards[ORD_EMPTY];
     *emptyBb = (~BITS_SQ[move->to] & *emptyBb) | BITS_SQ[attackSq];
     gs->board[attackSq] = &EMPTY;
+    APPLY_MASK(HASH_PIECE_SQ[attackSq][move->captures->ordinal]);
+    APPLY_MASK(HASH_PIECE_SQ[attackSq][ORD_EMPTY]);
 
     // Put attacking pawn in new place
     uint64_t* movingBb = &gs->bitboards[move->movingPiece->ordinal];
     *movingBb = (~(BITS_SQ[move->from]) & *movingBb) | BITS_SQ[move->to];
+    *runningHash = hash;
 }
 
 void makeMove(GameState* gameState, Move* move) {
@@ -144,11 +154,13 @@ void makeMove(GameState* gameState, Move* move) {
     const Piece* capturedPiece = move->captures;
     const bool isPawn = movingPiece == &BPAWN || movingPiece == &WPAWN;
     const bool isCapture = capturedPiece != &EMPTY;
+    const int sqTo = move->to;
+    const int sqFrom = move->from;
 
     uint64_t* movingPieceBitboard = &gameState->bitboards[movingPiece->ordinal];
     uint64_t* capturedPieceBitboard = &gameState->bitboards[capturedPiece->ordinal];
-    uint64_t bitboardSqTo = BITS_SQ[move->to];
-    uint64_t bitboardSqFrom = BITS_SQ[move->from];
+    uint64_t bitboardSqTo = BITS_SQ[sqTo];
+    uint64_t bitboardSqFrom = BITS_SQ[sqFrom];
 
     const Piece** board = gameState->board;
 
@@ -181,17 +193,27 @@ void makeMove(GameState* gameState, Move* move) {
 
     // Place "empty" at the source square
     gameState->bitboards[ORD_EMPTY] |= bitboardSqFrom;
-    APPLY_MASK(HASH_PIECE_SQ[move->from][movingPiece->ordinal]);
-    APPLY_MASK(HASH_PIECE_SQ[move->from][ORD_EMPTY]);
-    APPLY_MASK(HASH_PIECE_SQ[move->to][capturedPiece->ordinal]);
-    APPLY_MASK(HASH_PIECE_SQ[move->to][movingPiece->ordinal]);
-    board[move->to] = movingPiece;
-    board[move->from] = &EMPTY;
+    APPLY_MASK(HASH_PIECE_SQ[sqFrom][movingPiece->ordinal]);
+    APPLY_MASK(HASH_PIECE_SQ[sqFrom][ORD_EMPTY]);
+    board[sqFrom] = &EMPTY;
+
+    // Remove the target square and replace with what's moving.
+    // In the case of most moves, the target square will contain whatever piece is being captured (movingPiece->capturedPiece)
+    // In EP moves, this is always empty, and the captuedPiece is a pawn (which isn't actually what's in the destination square)
+    if (move->moveCode == CAPTURE_EP) {
+        APPLY_MASK(HASH_PIECE_SQ[sqTo][ORD_EMPTY]);
+    } else {
+        APPLY_MASK(HASH_PIECE_SQ[sqTo][capturedPiece->ordinal]);
+    }
+
+    APPLY_MASK(HASH_PIECE_SQ[sqTo][movingPiece->ordinal]);
+
+    board[sqTo] = movingPiece;
 
     // Update EP file
     int oldEpFile = nextData->epFile;
-    int newEpFile = isPawn && abs(move->to - move->from) == (2 * OFFSET_N)
-                        ? FILE_IDX(move->to) : NO_EP_FILE;
+    int newEpFile = isPawn && abs(sqTo - sqFrom) == (2 * OFFSET_N)
+                        ? FILE_IDX(sqTo) : NO_EP_FILE;
     if (oldEpFile != newEpFile) {
         APPLY_MASK(HASH_EP_FILE[oldEpFile])
         APPLY_MASK(HASH_EP_FILE[newEpFile])
@@ -203,42 +225,42 @@ void makeMove(GameState* gameState, Move* move) {
         case ORD_WKING:
             if (nextData->castleFlags & (CASTLE_WK | CASTLE_WQ)) {
                 APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
-                APPLY_MASK(HASH_PIECE_CASTLE[0])
                 nextData->castleFlags &= ~(CASTLE_WK | CASTLE_WQ);
+                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
             }
-            nextData->whiteKingSquare = move->to;
-            if (move->from == SQ_E1) {
+            nextData->whiteKingSquare = sqTo;
+            if (sqFrom == SQ_E1) {
                 whiteKingCastle(move, gameState, &hash);
             }
             break;
         case ORD_BKING:
             if (nextData->castleFlags & (CASTLE_BK | CASTLE_BQ)) {
                 APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
-                APPLY_MASK(HASH_PIECE_CASTLE[0])
                 nextData->castleFlags &= ~(CASTLE_BK | CASTLE_BQ);
+                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
             }
-            nextData->blackKingSquare = move->to;
-            if (move->from == SQ_E8) {
+            nextData->blackKingSquare = sqTo;
+            if (sqFrom == SQ_E8) {
                 blackKingCastle(move, gameState, &hash);
             }
             break;
         case ORD_WROOK:
-            if (move->from == SQ_H1 && nextData->castleFlags & CASTLE_WK) {
+            if (sqFrom == SQ_H1 && nextData->castleFlags & CASTLE_WK) {
                 APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
                 nextData->castleFlags &= ~(CASTLE_WK);
                 APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
-            } else if (move->from == SQ_A1 && nextData->castleFlags & CASTLE_WQ) {
+            } else if (sqFrom == SQ_A1 && nextData->castleFlags & CASTLE_WQ) {
                 APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
                 nextData->castleFlags &= ~(CASTLE_WQ);
                 APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
             }
             break;
         case ORD_BROOK:
-            if (move->from == SQ_H8 && nextData->castleFlags & CASTLE_BK) {
+            if (sqFrom == SQ_H8 && nextData->castleFlags & CASTLE_BK) {
                 APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
                 nextData->castleFlags &= ~(CASTLE_BK);
                 APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
-            } else if (move->from == SQ_A8 && nextData->castleFlags & CASTLE_BQ) {
+            } else if (sqFrom == SQ_A8 && nextData->castleFlags & CASTLE_BQ) {
                 APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
                 nextData->castleFlags &= ~(CASTLE_BQ);
                 APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
@@ -246,16 +268,16 @@ void makeMove(GameState* gameState, Move* move) {
             break;
         case ORD_WPAWN:
             if (IS_PROMOTE(move->moveCode)) {
-                promotePawn(move, gameState, COLOR_WHITE, ORD_WPAWN);
+                promotePawn(move, gameState, COLOR_WHITE, ORD_WPAWN, &hash);
             } else if (move->moveCode == CAPTURE_EP) {
-                enPassant(gameState, move, move->to + OFFSET_S);
+                enPassant(gameState, move, sqTo + OFFSET_S, &hash);
             }
             break;
         case ORD_BPAWN:
             if (IS_PROMOTE(move->moveCode)) {
-                promotePawn(move, gameState, COLOR_BLACK, ORD_BPAWN);
+                promotePawn(move, gameState, COLOR_BLACK, ORD_BPAWN, &hash);
             } else if (move->moveCode == CAPTURE_EP) {
-                enPassant(gameState, move, move->to + OFFSET_N);
+                enPassant(gameState, move, sqTo + OFFSET_N, &hash);
             }
             break;
     }
