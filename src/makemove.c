@@ -223,10 +223,14 @@ void makeMove(GameState* gameState, Move* move) {
             }
             break;
         case ORD_WROOK:
-            if (move->from == SQ_H1) {
+            if (move->from == SQ_H1 && nextData->castleFlags & CASTLE_WK) {
+                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
                 nextData->castleFlags &= ~(CASTLE_WK);
-            } else if (move->from == SQ_A1) {
+                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
+            } else if (move->from == SQ_A1 && nextData->castleFlags & CASTLE_WQ) {
+                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
                 nextData->castleFlags &= ~(CASTLE_WQ);
+                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
             }
             break;
         case ORD_BROOK:
