@@ -42,7 +42,11 @@ class TestBasicMoveApplication(unittest.TestCase):
     def make_move(self, fen, move):
         result = call_tulip(['-makemove', move, fen])
         parsed_output = json.loads(result)
-        return parsed_output['resultingState']
+        state = parsed_output['resultingState']
+        adjusted_hash = state['hash']
+        calculated_hash = state['recalculatedHash']
+        self.assertEqual(adjusted_hash, calculated_hash)
+        return state
 
     def test_initial_position_nf3(self):
         result = self.make_move('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'g1f3')

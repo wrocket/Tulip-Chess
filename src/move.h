@@ -45,7 +45,7 @@
 typedef struct {
 	int from;					// The "from" or "source" square index.
 	int to;						// The "to" or "destination" square index.
-	unsigned int moveCode;		// An integer that describes a special move condition 
+	int moveCode;		// An integer that describes a special move condition
 								// (e.g. PROMOTE_Q for a promotion to queen)
 	const Piece* captures;		// A reference to any piece captured by this move.
 								// If no capture, this will be &EMPTY.

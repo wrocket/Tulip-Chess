@@ -38,9 +38,8 @@ uint64_t computeHash(GameState* gameState) {
     for (int i=0; i<64; i++) {
         const int sq = BOARD_SQUARES[i];
         const Piece* piece = gameState->board[sq];
-        const int pieceSq = HASH_PIECE_SQ[sq][piece->ordinal];
 
-        h ^= pieceSq;
+        h ^= HASH_PIECE_SQ[sq][piece->ordinal];
     }
 
     h ^= HASH_EP_FILE[gameState->current->epFile];

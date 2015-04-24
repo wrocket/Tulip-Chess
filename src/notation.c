@@ -48,7 +48,7 @@ static int printMoveDisambiguation(GameState* g, Move* move, char* buffer) {
 	createMoveBuffer(&legalMoves);
 	generateLegalMoves(g, &legalMoves);
 
-	collidingMoves = ALLOC(legalMoves.length, int, collidingMoves, "Unable to allocate ambiguous move buffer.");
+	collidingMoves = ALLOC((unsigned long) legalMoves.length, int, collidingMoves, "Unable to allocate ambiguous move buffer.");
 
 	for (int i=0; i < legalMoves.length; i++) {
 		Move* candidate = &legalMoves.moves[i];
@@ -102,7 +102,7 @@ int printShortAlg(Move* move, GameState* gameState, char* buffer) {
 	}
 
 	if (!isPawn) {
-		buffer[count++] = toupper(movingPiece->name);
+		buffer[count++] = (char) toupper(movingPiece->name);
 		count += printMoveDisambiguation(gameState, move, &buffer[count]);
 	}
 
@@ -118,7 +118,7 @@ int printShortAlg(Move* move, GameState* gameState, char* buffer) {
 
 	if (IS_PROMOTE(move->moveCode)) {
 		buffer[count++] = '=';
-		buffer[count++] = toupper(getPromotePiece(movingPiece->color, move->moveCode)->name);
+		buffer[count++] = (char) toupper(getPromotePiece(movingPiece->color, move->moveCode)->name);
 	}
 
 add_check:

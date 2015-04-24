@@ -27,13 +27,14 @@
 #include "gamestate.h"
 #include "board.h"
 #include "notation.h"
+#include "hash.h"
 #include "move.h"
 #include "json.h"
 
 #define __STDC_FORMAT_MACROS
 
 // TODO: Use a real JSON library for this.
-static const char* maskBooleanToStrU(unsigned int value, unsigned int mask) {
+static const char* maskBooleanToStrU(int value, int mask) {
     return (value & mask) ? "true" : "false";
 }
 
@@ -185,7 +186,7 @@ void printGameState(char* position, GameState* state) {
     printSq(squareStr, stateData->blackKingSquare);
     printf("\"blackKingSquare\": \"%s\", ", squareStr);
 
-    printf("\"fiftyMoveCount\": %i, ", stateData->fiftyMoveCount);
+    printf("\"fiftyMoveCount\": %ld, ", stateData->fiftyMoveCount);
     printf("\"halfMoveCount\": %i, ", stateData->halfMoveCount);
 
     const int flags = stateData->castleFlags;
@@ -203,6 +204,7 @@ void printGameState(char* position, GameState* state) {
     }
 
     printf("\"hash\": \"%016"PRIX64"\", ", state->current->hash);
+    printf("\"recalculatedHash\": \"%016"PRIX64"\", ", computeHash(state));
 
     printf("\"board\": {");
     bool printedSq = false;

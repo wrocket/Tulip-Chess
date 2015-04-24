@@ -40,12 +40,12 @@
 #define NO_EP_FILE  INVALID_FILE
 
 typedef struct {
-    unsigned int toMove;        // The side to move, either COLOR_WHITE or COLOR_BLACK
-    unsigned int castleFlags;   // The castle flags as a bitmap; see CASTLE_WK and others.
+    int toMove;        // The side to move, either COLOR_WHITE or COLOR_BLACK
+    int castleFlags;   // The castle flags as a bitmap; see CASTLE_WK and others.
     int whiteKingSquare;        // The current square index of the white king.
     int blackKingSquare;        // The current square index of the black king.
     int epFile;                 // The current en passant file, if any.
-    int fiftyMoveCount;         // The fifty move count. This is the number of half-moves since a capture or pawn move.
+    long fiftyMoveCount;         // The fifty move count. This is the number of half-moves since a capture or pawn move.
     int halfMoveCount;          // The half move count. This increments by one after every move.
     uint64_t hash;              // The current state hash.
 } StateData;

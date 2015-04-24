@@ -32,7 +32,7 @@
 #include "statedata.h"
 
 // Useful to debug what's being hashed in to the position
-#define APPLY_MASK(mask) /*printf("applying mask to %016"PRIX64": %016"PRIX64"\n", hash, (uint64_t) (mask)); */hash ^= (mask);
+#define APPLY_MASK(mask) /*printf("applying mask to %016"PRIX64": %016"PRIX64"\n", hash, (uint64_t) (mask));*/ hash ^= (mask);
 
 static void unCastleRook(GameState* gameState, const int homeSq, const int rookCastledSq, const int rookOrdinal, const Piece* rook) {
         const Piece** board = gameState->board;
@@ -56,7 +56,7 @@ static void whiteKingCastle(Move* move, GameState* gs, uint64_t* runningHash) {
         APPLY_MASK(HASH_PIECE_SQ[SQ_F1][ORD_EMPTY])
         uint64_t* rb = &gs->bitboards[ORD_WROOK];
         uint64_t* eb = &gs->bitboards[ORD_EMPTY];
-        *rb = (*rb & ~BIT_SQ_H1) | BIT_SQ_F1;
+        *rb = (*rb & ~((uint64_t)BIT_SQ_H1)) | ((uint64_t)BIT_SQ_F1);
         *eb = (*eb & ~BIT_SQ_F1) | BIT_SQ_H1;
     } else if (move->to == SQ_C1) {
         gs->board[SQ_A1] = &EMPTY;

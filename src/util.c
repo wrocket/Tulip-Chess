@@ -32,7 +32,7 @@ int tokenize(const char* str, char** tokenBuffers, const int maxTokens) {
     char* currentBuffer = tokenBuffers[0];
     int currentBufferIdx = -1;
     int currentBufferStrIdx = 0;
-    int len = strlen(str);
+    unsigned long len = strlen(str);
     int isInToken = false;
 
     for(int idx = 0; idx < len && currentBufferIdx < maxTokens; idx++) {
@@ -62,9 +62,9 @@ int tokenize(const char* str, char** tokenBuffers, const int maxTokens) {
 }
 
 char** createTokenBuffer(const int tokens, const int maxLength) {
-    char** buffer = ALLOC_ZERO(tokens, char*, buffer, "Unable to allocate token buffer");
+    char** buffer = ALLOC_ZERO((unsigned long) tokens, char*, buffer, "Unable to allocate token buffer");
     for(int i=0; i<tokens; i++) {
-        buffer[i] = ALLOC_ZERO(maxLength, char, buffer[i], "Unable to allocate token buffer]");
+        buffer[i] = ALLOC_ZERO((unsigned long) maxLength, char, buffer[i], "Unable to allocate token buffer]");
     }
     return buffer;
 }
