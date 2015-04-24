@@ -35,9 +35,9 @@ class TestBasicMoveApplication(unittest.TestCase):
         None
 
     def print_hex(self, n):
-        h = hex(n)
+        h = hex(n).replace('0x', '')
         zeros = '0' * (16 - len(h))
-        return h.replace('0x', zeros).upper()
+        return zeros + h.upper()
 
     def make_move(self, fen, move):
         result = call_tulip(['-makemove', move, fen])
@@ -362,7 +362,7 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def test_hash_simple_move(self):
         result = self.make_move('4k3/8/8/8/8/1Q6/8/4K3 w - - 0 1', 'b3c4')
-        orig_hash = 0x618555F7C07711F8
+        orig_hash = 0x618555f7c07711f8
         wqueen_b3 = 0xb23fe2851af11c0b
         wqueen_c4 = 0x4cf17ca889590e6e
         empty_b3 = 0x577f452b5eb3fc01
@@ -370,6 +370,45 @@ class TestBasicMoveApplication(unittest.TestCase):
         white_to_move = 0x77e554c3ddafb8c6
         mask = wqueen_c4 ^ wqueen_b3 ^ empty_c4 ^ empty_b3 ^ white_to_move
         self.assertEqual(self.print_hex(orig_hash ^ mask), result['hash'])
+
+    def test_hash_white_kingside_castle(self):
+        result = self.make_move('4k3/8/8/8/8/8/8/4K2R w K - 0 1', 'e1g1')
+        orig_hash = 0xc74d8add75536c23
+
+        mask = 0xc8df942dcdd9d3e3 # K on e1
+        mask ^= 0x5165bdb57f3e5d48 # K on g1
+        mask ^= 0xca56b19fbc285239 # Empty on e1
+        mask ^= 0xd6a2781d1760be4e # Empty of g1
+        mask ^= 0xe9f98801eded53f7 # Rook on h1
+        mask ^= 0x394345456ac4fb80 # Rook on f1
+        mask ^= 0x381c599bd1a38fd8 # Empty on h1
+        mask ^= 0x70d7c44806003548 # Empty on f1
+        mask ^= 0x77e554c3ddafb8c6 # White to move
+        mask ^= 0x7ac3fac33fa2a123 # Original K castle flags
+        mask ^= 0xdc0b25e9f28ae0dd # The "no" castle flag
+
+        desired_hash = orig_hash ^ mask
+        self.assertEqual(self.print_hex(desired_hash), result['hash'])
+
+    def test_hash_white_queenside_castle(self):
+        result = self.make_move('4k3/8/8/8/8/8/8/R3K3 w Q - 0 1', 'e1c1')
+        orig_hash = 0x8bc0657deb4b3031
+
+        mask = 0xc8df942dcdd9d3e3 # K on E1
+        mask ^= 0x63dab1c7ac4a2570 # K on C1
+        mask ^= 0xca56b19fbc285239 # Empty on E1
+        mask ^= 0x0c5d579da3336099 # Empty on C1
+        mask ^= 0xfc0f0e854e8a0fcf # Rook on A1
+        mask ^= 0x17d426030a67bc7c # Rook on D1
+        mask ^= 0x82c3e240217eb87c # empty on A1
+        mask ^= 0x0d25aae264535842 # empty on D1
+        mask ^= 0x77e554c3ddafb8c6 # White to move
+        mask ^= 0x364e1563f20096ad # Original Q castle flag
+        mask ^= 0xdc0b25e9f28ae0dd # The "no" castle flag
+
+        desired_hash = orig_hash ^ mask
+        self.assertEqual(self.print_hex(desired_hash), result['hash'])
+
 
 if __name__ == '__main__':
     unittest.main()

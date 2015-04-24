@@ -20,6 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+/*#include <stdio.h>
+#include <inttypes.h>*/
+
 #include "tulip.h"
 #include "piece.h"
 #include "bitboard.h"
@@ -29,7 +32,7 @@
 #include "statedata.h"
 
 // Useful to debug what's being hashed in to the position
-#define APPLY_MASK(mask) /*printf("applying mask: %016"PRIX64"\n", (uint64_t) (mask));*/ hash ^= (mask);
+#define APPLY_MASK(mask) /*printf("applying mask to %016"PRIX64": %016"PRIX64"\n", hash, (uint64_t) (mask)); */hash ^= (mask);
 
 static void unCastleRook(GameState* gameState, const int homeSq, const int rookCastledSq, const int rookOrdinal, const Piece* rook) {
         const Piece** board = gameState->board;
@@ -41,10 +44,16 @@ static void unCastleRook(GameState* gameState, const int homeSq, const int rookC
         board[rookCastledSq] = &EMPTY;
 }
 
-static void whiteKingCastle(Move* move, GameState* gs) {
+static void whiteKingCastle(Move* move, GameState* gs, uint64_t* runningHash) {
+    uint64_t hash = *runningHash;
     if (move->to == SQ_G1) {
         gs->board[SQ_H1] = &EMPTY;
         gs->board[SQ_F1] = &WROOK;
+        // TODO: We can condense this in to a single constant?
+        APPLY_MASK(HASH_PIECE_SQ[SQ_H1][ORD_WROOK])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_F1][ORD_WROOK])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_H1][ORD_EMPTY])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_F1][ORD_EMPTY])
         uint64_t* rb = &gs->bitboards[ORD_WROOK];
         uint64_t* eb = &gs->bitboards[ORD_EMPTY];
         *rb = (*rb & ~BIT_SQ_H1) | BIT_SQ_F1;
@@ -52,11 +61,16 @@ static void whiteKingCastle(Move* move, GameState* gs) {
     } else if (move->to == SQ_C1) {
         gs->board[SQ_A1] = &EMPTY;
         gs->board[SQ_D1] = &WROOK;
+        APPLY_MASK(HASH_PIECE_SQ[SQ_A1][ORD_WROOK])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_D1][ORD_WROOK])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_A1][ORD_EMPTY])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_D1][ORD_EMPTY])
         uint64_t* rb = &gs->bitboards[ORD_WROOK];
         uint64_t* eb = &gs->bitboards[ORD_EMPTY];
         *rb = (*rb & ~BIT_SQ_A1) | BIT_SQ_D1;
         *eb = (*eb & ~BIT_SQ_D1) | BIT_SQ_A1;
     }
+    *runningHash = hash;
 }
 
 static void blackKingCastle(Move* move, GameState* gs) {
@@ -177,10 +191,14 @@ void makeMove(GameState* gameState, Move* move) {
     // Piece-specific special moves: EP captures, promotions, castling.
     switch (movingPiece->ordinal) {
         case ORD_WKING:
-            nextData->castleFlags &= ~(CASTLE_WK | CASTLE_WQ);
+            if (nextData->castleFlags & (CASTLE_WK | CASTLE_WQ)) {
+                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
+                APPLY_MASK(HASH_PIECE_CASTLE[0])
+                nextData->castleFlags &= ~(CASTLE_WK | CASTLE_WQ);
+            }
             nextData->whiteKingSquare = move->to;
             if (move->from == SQ_E1) {
-                whiteKingCastle(move, gameState);
+                whiteKingCastle(move, gameState, &hash);
             }
             break;
         case ORD_BKING:
