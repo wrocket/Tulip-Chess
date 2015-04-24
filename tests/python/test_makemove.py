@@ -409,6 +409,43 @@ class TestBasicMoveApplication(unittest.TestCase):
         desired_hash = orig_hash ^ mask
         self.assertEqual(self.print_hex(desired_hash), result['hash'])
 
+    def test_hash_black_kingside_castle(self):
+        result = self.make_move('4k2r/8/8/8/8/8/8/4K3 b k - 0 1', 'e8g8')
+        orig_hash = 0xc0a922018b2ed9e9
+
+        mask = 0x79ab469f2417a80c # K on e8
+        mask ^= 0x498757567d0304f6 # K on g8
+        mask ^= 0xe88948c88c965e82 # Empty on e8
+        mask ^= 0x6e9b57f33fde478c # Empty of g8
+        mask ^= 0x1c8a15dfafd8d934 # Rook on h8
+        mask ^= 0x66c959bbb905a316 # Rook on f8
+        mask ^= 0x5e8d1435579d024a # Empty on h8
+        mask ^= 0x57cd66545b16183c # Empty on f8
+        mask ^= 0x77e554c3ddafb8c6 # White to move
+        mask ^= 0xf53df923d87bab7e # Original K castle flags
+        mask ^= 0xdc0b25e9f28ae0dd # The "no" castle flag
+
+        desired_hash = orig_hash ^ mask
+        self.assertEqual(self.print_hex(desired_hash), result['hash'])
+
+    def test_hash_black_queenside_castle(self):
+        result = self.make_move('r3k3/8/8/8/8/8/8/4K3 b q - 0 1', 'e8c8')
+        orig_hash = 0xcc8a5b5f6d786956
+
+        mask = 0x79ab469f2417a80c # K on e8
+        mask ^= 0x2c09faad8766ee13 # K on c8
+        mask ^= 0xe88948c88c965e82 # Empty on e8
+        mask ^= 0x44e15261d0800493 # Empty of c8
+        mask ^= 0x04325c381abf132e # Rook on a8
+        mask ^= 0xd9653edc79fd29b7 # Rook on d8
+        mask ^= 0xf0aa7d665aa3a8fa # Empty on a8
+        mask ^= 0xd53bcbf41a7b69ba # Empty on d8
+        mask ^= 0x77e554c3ddafb8c6 # White to move
+        mask ^= 0x06e17f8286747b6b # Original K castle flags
+        mask ^= 0xdc0b25e9f28ae0dd # The "no" castle flag
+
+        desired_hash = orig_hash ^ mask
+        self.assertEqual(self.print_hex(desired_hash), result['hash'])
 
 if __name__ == '__main__':
     unittest.main()

@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-/*#include <stdio.h>
-#include <inttypes.h>*/
+#include <stdio.h>
+#include <inttypes.h>
 
 #include "tulip.h"
 #include "piece.h"
@@ -73,10 +73,15 @@ static void whiteKingCastle(Move* move, GameState* gs, uint64_t* runningHash) {
     *runningHash = hash;
 }
 
-static void blackKingCastle(Move* move, GameState* gs) {
+static void blackKingCastle(Move* move, GameState* gs, uint64_t* runningHash) {
+    uint64_t hash = *runningHash;
     if (move->to == SQ_G8) {
         gs->board[SQ_H8] = &EMPTY;
         gs->board[SQ_F8] = &BROOK;
+        APPLY_MASK(HASH_PIECE_SQ[SQ_H8][ORD_BROOK])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_F8][ORD_BROOK])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_H8][ORD_EMPTY])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_F8][ORD_EMPTY])
         uint64_t* rb = &gs->bitboards[ORD_BROOK];
         uint64_t* eb = &gs->bitboards[ORD_EMPTY];
         *rb = (*rb & ~BIT_SQ_H8) | BIT_SQ_F8;
@@ -84,11 +89,16 @@ static void blackKingCastle(Move* move, GameState* gs) {
     } else if (move->to == SQ_C8) {
         gs->board[SQ_A8] = &EMPTY;
         gs->board[SQ_D8] = &BROOK;
+        APPLY_MASK(HASH_PIECE_SQ[SQ_A8][ORD_BROOK])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_D8][ORD_BROOK])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_A8][ORD_EMPTY])
+        APPLY_MASK(HASH_PIECE_SQ[SQ_D8][ORD_EMPTY])
         uint64_t* rb = &gs->bitboards[ORD_BROOK];
         uint64_t* eb = &gs->bitboards[ORD_EMPTY];
         *rb = (*rb & ~BIT_SQ_A8) | BIT_SQ_D8;
         *eb = (*eb & ~BIT_SQ_D8) | BIT_SQ_A8;
     }
+    *runningHash = hash;
 }
 
 static void promotePawn(Move* move, GameState* gs, const int color, const int pawnOrdinal) {
@@ -202,10 +212,14 @@ void makeMove(GameState* gameState, Move* move) {
             }
             break;
         case ORD_BKING:
-            nextData->castleFlags &= ~(CASTLE_BQ | CASTLE_BK);
+            if (nextData->castleFlags & (CASTLE_BK | CASTLE_BQ)) {
+                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags])
+                APPLY_MASK(HASH_PIECE_CASTLE[0])
+                nextData->castleFlags &= ~(CASTLE_BK | CASTLE_BQ);
+            }
             nextData->blackKingSquare = move->to;
             if (move->from == SQ_E8) {
-                blackKingCastle(move, gameState);
+                blackKingCastle(move, gameState, &hash);
             }
             break;
         case ORD_WROOK:
