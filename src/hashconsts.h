@@ -31,6 +31,11 @@ extern const uint64_t HASH_PIECE_SQ[144][ORD_MAX + 1];
 extern const uint64_t HASH_PIECE_CASTLE[16];
 extern const uint64_t HASH_EP_FILE[9];
 
+extern const uint64_t HASH_MASK_CASTLE_WK;
+extern const uint64_t HASH_MASK_CASTLE_WQ;
+extern const uint64_t HASH_MASK_CASTLE_BK;
+extern const uint64_t HASH_MASK_CASTLE_BQ;
+
 // WHITE_TO_MOVE
 #define HASH_WHITE_TO_MOVE ((uint64_t) 0x77e554c3ddafb8c6)
 

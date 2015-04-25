@@ -25,6 +25,11 @@
 #include "board.h"
 #include "piece.h"
 
+const uint64_t HASH_MASK_CASTLE_WK = /*Rh1*/ 0xe9f98801eded53f7 ^ /*Rf1*/ 0x394345456ac4fb80 ^ /*-f1*/ 0x70d7c44806003548 ^ /*-h1*/ 0x381c599bd1a38fd8;
+const uint64_t HASH_MASK_CASTLE_WQ = /*Ra1*/ 0xfc0f0e854e8a0fcf ^ /*Rd1*/ 0x17d426030a67bc7c ^ /*-a1*/ 0x82c3e240217eb87c ^ /*-d1*/ 0x0d25aae264535842;
+const uint64_t HASH_MASK_CASTLE_BK = /*rh8*/ 0x1c8a15dfafd8d934 ^ /*rf8*/ 0x66c959bbb905a316 ^ /*-h8*/ 0x5e8d1435579d024a ^ /*-f8*/ 0x57cd66545b16183c;
+const uint64_t HASH_MASK_CASTLE_BQ = /*ra8*/ 0x04325c381abf132e ^ /*rd8*/ 0xd9653edc79fd29b7 ^ /*-a8*/ 0xf0aa7d665aa3a8fa ^ /*-d8*/ 0xd53bcbf41a7b69ba;
+
 const uint64_t HASH_PIECE_CASTLE[16] = {
     0xdc0b25e9f28ae0dd,     // CASTLE_FLAG_0
     0x7ac3fac33fa2a123,     // CASTLE_FLAG_1

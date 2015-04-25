@@ -49,11 +49,7 @@ static void whiteKingCastle(Move* move, GameState* gs, uint64_t* runningHash) {
     if (move->to == SQ_G1) {
         gs->board[SQ_H1] = &EMPTY;
         gs->board[SQ_F1] = &WROOK;
-        // TODO: We can condense this in to a single constant?
-        APPLY_MASK(HASH_PIECE_SQ[SQ_H1][ORD_WROOK])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_F1][ORD_WROOK])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_H1][ORD_EMPTY])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_F1][ORD_EMPTY])
+        APPLY_MASK(HASH_MASK_CASTLE_WK)
         uint64_t* rb = &gs->bitboards[ORD_WROOK];
         uint64_t* eb = &gs->bitboards[ORD_EMPTY];
         *rb = (*rb & ~((uint64_t)BIT_SQ_H1)) | ((uint64_t)BIT_SQ_F1);
@@ -61,10 +57,7 @@ static void whiteKingCastle(Move* move, GameState* gs, uint64_t* runningHash) {
     } else if (move->to == SQ_C1) {
         gs->board[SQ_A1] = &EMPTY;
         gs->board[SQ_D1] = &WROOK;
-        APPLY_MASK(HASH_PIECE_SQ[SQ_A1][ORD_WROOK])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_D1][ORD_WROOK])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_A1][ORD_EMPTY])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_D1][ORD_EMPTY])
+        APPLY_MASK(HASH_MASK_CASTLE_WQ)
         uint64_t* rb = &gs->bitboards[ORD_WROOK];
         uint64_t* eb = &gs->bitboards[ORD_EMPTY];
         *rb = (*rb & ~BIT_SQ_A1) | BIT_SQ_D1;
@@ -78,10 +71,7 @@ static void blackKingCastle(Move* move, GameState* gs, uint64_t* runningHash) {
     if (move->to == SQ_G8) {
         gs->board[SQ_H8] = &EMPTY;
         gs->board[SQ_F8] = &BROOK;
-        APPLY_MASK(HASH_PIECE_SQ[SQ_H8][ORD_BROOK])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_F8][ORD_BROOK])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_H8][ORD_EMPTY])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_F8][ORD_EMPTY])
+        APPLY_MASK(HASH_MASK_CASTLE_BK)
         uint64_t* rb = &gs->bitboards[ORD_BROOK];
         uint64_t* eb = &gs->bitboards[ORD_EMPTY];
         *rb = (*rb & ~BIT_SQ_H8) | BIT_SQ_F8;
@@ -89,10 +79,7 @@ static void blackKingCastle(Move* move, GameState* gs, uint64_t* runningHash) {
     } else if (move->to == SQ_C8) {
         gs->board[SQ_A8] = &EMPTY;
         gs->board[SQ_D8] = &BROOK;
-        APPLY_MASK(HASH_PIECE_SQ[SQ_A8][ORD_BROOK])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_D8][ORD_BROOK])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_A8][ORD_EMPTY])
-        APPLY_MASK(HASH_PIECE_SQ[SQ_D8][ORD_EMPTY])
+        APPLY_MASK(HASH_MASK_CASTLE_BQ)
         uint64_t* rb = &gs->bitboards[ORD_BROOK];
         uint64_t* eb = &gs->bitboards[ORD_EMPTY];
         *rb = (*rb & ~BIT_SQ_A8) | BIT_SQ_D8;
