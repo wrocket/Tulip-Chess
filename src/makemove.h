@@ -26,7 +26,19 @@
 #include "gamestate.h"
 #include "move.h"
 
+// Applies a given move to the given game state.
+// This will update all relevant state data reflecting the new move.
+// Important: This does not check that the move is actually a legal move in the
+// game state. Applying an illegal or nonesense move can permanently corrupt the
+// game state/
 void makeMove(GameState* gameState, Move* move);
+
+// Unmakes a given move from a given game state.
+// This assumes that the move being unmade was the move that was just applied
+// to achieve the current state.
+// Important: This does not check that the move is actually a legal move in the
+// game state. Unapplying an illegal or nonesense move can permanently corrupt the
+// game state/
 void unmakeMove(GameState* gameState, Move* move);
 
 #endif

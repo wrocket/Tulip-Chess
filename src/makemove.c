@@ -194,7 +194,6 @@ void makeMove(GameState* gameState, Move* move) {
     }
 
     APPLY_MASK(HASH_PIECE_SQ[sqTo][movingPiece->ordinal]);
-
     board[sqTo] = movingPiece;
 
     // Update EP file
