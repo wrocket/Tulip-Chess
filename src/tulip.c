@@ -128,8 +128,7 @@ static void printMoveResult(int argc, char** argv) {
     GameState gs = parseFenOrQuit(argv[2]);
     Move m;
 
-    // TODO: Switch this to use the "real" moves once that's implemented
-    if (!matchPseudoMoveCoord(&gs, argv[1], &m)) {
+    if (!matchMove(argv[1], &gs, &m)) {
         fprintf(stderr, "Unknown move \"%s\" for position %s\n", argv[1], argv[2]);
         exit(EXIT_FAILURE);
     }
@@ -163,8 +162,7 @@ static void printMakeUnmakeMoveResult(int argc, char** argv) {
     GameState gs = parseFenOrQuit(argv[2]);
     Move m;
 
-    // TODO: Switch this to use the "real" moves once that's implemented
-    if (!matchPseudoMoveCoord(&gs, argv[1], &m)) {
+    if (!matchMove(argv[1], &gs, &m)) {
         fprintf(stderr, "Unknown move \"%s\" for position %s\n", argv[1], argv[2]);
         exit(EXIT_FAILURE);
     }
