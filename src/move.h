@@ -70,7 +70,6 @@ void destroyMoveBuffer(MoveBuffer*);
 // Returns the number of characters printed to the buffer.
 // The result will be null-terminated.
 int printMoveCoordinate(Move*, char*);
-void printMovelist(MoveBuffer*);
 
 // Matches a *pseudo*move in coordinate algebraic form to a Move object for
 // the given game state. Returns false if no such move exists.

@@ -49,17 +49,6 @@ void destroyMoveBuffer(MoveBuffer* buff) {
     buff->created = false;
 }
 
-void printMovelist(MoveBuffer* buffer) {
-    char strBuff[16];
-
-    printf("%i move(s)\n", buffer->length);
-    printf("----------\n");
-    for(int i=0; i<buffer->length; i++) {
-        printMoveCoordinate(&(buffer->moves[i]), strBuff);
-        printf("%i\t%s\n", i, strBuff);
-    }
-}
-
 bool matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m) {
     MoveBuffer moveBuff;
     int moveCount;
