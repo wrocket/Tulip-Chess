@@ -35,6 +35,9 @@
 #define PUSH_MOVE(move, fromSq, toSq, moving, capturesP, code)  \
     (m)->from=(fromSq); (m)->to=(toSq); (m)->movingPiece=(moving); (m)->captures=(capturesP); (m)->moveCode=(code);
 
+// This method checks for the ability for a non-sliding piece (knight, king) to move/capture a given square.
+// Increments the count and adds the move if the move from "sq" to "sq + offset" is possible.
+// Either one or zero moves will be pushed here.
 static void nonSlider(const int sq, const int offset, const Piece** board, Move* moveBuff, int* count, const int capturable) {
     const int target = sq + offset;
     const Piece* targetPiece = board[target];
@@ -45,6 +48,9 @@ static void nonSlider(const int sq, const int offset, const Piece** board, Move*
     }
 }
 
+// This method checks for the ability for a sliding piece (bishop, rook, queen) to move/capture a given square.
+// This method walks the board, adding "offset" to "sq" on each step, looking for empty squares to move or
+// occupied squares to capture.
 static void slider(const int sq, const int offset, const Piece** board, Move* moveBuff, int* count, const int capturable) {
     int target = sq + offset;
     const Piece* targetPiece = board[target];
@@ -102,6 +108,7 @@ static void king(const int sq, const Piece** board, Move* moveArr, int* count, c
 
 static void whitePawnEp(const int sq, const Piece** board, Move* moveBuffer, int* count, int epFile) {
     const int dF = epFile - FILE_IDX(sq);
+    // TODO: Compare the performance of calculating rank index using RANK_IDX versus something like "sq betwee SQ_A5 and SQ_H5"
     if ((dF == 1 || dF == -1) && RANK_IDX(sq) == RANK_5) {
         Move* m = &moveBuffer[*count];
         PUSH_MOVE(m, sq, sq + (dF * OFFSET_E) + OFFSET_N, &WPAWN, &BPAWN, CAPTURE_EP);
@@ -109,9 +116,10 @@ static void whitePawnEp(const int sq, const Piece** board, Move* moveBuffer, int
     }
 }
 
-// TODO: Condense whitePawnEp and blackPawnEp in to a single method.
+// TODO: Condense whitePawnEp and blackPawnEp in to a single method?
 static void blackPawnEp(const int sq, const Piece** board, Move* moveBuffer, int* count, int epFile) {
     const int dF = epFile - FILE_IDX(sq);
+    // TODO: Compare the performance of calculating rank index using RANK_IDX versus something like "sq betwee SQ_A4 and SQ_H4"
     if ((dF == 1 || dF == -1) && RANK_IDX(sq) == RANK_4) {
         Move* m = &moveBuffer[*count];
         PUSH_MOVE(m, sq, sq + (dF * OFFSET_E) + OFFSET_S, &BPAWN, &WPAWN, CAPTURE_EP);
@@ -203,7 +211,7 @@ static void whitePawn(const int sq, const Piece** board, Move* moveBuff, int* co
     }
 }
 
-// TODO: Condense whitePawn() and backPawn() in to a single method...
+// TODO: Condense whitePawn() and backPawn() in to a single method?
 static void blackPawn(const int sq, const Piece** board, Move* moveBuff, int* count) {
     Move* m = &moveBuff[*count];
     int target;
