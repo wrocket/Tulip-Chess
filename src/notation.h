@@ -32,4 +32,6 @@
 // Returns the number of characters printed, not including the null char.
 int printShortAlg(Move* move, GameState* gameState, char* buffer);
 
+bool matchMove(char* str, GameState* gs, Move* move);
+
 #endif

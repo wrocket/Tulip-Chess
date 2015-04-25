@@ -22,6 +22,7 @@
 
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "attack.h"
 #include "board.h"
@@ -132,4 +133,61 @@ add_check:
 
 	buffer[count] = '\0';
 	return count;
+}
+
+static void normalizeMove(char* original, char* normalized) {
+    char* c = original;
+    char* start = normalized;
+    int cnt = 0;
+    while (*c) {
+        if (isalnum(*c) && tolower(*c) != 'x') {
+        	char cv = *c;
+
+        	// Normalize algebraic castling to "oh" instead of "zero"
+        	if (cv == '0') {
+        		cv = 'O';
+        	}
+
+            *normalized = (char) tolower(cv);
+            normalized++;
+            cnt++;
+        }
+        c++;
+    }
+
+    *normalized = '\0';
+
+    // Lop off trailing 'ep' designating pawn en passant captures.
+    if (cnt >= 3) {
+	    char* ep_file = strstr(start, "ep");
+	    if (ep_file && ep_file == normalized - 2) {
+	    	*(normalized - 2) = '\0';
+	    }
+	}
+}
+
+bool matchMove(char* str, GameState* gs, Move* m) {
+	MoveBuffer buffer;
+	char moveStr[16];
+	char normalizedMove[16];
+	char normalizedInputMove[16];
+	createMoveBuffer(&buffer);
+	generateLegalMoves(gs, &buffer);
+	bool result = false;
+
+	normalizeMove(str, normalizedInputMove);
+
+	for (int i=0; i<buffer.length; i++) {
+		printShortAlg(&buffer.moves[i], gs, moveStr);
+		normalizeMove(moveStr, normalizedMove);
+		// printf("%s to %s\n", normalizedMove, normalizedInputMove);
+		if(strcmp(normalizedMove, normalizedInputMove) == 0) {
+			result = true;
+			*m = buffer.moves[i];
+			break;
+		}
+	}
+
+	destroyMoveBuffer(&buffer);
+	return result;
 }

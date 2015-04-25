@@ -251,6 +251,16 @@ void printGameState(char* position, GameState* state) {
     printf("}\n");
 }
 
+void printMatchMoveResult(Move* move) {
+    printf("{\"matchedMove\": ");
+    if (move) {
+        printMoveDetail(move);
+    } else {
+        printf("null");
+    }
+    printf("}\n");
+}
+
 void printCheckStatus(char* position, bool isCheck) {
     printf("{");
     printf("\"fenString\": \"%s\", ", position);

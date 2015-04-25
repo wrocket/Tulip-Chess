@@ -35,6 +35,7 @@
 #include "makemove.h"
 #include "move.h"
 #include "movegen.h"
+#include "notation.h"
 #include "piece.h"
 #include "statedata.h"
 #include "tulip.h"
@@ -175,6 +176,24 @@ static void printMakeUnmakeMoveResult(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
+static void printMatchMove(int argc, char** argv) {
+    if(argc != 3) {
+        fprintf(stderr, "Usage: -matchmove [moveString] \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    GameState gs = parseFenOrQuit(argv[2]);
+
+    Move m;
+    if (!matchMove(argv[1], &gs, &m)) {
+        printMatchMoveResult(NULL);
+    } else {
+        printMatchMoveResult(&m);
+    }
+
+    destroyGamestate(&gs);
+}
+
 int main(int argc, char** argv) {
     argc--;
     argv++;
@@ -192,6 +211,8 @@ int main(int argc, char** argv) {
             checkStatus(argc, argv);
         } else if(0 == strcmp("-makeunmake", argv[0])) {
             printMakeUnmakeMoveResult(argc, argv);
+        } else if(0 == strcmp("-matchmove", argv[0])) {
+            printMatchMove(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);
