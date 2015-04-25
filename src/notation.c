@@ -178,12 +178,25 @@ bool matchMove(char* str, GameState* gs, Move* m) {
 	normalizeMove(str, normalizedInputMove);
 
 	for (int i=0; i<buffer.length; i++) {
-		printShortAlg(&buffer.moves[i], gs, moveStr);
+		Move currentMove = buffer.moves[i];
+
+		// Fist match with algebraic notation
+		printShortAlg(&currentMove, gs, moveStr);
 		normalizeMove(moveStr, normalizedMove);
 		// printf("%s to %s\n", normalizedMove, normalizedInputMove);
 		if(strcmp(normalizedMove, normalizedInputMove) == 0) {
 			result = true;
-			*m = buffer.moves[i];
+			*m = currentMove;
+			break;
+		}
+
+		// Next match with coordinate notation
+		printMoveCoordinate(&currentMove, moveStr);
+		normalizeMove(moveStr, normalizedMove);
+		// printf("%s to %s\n", normalizedMove, normalizedInputMove);
+		if(strcmp(normalizedMove, normalizedInputMove) == 0) {
+			result = true;
+			*m = currentMove;
 			break;
 		}
 	}

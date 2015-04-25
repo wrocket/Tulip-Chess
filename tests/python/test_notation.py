@@ -256,6 +256,38 @@ class TestNotation(unittest.TestCase):
         self.assertEqual('-', move['capturedPiece'])
         self.assertEqual('none', move['moveCode'])
 
+    def test_match_move_Nf3_from_initial_coord(self):
+        move = self.match_move('g1f3', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+        self.assertIsNotNone(move);
+        self.assertEqual('g1f3', move['move'])
+        self.assertEqual('N', move['movingPiece'])
+        self.assertEqual('-', move['capturedPiece'])
+        self.assertEqual('none', move['moveCode'])
+
+    def test_match_pawn_promote_capture_coord(self):
+        move = self.match_move('c2b1=q', '4k3/8/8/8/8/8/2p5/1B2K3 b - - 0 1')
+        self.assertIsNotNone(move)
+        self.assertEqual('c2b1=q', move['move'])
+        self.assertEqual('p', move['movingPiece'])
+        self.assertEqual('B', move['capturedPiece'])
+        self.assertEqual('promoteQueen', move['moveCode'])
+
+    def test_match_castling_coord(self):
+        move = self.match_move("e1g1", '4k3/8/8/8/8/8/8/4K2R w K - 0 1')
+        self.assertIsNotNone(move)
+        self.assertEqual('e1g1', move['move'])
+        self.assertEqual('K', move['movingPiece'])
+        self.assertEqual('-', move['capturedPiece'])
+        self.assertEqual('none', move['moveCode'])
+
+    def test_match_ep_coord(self):
+        move = self.match_move('f4e3', '4k3/8/8/8/4Pp2/8/8/4K3 b - e3 0 1')
+        self.assertIsNotNone(move)
+        self.assertEqual('f4e3', move['move'])
+        self.assertEqual('p', move['movingPiece'])
+        self.assertEqual('P', move['capturedPiece'])
+        self.assertEqual('epCapture', move['moveCode'])
+
     def test_match_move_not_found_from_initial(self):
         move = self.match_move('Q!?SA?DA?SD', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
         self.assertIsNone(move);
