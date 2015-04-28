@@ -37,6 +37,7 @@ void createStateData(StateData * data) {
     data->hash = 0;
     data->epFile = 0;
     data->fiftyMoveCount = 0;
+    data->halfMoveCount = 0;
 }
 
 void copyStateData(StateData* from, StateData* to) {
