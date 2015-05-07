@@ -170,6 +170,9 @@
 // Contains the board indexes of the chessboard.
 extern const int BOARD_SQUARES[64];
 
+// Contains the square color of a given square.
+extern const int BOARD_SQ_COLORS[144];
+
 // Defines constants to add to board indexes to get the indexes of other
 // squares on the board. "North" is towards black's side of the board.
 // So, SQ_E4 + OFFSET_N = SQ_E5, and so on.

@@ -1,17 +1,17 @@
 # The MIT License (MIT)
 #
 # Copyright (c) 2015 Brian Wray (brian@wrocket.org)
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -152,6 +152,15 @@ def compute_king_mask(file, rank):
 	offsets = filter(lambda t: (t[0] | t[1]) != 0, pairs)
 	return compute_nonslider_mask(file, rank, offsets)
 
+def compute_light_squares():
+	result = 0
+	for file, rank in itertools.product(range(8), range(8)):
+		if rank & 1 == 0:
+			if file & 1 == 1:
+				result |= get_sq_bit(square_index(file, rank))
+		elif file & 1 == 0:
+				result |= get_sq_bit(square_index(file, rank))
+	return result
 
 print("// Bitmasks for individual squares.")
 for file, rank in itertools.product(range(8), range(8)):
@@ -161,6 +170,10 @@ for file, rank in itertools.product(range(8), range(8)):
 	hex_str = print_hex(mask)
 	print('#define BIT_SQ_%s\t%s' % (sq_str, hex_str))
 
+print()
+print("// Bitmasks for the squares of a given color.")
+print("#define BIT_SQUARES_LIGHT ((uint64_t) %s)" % print_hex(compute_light_squares()))
+print("#define BIT_SQUARES_DARK (~BIT_SQUARES_LIGHT)")
 
 print()
 print("// Bitmasks for particular ranks (basically an OR of all the square bitmasks on a given rank)")

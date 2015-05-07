@@ -89,6 +89,10 @@
 #define BIT_SQ_H7	((uint64_t) 0x0080000000000000)
 #define BIT_SQ_H8	((uint64_t) 0x8000000000000000)
 
+// Bitmasks for the squares of a given color.
+#define BIT_SQUARES_LIGHT ((uint64_t) 0x55aa55aa55aa55aa)
+#define BIT_SQUARES_DARK (~BIT_SQUARES_LIGHT)
+
 // Bitmasks for particular ranks (basically an OR of all the square bitmasks on a given rank)
 #define BIT_RANK_1	((uint64_t) 0x00000000000000ff)
 #define BIT_RANK_2	((uint64_t) 0x000000000000ff00)

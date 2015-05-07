@@ -20,17 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef JSON_H
-#define JSON_H
+#ifndef DRAW_H
+#define DRAW_H
 
-#include "move.h"
 #include "gamestate.h"
 
-void printMovelistJson(char*, char*, GameState*, MoveBuffer*);
-void printGameState(char*, GameState*);
-void printCheckStatus(char*, bool isCheck);
-void printMakeMoveResult(char* position, Move* m, GameState* state);
-void printAttackList(char* position, bool* attackGrid, GameState* state);
-void printMatchMoveResult(Move* move);
-void printDrawStatus(char* position, bool isDraw);
+bool isMaterialDraw(GameState* g);
+
 #endif

@@ -263,6 +263,13 @@ void printMatchMoveResult(Move* move) {
     printf("}\n");
 }
 
+void printDrawStatus(char* position, bool isDraw) {
+    printf("{");
+    printf("\"fenString\": \"%s\", ", position);
+    printf("\"isDraw\": %s", isDraw ? "true" : "false");
+    printf("}\n");
+}
+
 void printCheckStatus(char* position, bool isCheck) {
     printf("{");
     printf("\"fenString\": \"%s\", ", position);
