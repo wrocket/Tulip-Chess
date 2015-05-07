@@ -86,6 +86,8 @@ class TestBasicMoveApplication(unittest.TestCase):
         self.assertTrue('r' not in board.values())
         self.assertEqual(0, piece_counts['r'])
         self.assertEqual(1, piece_counts['N'])
+        self.assertEqual(2, result['whitePieceCount'])
+        self.assertEqual(1, result['blackPieceCount'])
         self.assertEqual(61, piece_counts['-'])
         self.assertEqual('0000000000000000', bitboards['n'])
         self.assertEqual('0000040000000000', bitboards['N'])

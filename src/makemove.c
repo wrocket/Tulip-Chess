@@ -169,6 +169,11 @@ void makeMove(GameState* gameState, Move* move) {
     if (isCapture) {
         gameState->pieceCounts[capturedPiece->ordinal]--;
         gameState->pieceCounts[ORD_EMPTY]++;
+        if (capturedPiece->color == COLOR_WHITE) {
+            nextData->whitePieceCount--;
+        } else {
+            nextData->blackPieceCount--;
+        }
     }
 
     if (move->moveCode == NO_MOVE_CODE) {

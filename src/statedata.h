@@ -48,6 +48,8 @@ typedef struct {
     long fiftyMoveCount;         // The fifty move count. This is the number of half-moves since a capture or pawn move.
     int halfMoveCount;          // The half move count. This increments by one after every move.
     uint64_t hash;              // The current state hash.
+    int whitePieceCount;        // The current white piece count.
+    int blackPieceCount;        // The current black piece count.
 } StateData;
 
 // Allocate memory for an new state data object.

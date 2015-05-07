@@ -126,14 +126,13 @@ static bool parseCastleFlags(char* t, int* result) {
 
 static bool parseBoard(char* t, GameState* gs) {
     const Piece** board = gs->board;
-
+    int* pCounts = gs->pieceCounts;
     bool result = true;
     int currentFile = FILE_A;
     int currentRank = RANK_8;
     int squares = 0;
     int sqwk = -1;
     int sqbk = -1;
-
 
     char* c = t;
     while(*c && currentRank >= RANK_1) {
@@ -144,7 +143,7 @@ static bool parseBoard(char* t, GameState* gs) {
             int spaceDigits = *c - '0'; // Hack: Char to int. Might be funny in strange encodings...
             for(int i=0; i<spaceDigits; i++) {
                 board[B_IDX(currentFile++, currentRank)] = &EMPTY;
-                gs->pieceCounts[(&EMPTY)->ordinal]++;
+                pCounts[(&EMPTY)->ordinal]++;
                 squares++;
             }
         } else {
@@ -175,7 +174,7 @@ static bool parseBoard(char* t, GameState* gs) {
                 sqbk = idx;
             }
 
-            gs->pieceCounts[p->ordinal]++;
+            pCounts[p->ordinal]++;
 
             board[idx] = p;
             squares++;
@@ -201,6 +200,12 @@ static bool parseBoard(char* t, GameState* gs) {
 
     gs->current->whiteKingSquare = sqwk;
     gs->current->blackKingSquare = sqbk;
+
+    gs->current->whitePieceCount = pCounts[ORD_WPAWN] + pCounts[ORD_WKNIGHT] + pCounts[ORD_WBISHOP]
+        + pCounts[ORD_WROOK] + pCounts[ORD_WQUEEN] + pCounts[ORD_WKING];
+
+    gs->current->blackPieceCount = pCounts[ORD_BPAWN] + pCounts[ORD_BKNIGHT] + pCounts[ORD_BBISHOP]
+        + pCounts[ORD_BROOK] + pCounts[ORD_BQUEEN] + pCounts[ORD_BKING];
 
 parse_board_err:
     return result;

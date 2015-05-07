@@ -224,6 +224,8 @@ void printGameState(char* position, GameState* state) {
 
     printf("}, ");
 
+    printf("\"whitePieceCount\": %i, \"blackPieceCount\": %i, ", state->current->whitePieceCount, state->current->blackPieceCount);
+
     printf("\"pieceCounts\": {");
     const Piece* pieces[] = {&WPAWN, &BPAWN, &WKNIGHT, &BKNIGHT, &WBISHOP,
                              &BBISHOP, &WROOK, &BROOK, &WQUEEN, &BQUEEN,

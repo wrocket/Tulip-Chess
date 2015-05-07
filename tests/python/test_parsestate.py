@@ -121,6 +121,8 @@ class TestBasicStateParse(unittest.TestCase):
         for p in ['K', 'k', 'Q', 'q']:
             self.assertEqual(1, piece_counts[p])
         self.assertEqual(32, piece_counts['-'])
+        self.assertEqual(16, state['whitePieceCount'])
+        self.assertEqual(16, state['whitePieceCount'])
 
     def test_initial_position_bitboards(self):
         state = self.parseState('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')

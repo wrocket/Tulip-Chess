@@ -38,6 +38,8 @@ void createStateData(StateData * data) {
     data->epFile = 0;
     data->fiftyMoveCount = 0;
     data->halfMoveCount = 0;
+    data->whitePieceCount = 0;
+    data->blackPieceCount = 0;
 }
 
 void copyStateData(StateData* from, StateData* to) {
