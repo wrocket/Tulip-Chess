@@ -20,18 +20,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef JSON_H
-#define JSON_H
-
+#include "tulip.h"
+#include "draw.h"
+#include "attack.h"
 #include "move.h"
-#include "gamestate.h"
+#include "movegen.h"
+#include "result.h"
 
-void printMovelistJson(char*, char*, GameState*, MoveBuffer*);
-void printGameState(char*, GameState*);
-void printCheckStatus(char*, bool isCheck);
-void printMakeMoveResult(char* position, Move* m, GameState* state);
-void printAttackList(char* position, bool* attackGrid, GameState* state);
-void printMatchMoveResult(Move* move);
-void printGameStatus(char* position, int status);
+int getResult(GameState* g) {
 
-#endif
+    if (isMaterialDraw(g)) {
+        return STATUS_MATERIAL_DRAW;
+    }
+
+    const int moves = countLegalMoves(g);
+
+    if (moves == 0) {
+        const bool check = isCheck(g);
+
+        if (check) {
+            return g->current->toMove == COLOR_WHITE ?
+                STATUS_WHITE_CHECKMATED : STATUS_BLACK_CHECKMATED;
+        } else {
+            return STATUS_STALEMATE;
+        }
+    }
+
+    return STATUS_NONE;
+}

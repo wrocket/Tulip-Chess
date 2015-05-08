@@ -37,6 +37,7 @@
 #include "move.h"
 #include "movegen.h"
 #include "notation.h"
+#include "result.h"
 #include "piece.h"
 #include "statedata.h"
 #include "tulip.h"
@@ -175,21 +176,6 @@ static void printMakeUnmakeMoveResult(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void printMaterialDraw(int argc, char** argv) {
-    if(argc != 2) {
-        fprintf(stderr, "Usage: -materialdraw \"[FEN string]\"\n");
-        exit(EXIT_FAILURE);
-    }
-
-    GameState gs = parseFenOrQuit(argv[1]);
-
-    bool posDraw = isMaterialDraw(&gs);
-
-    printDrawStatus(argv[1], posDraw);
-
-    destroyGamestate(&gs);
-}
-
 static void printMatchMove(int argc, char** argv) {
     if(argc != 3) {
         fprintf(stderr, "Usage: -matchmove [moveString] \"[FEN string]\"\n");
@@ -204,6 +190,21 @@ static void printMatchMove(int argc, char** argv) {
     } else {
         printMatchMoveResult(&m);
     }
+
+    destroyGamestate(&gs);
+}
+
+static void printGameResultStatus(int argc, char** argv) {
+    if(argc != 2) {
+        fprintf(stderr, "Usage: -gamestatus \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    GameState gs = parseFenOrQuit(argv[1]);
+
+    int result = getResult(&gs);
+
+    printGameStatus(argv[1], result);
 
     destroyGamestate(&gs);
 }
@@ -227,8 +228,8 @@ int main(int argc, char** argv) {
             printMakeUnmakeMoveResult(argc, argv);
         } else if(0 == strcmp("-matchmove", argv[0])) {
             printMatchMove(argc, argv);
-        } else if(0 == strcmp("-materialdraw", argv[0])) {
-            printMaterialDraw(argc, argv);
+        } else if(0 == strcmp("-gamestatus", argv[0])) {
+            printGameResultStatus(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);

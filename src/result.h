@@ -20,18 +20,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef JSON_H
-#define JSON_H
+#ifndef RESULT_H
+#define RESULT_H
 
-#include "move.h"
 #include "gamestate.h"
 
-void printMovelistJson(char*, char*, GameState*, MoveBuffer*);
-void printGameState(char*, GameState*);
-void printCheckStatus(char*, bool isCheck);
-void printMakeMoveResult(char* position, Move* m, GameState* state);
-void printAttackList(char* position, bool* attackGrid, GameState* state);
-void printMatchMoveResult(Move* move);
-void printGameStatus(char* position, int status);
+// Game continues.
+#define STATUS_NONE 0
+
+// White is checkmated.
+#define STATUS_WHITE_CHECKMATED 1
+
+// Black is checkmated.
+#define STATUS_BLACK_CHECKMATED 2
+
+// Stalemate.
+#define STATUS_STALEMATE 3
+
+// Material draw.
+#define STATUS_MATERIAL_DRAW 4
+
+// Threefold draw.
+#define STATUS_THREEFOLD_DRAW 5
+
+// Fifty-move draw.
+#define STATUS_FIFTY_MOVE_DRAW 6
+
+int getResult(GameState* g);
 
 #endif

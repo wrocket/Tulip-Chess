@@ -420,7 +420,7 @@ int generateLegalMoves(GameState* gameState, MoveBuffer* destination) {
     return count;
 }
 
-int countLegalMoves(GameState* gameState, MoveBuffer* destination) {
+int countLegalMoves(GameState* gameState) {
     MoveBuffer pseudoMoves;
     createMoveBuffer(&pseudoMoves);
     generatePseudoMoves(gameState, &pseudoMoves);

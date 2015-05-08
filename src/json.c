@@ -30,6 +30,7 @@
 #include "hash.h"
 #include "move.h"
 #include "json.h"
+#include "result.h"
 
 #define __STDC_FORMAT_MACROS
 
@@ -263,16 +264,45 @@ void printMatchMoveResult(Move* move) {
     printf("}\n");
 }
 
-void printDrawStatus(char* position, bool isDraw) {
-    printf("{");
-    printf("\"fenString\": \"%s\", ", position);
-    printf("\"isDraw\": %s", isDraw ? "true" : "false");
-    printf("}\n");
-}
-
 void printCheckStatus(char* position, bool isCheck) {
     printf("{");
     printf("\"fenString\": \"%s\", ", position);
     printf("\"isCheck\": %s", isCheck ? "true" : "false");
+    printf("}\n");
+}
+
+void printGameStatus(char* position, int status) {
+    const char* resultStr;
+
+    switch (status) {
+        case STATUS_NONE:
+            resultStr = "none";
+            break;
+        case STATUS_WHITE_CHECKMATED:
+            resultStr = "whiteCheckmated";
+            break;
+        case STATUS_BLACK_CHECKMATED:
+            resultStr = "blackCheckmated";
+            break;
+        case STATUS_STALEMATE:
+            resultStr = "stalemate";
+            break;
+        case STATUS_MATERIAL_DRAW:
+            resultStr = "materialDraw";
+            break;
+        case STATUS_THREEFOLD_DRAW:
+            resultStr = "threefoldDraw";
+            break;
+        case STATUS_FIFTY_MOVE_DRAW:
+            resultStr = "fiftyMoveDraw";
+            break;
+        default:
+            resultStr = "unknown";
+            break;
+    }
+
+    printf("{");
+    printf("\"fenString\": \"%s\", ", position);
+    printf("\"status\": \"%s\"", resultStr);
     printf("}\n");
 }
