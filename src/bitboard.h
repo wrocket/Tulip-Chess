@@ -23,6 +23,8 @@
 #ifndef BITBOARD_H
 #define BITBOARD_H
 
+#include <stdint.h>
+
 // Bitmasks for individual squares.
 #define BIT_SQ_A1	((uint64_t) 0x0000000000000001)
 #define BIT_SQ_A2	((uint64_t) 0x0000000000000100)
