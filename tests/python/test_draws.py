@@ -70,5 +70,25 @@ class TestDrawDetection(unittest.TestCase):
         result = self.get_status('3k4/8/5b2/8/6B1/8/8/3K4 w - - 0 1')
         self.assertFalse(result)
 
+    def test_material_draw_many_bishops_same_color(self):
+        result = self.get_status('3k1b2/8/1B3b2/b7/7B/b1b1B1B1/5B2/3K4 b - - 0 1')
+        self.assertTrue(result)
+
+    def test_material_draw_many_bishops_different_color(self):
+        result = self.get_status('3k1b2/8/1B3b2/b7/2b4B/b1b1B1B1/5B2/3K4 b - - 0 1')
+        self.assertFalse(result)
+
+    def test_material_draw_many_bishops_extra_piece(self):
+        result = self.get_status('3k1b2/8/1B1P1b2/b7/7B/b1b1B1B1/5B2/3K4 b - - 0 1')
+        self.assertFalse(result)
+
+    def test_material_draw_many_bishops_only_one_side_with_bishops_w(self):
+        result = self.get_status('3k4/8/1B6/8/7B/4B1B1/5B2/3K4 b - - 0 1')
+        self.assertFalse(result)
+
+    def test_material_draw_many_bishops_only_one_side_with_bishops_b(self):
+        result = self.get_status('3k4/8/1b6/8/7b/4b1b1/5b2/3K4 b - - 0 1')
+        self.assertFalse(result)
+
 if __name__ == '__main__':
     unittest.main()

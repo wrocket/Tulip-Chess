@@ -33,26 +33,46 @@ bool isMaterialDraw(GameState* g) {
 
     bool result = false;
 
-    // TODO: Bug. An improbable position consisting of kings with an arbitrary number
-    // of same colored bishops on the same color is a material draw. However, this is
-    // a great speedup to simply discard this sort of nonsense...
     if (total <= 4) {
         if (total == 4) {
+            // Deal with KB vs KB with bishops on same squre.
             if (g->pieceCounts[ORD_WBISHOP] == 1 && g->pieceCounts[ORD_BBISHOP] == 1) {
                 const uint64_t wbishop = g->bitboards[ORD_WBISHOP];
                 const uint64_t bbishop = g->bitboards[ORD_BBISHOP];
-
-                // Either both bishops are on light squares, or both on dark squares.
                 result = ((BIT_SQUARES_LIGHT & wbishop) && (BIT_SQUARES_LIGHT & bbishop))
-                 || ((BIT_SQUARES_DARK & wbishop) && (BIT_SQUARES_DARK & bbishop));
+                    || ((BIT_SQUARES_DARK & wbishop) && (BIT_SQUARES_DARK & bbishop));
             }
         } else if (total == 3) {
+            // Deal with KBvsK and KNvsK
             result = g->pieceCounts[ORD_WBISHOP] > 0
                         || g->pieceCounts[ORD_BBISHOP] > 0
                         || g->pieceCounts[ORD_WKNIGHT] > 0
                         || g->pieceCounts[ORD_WKNIGHT] > 0;
         } else { // Must be a piece count of 2, KvK, this is a draw.
             result = true;
+        }
+    } else {
+        // Deal with king and arbitrary bishops vs king and arbitrary bishops.
+        // If all the bishops are on the same color, and each side has at least
+        // one bishop, and there are no other pieces, this is a draw.
+        const int wbishops = g->pieceCounts[ORD_WBISHOP];
+        const int bbishops = g->pieceCounts[ORD_BBISHOP];
+
+        if (wbishops && bbishops && (wbishops + bbishops + 2) == total) {
+            // TODO: optimize?
+            const uint64_t wbishop = g->bitboards[ORD_WBISHOP];
+            const uint64_t bbishop = g->bitboards[ORD_BBISHOP];
+
+            const bool wbishopsOnLight = (BIT_SQUARES_LIGHT & wbishop) != 0;
+            const bool wbishopsOnDark = (BIT_SQUARES_DARK & wbishop) != 0;
+            const bool bbishopsOnLight = (BIT_SQUARES_LIGHT & bbishop) != 0;
+            const bool bbishopsOnDark = (BIT_SQUARES_DARK & bbishop) != 0;
+
+            const bool allWBishopsOnSameColor = wbishopsOnLight ^ wbishopsOnDark;
+            const bool allBBishopsOnSameColor = bbishopsOnLight ^ bbishopsOnDark;
+            const bool allBishopsOnSameColor = ((wbishopsOnLight && bbishopsOnLight) || (wbishopsOnDark && bbishopsOnDark));
+
+            result = allWBishopsOnSameColor && allBBishopsOnSameColor && allBishopsOnSameColor;
         }
     }
 
