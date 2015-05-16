@@ -35,15 +35,15 @@ int tokenize(const char* str, char** tokenBuffers, const int maxTokens) {
     unsigned long len = strlen(str);
     int isInToken = false;
 
-    for(int idx = 0; idx < len && currentBufferIdx < maxTokens; idx++) {
+    for (int idx = 0; idx < len && currentBufferIdx < maxTokens; idx++) {
         const char c = str[idx];
-        if(isspace(c)) {
-            if(isInToken) {
+        if (isspace(c)) {
+            if (isInToken) {
                 isInToken = false;
                 currentBuffer[currentBufferStrIdx++] = '\0';
             }
         } else {
-            if(!isInToken) {
+            if (!isInToken) {
                 isInToken = true;
                 currentBuffer = tokenBuffers[++currentBufferIdx];
                 currentBufferStrIdx = 0;
@@ -53,7 +53,7 @@ int tokenize(const char* str, char** tokenBuffers, const int maxTokens) {
         }
     }
 
-    if(currentBufferStrIdx > 0 && currentBufferIdx < maxTokens) {
+    if (currentBufferStrIdx > 0 && currentBufferIdx < maxTokens) {
         currentBuffer[currentBufferStrIdx++] = '\0';
         currentBufferIdx++;
     }
@@ -63,14 +63,14 @@ int tokenize(const char* str, char** tokenBuffers, const int maxTokens) {
 
 char** createTokenBuffer(const int tokens, const int maxLength) {
     char** buffer = ALLOC_ZERO((unsigned long) tokens, char*, buffer, "Unable to allocate token buffer");
-    for(int i=0; i<tokens; i++) {
+    for (int i = 0; i < tokens; i++) {
         buffer[i] = ALLOC_ZERO((unsigned long) maxLength, char, buffer[i], "Unable to allocate token buffer]");
     }
     return buffer;
 }
 
 void freeTokenBuffer(char** buffer, const int length) {
-    for(int i=0; i<length; i++) {
+    for (int i = 0; i < length; i++) {
         free(buffer[i]);
     }
 

@@ -40,7 +40,7 @@ int getResult(GameState* g) {
 
         if (check) {
             return g->current->toMove == COLOR_WHITE ?
-                STATUS_WHITE_CHECKMATED : STATUS_BLACK_CHECKMATED;
+                   STATUS_WHITE_CHECKMATED : STATUS_BLACK_CHECKMATED;
         } else {
             return STATUS_STALEMATE;
         }

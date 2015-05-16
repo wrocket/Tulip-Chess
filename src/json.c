@@ -54,28 +54,28 @@ static void printMoveDetail(Move* m) {
 
     const char* codeStr;
 
-    switch(m->moveCode) {
-        case NO_MOVE_CODE:
-            codeStr = "none";
-            break;
-        case PROMOTE_R:
-            codeStr = "promoteRook";
-            break;
-        case PROMOTE_B:
-            codeStr = "promoteBishop";
-            break;
-        case PROMOTE_N:
-            codeStr = "promoteKnight";
-            break;
-        case PROMOTE_Q:
-            codeStr = "promoteQueen";
-            break;
-        case CAPTURE_EP:
-            codeStr = "epCapture";
-            break;
-        default:
-            codeStr = "unknown";
-            break;
+    switch (m->moveCode) {
+    case NO_MOVE_CODE:
+        codeStr = "none";
+        break;
+    case PROMOTE_R:
+        codeStr = "promoteRook";
+        break;
+    case PROMOTE_B:
+        codeStr = "promoteBishop";
+        break;
+    case PROMOTE_N:
+        codeStr = "promoteKnight";
+        break;
+    case PROMOTE_Q:
+        codeStr = "promoteQueen";
+        break;
+    case CAPTURE_EP:
+        codeStr = "epCapture";
+        break;
+    default:
+        codeStr = "unknown";
+        break;
     }
 
     printf("\"moveCode\": \"%s\"", codeStr);
@@ -83,10 +83,10 @@ static void printMoveDetail(Move* m) {
 }
 
 static const char* printColor(int color) {
-    switch(color) {
-        case COLOR_WHITE: return "white";
-        case COLOR_BLACK: return "black";
-        default: return "unknown";
+    switch (color) {
+    case COLOR_WHITE: return "white";
+    case COLOR_BLACK: return "black";
+    default: return "unknown";
     }
 }
 
@@ -100,8 +100,8 @@ void printMovelistJson(char* position, char* listType, GameState* gameState, Mov
     printf("\"moveListType\": \"%s\", ", listType);
 
     printf("\"moveList\": [");
-    for(int i=0; i<buffer->length; i++) {
-        if(i > 0) {
+    for (int i = 0; i < buffer->length; i++) {
+        if (i > 0) {
             printf(", ");
         }
 
@@ -111,8 +111,8 @@ void printMovelistJson(char* position, char* listType, GameState* gameState, Mov
     printf("], ");
 
     printf("\"shortAlgebraicMoves\":[");
-    for(int i=0; i<buffer->length; i++) {
-        if(i > 0) {
+    for (int i = 0; i < buffer->length; i++) {
+        if (i > 0) {
             printf(", ");
         }
 
@@ -123,8 +123,8 @@ void printMovelistJson(char* position, char* listType, GameState* gameState, Mov
     printf("], ");
 
     printf("\"moveDetails\": [");
-    for(int i=0; i<buffer->length; i++) {
-        if(i > 0) {
+    for (int i = 0; i < buffer->length; i++) {
+        if (i > 0) {
             printf(", ");
         }
 
@@ -142,10 +142,10 @@ void printAttackList(char* position, bool* attackGrid, GameState* state) {
     char strBuff[4];
 
     bool atLeastOne = false;
-    for(int i=0; i<64; i++) {
+    for (int i = 0; i < 64; i++) {
         int idx = BOARD_SQUARES[i];
-        if(attackGrid[idx]) {
-            if(atLeastOne) {
+        if (attackGrid[idx]) {
+            if (atLeastOne) {
                 printf(", ");
             }
 
@@ -198,7 +198,7 @@ void printGameState(char* position, GameState* state) {
 
     printf("\"epFile\": ");
 
-    if(stateData->epFile == NO_EP_FILE) {
+    if (stateData->epFile == NO_EP_FILE) {
         printf("\"none\", ");
     } else {
         printf("\"%c\", ", fileToChar(stateData->epFile));
@@ -209,11 +209,11 @@ void printGameState(char* position, GameState* state) {
 
     printf("\"board\": {");
     bool printedSq = false;
-    for(int i=0; i<64; i++) {
+    for (int i = 0; i < 64; i++) {
         const int sq = BOARD_SQUARES[i];
         const Piece* p = state->board[sq];
-        if(p != &EMPTY) {
-            if(printedSq) {
+        if (p != &EMPTY) {
+            if (printedSq) {
                 printf(", ");
             }
 
@@ -230,10 +230,11 @@ void printGameState(char* position, GameState* state) {
     printf("\"pieceCounts\": {");
     const Piece* pieces[] = {&WPAWN, &BPAWN, &WKNIGHT, &BKNIGHT, &WBISHOP,
                              &BBISHOP, &WROOK, &BROOK, &WQUEEN, &BQUEEN,
-                             &WKING, &BKING, &EMPTY, &OFF_BOARD};
+                             &WKING, &BKING, &EMPTY, &OFF_BOARD
+                            };
 
-    for(int i=0; i<14; i++) {
-        if(i > 0) {
+    for (int i = 0; i < 14; i++) {
+        if (i > 0) {
             printf(", ");
         }
 
@@ -242,8 +243,8 @@ void printGameState(char* position, GameState* state) {
     }
     printf("},");
     printf(" \"bitboards\" : {");
-    for(int i=0; i<ALL_PIECES_LEN; i++) {
-        if(i > 0) {
+    for (int i = 0; i < ALL_PIECES_LEN; i++) {
+        if (i > 0) {
             printf(", ");
         }
 
@@ -275,30 +276,30 @@ void printGameStatus(char* position, int status) {
     const char* resultStr;
 
     switch (status) {
-        case STATUS_NONE:
-            resultStr = "none";
-            break;
-        case STATUS_WHITE_CHECKMATED:
-            resultStr = "whiteCheckmated";
-            break;
-        case STATUS_BLACK_CHECKMATED:
-            resultStr = "blackCheckmated";
-            break;
-        case STATUS_STALEMATE:
-            resultStr = "stalemate";
-            break;
-        case STATUS_MATERIAL_DRAW:
-            resultStr = "materialDraw";
-            break;
-        case STATUS_THREEFOLD_DRAW:
-            resultStr = "threefoldDraw";
-            break;
-        case STATUS_FIFTY_MOVE_DRAW:
-            resultStr = "fiftyMoveDraw";
-            break;
-        default:
-            resultStr = "unknown";
-            break;
+    case STATUS_NONE:
+        resultStr = "none";
+        break;
+    case STATUS_WHITE_CHECKMATED:
+        resultStr = "whiteCheckmated";
+        break;
+    case STATUS_BLACK_CHECKMATED:
+        resultStr = "blackCheckmated";
+        break;
+    case STATUS_STALEMATE:
+        resultStr = "stalemate";
+        break;
+    case STATUS_MATERIAL_DRAW:
+        resultStr = "materialDraw";
+        break;
+    case STATUS_THREEFOLD_DRAW:
+        resultStr = "threefoldDraw";
+        break;
+    case STATUS_FIFTY_MOVE_DRAW:
+        resultStr = "fiftyMoveDraw";
+        break;
+    default:
+        resultStr = "unknown";
+        break;
     }
 
     printf("{");

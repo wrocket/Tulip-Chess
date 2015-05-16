@@ -35,13 +35,13 @@
 #define APPLY_MASK(mask) /*printf("applying mask to %016"PRIX64": %016"PRIX64"\n", hash, (uint64_t) (mask));*/ hash ^= (mask);
 
 static void unCastleRook(GameState* gameState, const int homeSq, const int rookCastledSq, const int rookOrdinal, const Piece* rook) {
-        const Piece** board = gameState->board;
-        uint64_t* emptyBb = &gameState->bitboards[ORD_EMPTY];
-        uint64_t* rookBb = &gameState->bitboards[rookOrdinal];
-        *rookBb = (*rookBb & ~BITS_SQ[rookCastledSq]) | BITS_SQ[homeSq];
-        *emptyBb = (*emptyBb & ~BITS_SQ[homeSq]) | BITS_SQ[rookCastledSq];
-        board[homeSq] = rook;
-        board[rookCastledSq] = &EMPTY;
+    const Piece** board = gameState->board;
+    uint64_t* emptyBb = &gameState->bitboards[ORD_EMPTY];
+    uint64_t* rookBb = &gameState->bitboards[rookOrdinal];
+    *rookBb = (*rookBb & ~BITS_SQ[rookCastledSq]) | BITS_SQ[homeSq];
+    *emptyBb = (*emptyBb & ~BITS_SQ[homeSq]) | BITS_SQ[rookCastledSq];
+    board[homeSq] = rook;
+    board[rookCastledSq] = &EMPTY;
 }
 
 static void whiteKingCastle(Move* move, GameState* gs, uint64_t* runningHash) {
@@ -204,7 +204,7 @@ void makeMove(GameState* gameState, Move* move) {
     // Update EP file
     int oldEpFile = nextData->epFile;
     int newEpFile = isPawn && abs(sqTo - sqFrom) == (2 * OFFSET_N)
-                        ? FILE_IDX(sqTo) : NO_EP_FILE;
+                    ? FILE_IDX(sqTo) : NO_EP_FILE;
     if (oldEpFile != newEpFile) {
         APPLY_MASK(HASH_EP_FILE[oldEpFile]);
         APPLY_MASK(HASH_EP_FILE[newEpFile]);
@@ -213,64 +213,64 @@ void makeMove(GameState* gameState, Move* move) {
 
     // Piece-specific special moves: EP captures, promotions, castling.
     switch (movingPiece->ordinal) {
-        case ORD_WKING:
-            if (nextData->castleFlags & (CASTLE_WK | CASTLE_WQ)) {
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-                nextData->castleFlags &= ~(CASTLE_WK | CASTLE_WQ);
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-            }
-            nextData->whiteKingSquare = sqTo;
-            if (sqFrom == SQ_E1) {
-                whiteKingCastle(move, gameState, &hash);
-            }
-            break;
-        case ORD_BKING:
-            if (nextData->castleFlags & (CASTLE_BK | CASTLE_BQ)) {
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-                nextData->castleFlags &= ~(CASTLE_BK | CASTLE_BQ);
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-            }
-            nextData->blackKingSquare = sqTo;
-            if (sqFrom == SQ_E8) {
-                blackKingCastle(move, gameState, &hash);
-            }
-            break;
-        case ORD_WROOK:
-            if (sqFrom == SQ_H1 && nextData->castleFlags & CASTLE_WK) {
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-                nextData->castleFlags &= ~(CASTLE_WK);
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-            } else if (sqFrom == SQ_A1 && nextData->castleFlags & CASTLE_WQ) {
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-                nextData->castleFlags &= ~(CASTLE_WQ);
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-            }
-            break;
-        case ORD_BROOK:
-            if (sqFrom == SQ_H8 && nextData->castleFlags & CASTLE_BK) {
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-                nextData->castleFlags &= ~(CASTLE_BK);
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-            } else if (sqFrom == SQ_A8 && nextData->castleFlags & CASTLE_BQ) {
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-                nextData->castleFlags &= ~(CASTLE_BQ);
-                APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
-            }
-            break;
-        case ORD_WPAWN:
-            if (IS_PROMOTE(move->moveCode)) {
-                promotePawn(move, gameState, COLOR_WHITE, ORD_WPAWN, &hash);
-            } else if (move->moveCode == CAPTURE_EP) {
-                enPassant(gameState, move, sqTo + OFFSET_S, &hash);
-            }
-            break;
-        case ORD_BPAWN:
-            if (IS_PROMOTE(move->moveCode)) {
-                promotePawn(move, gameState, COLOR_BLACK, ORD_BPAWN, &hash);
-            } else if (move->moveCode == CAPTURE_EP) {
-                enPassant(gameState, move, sqTo + OFFSET_N, &hash);
-            }
-            break;
+    case ORD_WKING:
+        if (nextData->castleFlags & (CASTLE_WK | CASTLE_WQ)) {
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+            nextData->castleFlags &= ~(CASTLE_WK | CASTLE_WQ);
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+        }
+        nextData->whiteKingSquare = sqTo;
+        if (sqFrom == SQ_E1) {
+            whiteKingCastle(move, gameState, &hash);
+        }
+        break;
+    case ORD_BKING:
+        if (nextData->castleFlags & (CASTLE_BK | CASTLE_BQ)) {
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+            nextData->castleFlags &= ~(CASTLE_BK | CASTLE_BQ);
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+        }
+        nextData->blackKingSquare = sqTo;
+        if (sqFrom == SQ_E8) {
+            blackKingCastle(move, gameState, &hash);
+        }
+        break;
+    case ORD_WROOK:
+        if (sqFrom == SQ_H1 && nextData->castleFlags & CASTLE_WK) {
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+            nextData->castleFlags &= ~(CASTLE_WK);
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+        } else if (sqFrom == SQ_A1 && nextData->castleFlags & CASTLE_WQ) {
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+            nextData->castleFlags &= ~(CASTLE_WQ);
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+        }
+        break;
+    case ORD_BROOK:
+        if (sqFrom == SQ_H8 && nextData->castleFlags & CASTLE_BK) {
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+            nextData->castleFlags &= ~(CASTLE_BK);
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+        } else if (sqFrom == SQ_A8 && nextData->castleFlags & CASTLE_BQ) {
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+            nextData->castleFlags &= ~(CASTLE_BQ);
+            APPLY_MASK(HASH_PIECE_CASTLE[nextData->castleFlags]);
+        }
+        break;
+    case ORD_WPAWN:
+        if (IS_PROMOTE(move->moveCode)) {
+            promotePawn(move, gameState, COLOR_WHITE, ORD_WPAWN, &hash);
+        } else if (move->moveCode == CAPTURE_EP) {
+            enPassant(gameState, move, sqTo + OFFSET_S, &hash);
+        }
+        break;
+    case ORD_BPAWN:
+        if (IS_PROMOTE(move->moveCode)) {
+            promotePawn(move, gameState, COLOR_BLACK, ORD_BPAWN, &hash);
+        } else if (move->moveCode == CAPTURE_EP) {
+            enPassant(gameState, move, sqTo + OFFSET_N, &hash);
+        }
+        break;
     }
 
     nextData->hash = hash;

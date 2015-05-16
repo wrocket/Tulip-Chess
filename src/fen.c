@@ -41,12 +41,12 @@
 #define _FEN_MAX_TOKEN_LEN  64
 
 static bool parseToMove(char * t, int* result) {
-    if(strlen(t) != 1) {
+    if (strlen(t) != 1) {
         fprintf(stderr, "Invalid to-move string: %s\n", t);
         return false;
     }
 
-    if(!strstr("bw", t)) {
+    if (!strstr("bw", t)) {
         fprintf(stderr, "Invalid to-move string: %s\n", t);
         return false;
     }
@@ -59,16 +59,16 @@ static bool parseFiftyMove(char* t, long* result) {
     char* endToken;
     long parsed = strtol(t, &endToken, 10);
 
-    if(endToken == t) {
+    if (endToken == t) {
         fprintf(stderr, "Missing fifty-move token.\n");
         return false;
     }
 
-    if(parsed < 0
-        || parsed > INT_MAX
-        || errno != 0) {
+    if (parsed < 0
+            || parsed > INT_MAX
+            || errno != 0) {
         fprintf(stderr, "Invalid fifty-move token \"%s\"", t);
-        if(errno != 0) {
+        if (errno != 0) {
             fprintf(stderr, ": %s\n", strerror(errno));
         } else {
             fprintf(stderr, ".\n");
@@ -84,11 +84,11 @@ static bool parseEpFile(char* t, int* result) {
     unsigned long len = strlen(t);
     bool valid = true;
 
-    if(len == 1 && strcmp("-", t) == 0) {
+    if (len == 1 && strcmp("-", t) == 0) {
         *result = NO_EP_FILE;
-    } else if(len == 2 && (t[1] == '3' || t[1] == '6')) {
+    } else if (len == 2 && (t[1] == '3' || t[1] == '6')) {
         const int file = parseFileChar(t[0]);
-        if(file != INVALID_FILE) {
+        if (file != INVALID_FILE) {
             *result = file;
         }
         else {
@@ -104,19 +104,19 @@ static bool parseEpFile(char* t, int* result) {
 static bool parseCastleFlags(char* t, int* result) {
     int flags = 0;
 
-    if(strstr(t, "K")) {
+    if (strstr(t, "K")) {
         flags |= CASTLE_WK;
     }
 
-    if(strstr(t, "Q")) {
+    if (strstr(t, "Q")) {
         flags |= CASTLE_WQ;
     }
 
-    if(strstr(t, "k")) {
+    if (strstr(t, "k")) {
         flags |= CASTLE_BK;
     }
 
-    if(strstr(t, "q")) {
+    if (strstr(t, "q")) {
         flags |= CASTLE_BQ;
     }
 
@@ -135,20 +135,20 @@ static bool parseBoard(char* t, GameState* gs) {
     int sqbk = -1;
 
     char* c = t;
-    while(*c && currentRank >= RANK_1) {
-        if(*c == '/') {
+    while (*c && currentRank >= RANK_1) {
+        if (*c == '/') {
             currentRank--;
             currentFile = FILE_A;
-        } else if(isdigit(*c)) {
+        } else if (isdigit(*c)) {
             int spaceDigits = *c - '0'; // Hack: Char to int. Might be funny in strange encodings...
-            for(int i=0; i<spaceDigits; i++) {
+            for (int i = 0; i < spaceDigits; i++) {
                 board[B_IDX(currentFile++, currentRank)] = &EMPTY;
                 pCounts[(&EMPTY)->ordinal]++;
                 squares++;
             }
         } else {
             const Piece* p = parsePiece(*c);
-            if(!p) {
+            if (!p) {
                 fprintf(stderr, "Invalid FEN. Unknown piece found: %c\n", *c);
                 result = false;
                 goto parse_board_err;
@@ -156,16 +156,16 @@ static bool parseBoard(char* t, GameState* gs) {
 
             const int idx = B_IDX(currentFile++, currentRank);
 
-            if(p == &WKING) {
-                if(sqwk >= 0) {
+            if (p == &WKING) {
+                if (sqwk >= 0) {
                     fprintf(stderr, "Invalid FEN. Multiple white kings on the board.\n");
                     result = false;
                     goto parse_board_err;
                 }
 
                 sqwk = idx;
-            } else if(p == &BKING) {
-                if(sqbk >= 0) {
+            } else if (p == &BKING) {
+                if (sqbk >= 0) {
                     fprintf(stderr, "Invalid FEN. Multiple black kings on the board.\n");
                     result = false;
                     goto parse_board_err;
@@ -183,17 +183,17 @@ static bool parseBoard(char* t, GameState* gs) {
         ++c;
     }
 
-    if(sqbk < 0) {
+    if (sqbk < 0) {
         fprintf(stderr, "Invalid FEN. No black king on the board.\n");
         result = false;
     }
 
-    if(sqwk < 0) {
+    if (sqwk < 0) {
         fprintf(stderr, "Invalid FEN. No white king on the board.\n");
         result = false;
     }
 
-    if(squares != 64) {
+    if (squares != 64) {
         fprintf(stderr, "Invalid FEN. Expected to parse 64 squares, instead parsed %d.\n", squares);
         result = false;
     }
@@ -202,10 +202,10 @@ static bool parseBoard(char* t, GameState* gs) {
     gs->current->blackKingSquare = sqbk;
 
     gs->current->whitePieceCount = pCounts[ORD_WPAWN] + pCounts[ORD_WKNIGHT] + pCounts[ORD_WBISHOP]
-        + pCounts[ORD_WROOK] + pCounts[ORD_WQUEEN] + pCounts[ORD_WKING];
+                                   + pCounts[ORD_WROOK] + pCounts[ORD_WQUEEN] + pCounts[ORD_WKING];
 
     gs->current->blackPieceCount = pCounts[ORD_BPAWN] + pCounts[ORD_BKNIGHT] + pCounts[ORD_BBISHOP]
-        + pCounts[ORD_BROOK] + pCounts[ORD_BQUEEN] + pCounts[ORD_BKING];
+                                   + pCounts[ORD_BROOK] + pCounts[ORD_BQUEEN] + pCounts[ORD_BKING];
 
 parse_board_err:
     return result;
@@ -223,33 +223,33 @@ int parseFen(GameState* state, char* fenStr) {
 
     int tokenCount = tokenize(fenStr, tokenBuffer, _FEN_MAX_TOKENS);
 
-    if(tokenCount != 6) {
+    if (tokenCount != 6) {
         fprintf(stderr, "Invalid FEN string; invalid token count (should be 6): %i.", tokenCount);
         result = false;
         goto clean_tokens;
     }
 
-    if(!parseBoard(tokenBuffer[0], state)) {
+    if (!parseBoard(tokenBuffer[0], state)) {
         result = false;
         goto clean_tokens;
     }
 
-    if(!parseToMove(tokenBuffer[1], &toMove)) {
+    if (!parseToMove(tokenBuffer[1], &toMove)) {
         result = false;
         goto clean_tokens;
     }
 
-    if(!parseCastleFlags(tokenBuffer[2], &castleFlags)) {
+    if (!parseCastleFlags(tokenBuffer[2], &castleFlags)) {
         result = false;
         goto clean_tokens;
     }
 
-    if(!parseEpFile(tokenBuffer[3], &epFile)) {
+    if (!parseEpFile(tokenBuffer[3], &epFile)) {
         result = false;
         goto clean_tokens;
     }
 
-    if(!parseFiftyMove(tokenBuffer[4], &fiftyMove)) {
+    if (!parseFiftyMove(tokenBuffer[4], &fiftyMove)) {
         result = false;
         goto clean_tokens;
     }

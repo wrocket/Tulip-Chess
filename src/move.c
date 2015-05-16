@@ -39,7 +39,7 @@ void createMoveBuffer(MoveBuffer* buff) {
 }
 
 void destroyMoveBuffer(MoveBuffer* buff) {
-    if(!(buff->created)) {
+    if (!(buff->created)) {
         fprintf(stderr, "Attempting to destroy move buffer that hasn't been created (or was already destroyed)\n");
         return;
     }
@@ -58,7 +58,7 @@ bool matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m) {
     createMoveBuffer(&moveBuff);
     moveCount = generatePseudoMoves(gameState, &moveBuff);
 
-    for (int i=0; i<moveCount; i++) {
+    for (int i = 0; i < moveCount; i++) {
         Move current = moveBuff.moves[i];
         printMoveCoordinate(&current, moveStrBuff);
 
@@ -80,23 +80,23 @@ int printMoveCoordinate(Move* move, char* buffer) {
     index += printSquareIndex(move->from, buffer);
     index += printSquareIndex(move->to, buffer + index);
 
-    switch(move->moveCode) {
-        case PROMOTE_N:
-            buffer[index++] = '=';
-            buffer[index++] = 'n';
-            break;
-        case PROMOTE_R:
-            buffer[index++] = '=';
-            buffer[index++] = 'r';
-            break;
-        case PROMOTE_B:
-            buffer[index++] = '=';
-            buffer[index++] = 'b';
-            break;
-        case PROMOTE_Q:
-            buffer[index++] = '=';
-            buffer[index++] = 'q';
-            break;
+    switch (move->moveCode) {
+    case PROMOTE_N:
+        buffer[index++] = '=';
+        buffer[index++] = 'n';
+        break;
+    case PROMOTE_R:
+        buffer[index++] = '=';
+        buffer[index++] = 'r';
+        break;
+    case PROMOTE_B:
+        buffer[index++] = '=';
+        buffer[index++] = 'b';
+        break;
+    case PROMOTE_Q:
+        buffer[index++] = '=';
+        buffer[index++] = 'q';
+        break;
     }
 
     buffer[index++] = '\0';
@@ -107,23 +107,23 @@ int printMoveCoordinate(Move* move, char* buffer) {
 const Piece* getPromotePiece(const int color, const int moveCode) {
     if (color == COLOR_WHITE) {
         switch (moveCode) {
-            case PROMOTE_Q: return &WQUEEN;
-            case PROMOTE_N: return &WKNIGHT;
-            case PROMOTE_B: return &WBISHOP;
-            case PROMOTE_R: return &WROOK;
-            default:
-                fprintf(stderr, "Inside getPromotePiece() (white) with an invalid move code: %i\n", moveCode);
-                return &WPAWN;
+        case PROMOTE_Q: return &WQUEEN;
+        case PROMOTE_N: return &WKNIGHT;
+        case PROMOTE_B: return &WBISHOP;
+        case PROMOTE_R: return &WROOK;
+        default:
+            fprintf(stderr, "Inside getPromotePiece() (white) with an invalid move code: %i\n", moveCode);
+            return &WPAWN;
         }
     } else {
         switch (moveCode) {
-            case PROMOTE_Q: return &BQUEEN;
-            case PROMOTE_N: return &BKNIGHT;
-            case PROMOTE_B: return &BBISHOP;
-            case PROMOTE_R: return &BROOK;
-            default:
-                fprintf(stderr, "Inside getPromotePiece() (black) with an invalid move code: %i\n", moveCode);
-                return &BPAWN;
+        case PROMOTE_Q: return &BQUEEN;
+        case PROMOTE_N: return &BKNIGHT;
+        case PROMOTE_B: return &BBISHOP;
+        case PROMOTE_R: return &BROOK;
+        default:
+            fprintf(stderr, "Inside getPromotePiece() (black) with an invalid move code: %i\n", moveCode);
+            return &BPAWN;
         }
     }
 }

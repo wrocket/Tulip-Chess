@@ -61,7 +61,7 @@ static inline bool fourPieces(GameState* g, const int total) {
         const uint64_t wbishop = g->bitboards[ORD_WBISHOP];
         const uint64_t bbishop = g->bitboards[ORD_BBISHOP];
         result = ((BIT_SQUARES_LIGHT & wbishop) && (BIT_SQUARES_LIGHT & bbishop))
-            || ((BIT_SQUARES_DARK & wbishop) && (BIT_SQUARES_DARK & bbishop));
+                 || ((BIT_SQUARES_DARK & wbishop) && (BIT_SQUARES_DARK & bbishop));
     }
 
     return result;
@@ -72,27 +72,27 @@ static inline bool threePieces(GameState* g, const int total) {
     // That means there's one non-king piece.
     // If that one piece is a knight or bishop of any color, we're in a draw.
     return g->pieceCounts[ORD_WBISHOP] > 0
-        || g->pieceCounts[ORD_BBISHOP] > 0
-        || g->pieceCounts[ORD_WKNIGHT] > 0
-        || g->pieceCounts[ORD_WKNIGHT] > 0;
+           || g->pieceCounts[ORD_BBISHOP] > 0
+           || g->pieceCounts[ORD_WKNIGHT] > 0
+           || g->pieceCounts[ORD_WKNIGHT] > 0;
 }
 
 bool isMaterialDraw(GameState* g) {
     const int total = g->current->whitePieceCount + g->current->blackPieceCount;
     bool result;
-    switch(total) {
-        case 4:
-            result = fourPieces(g, total);
-            break;
-        case 3:
-            result = threePieces(g, total);
-            break;
-        case 2:
-            result = true;
-            break;
-        default:
-            result = moreThanFourPieces(g, total);
-            break;
+    switch (total) {
+    case 4:
+        result = fourPieces(g, total);
+        break;
+    case 3:
+        result = threePieces(g, total);
+        break;
+    case 2:
+        result = true;
+        break;
+    default:
+        result = moreThanFourPieces(g, total);
+        break;
     }
 
     return result;

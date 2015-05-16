@@ -112,19 +112,19 @@ const Piece OFF_BOARD = {
 const Piece* ALL_PIECES[13] = {&WPAWN, &BPAWN, &WKNIGHT, &BKNIGHT, &WBISHOP, &BBISHOP, &WROOK, &BROOK, &WQUEEN, &BQUEEN, &WKING, &BKING, &EMPTY};
 
 const Piece* parsePiece(char p) {
-    switch(p) {
-        case 'P': return &WPAWN;
-        case 'p': return &BPAWN;
-        case 'N': return &WKNIGHT;
-        case 'n': return &BKNIGHT;
-        case 'B': return &WBISHOP;
-        case 'b': return &BBISHOP;
-        case 'R': return &WROOK;
-        case 'r': return &BROOK;
-        case 'Q': return &WQUEEN;
-        case 'q': return &BQUEEN;
-        case 'K': return &WKING;
-        case 'k': return &BKING;
-        default: return NULL;
+    switch (p) {
+    case 'P': return &WPAWN;
+    case 'p': return &BPAWN;
+    case 'N': return &WKNIGHT;
+    case 'n': return &BKNIGHT;
+    case 'B': return &WBISHOP;
+    case 'b': return &BBISHOP;
+    case 'R': return &WROOK;
+    case 'r': return &BROOK;
+    case 'Q': return &WQUEEN;
+    case 'q': return &BQUEEN;
+    case 'K': return &WKING;
+    case 'k': return &BKING;
+    default: return NULL;
     }
 }

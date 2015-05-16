@@ -128,20 +128,20 @@ static void blackPawnEp(const int sq, const Piece** board, Move* moveBuffer, int
 }
 
 static void pawnPromote(Move* moveBuff, const int from, const int to, const Piece* captures, int* count, const Piece* pawn) {
-        Move* m = &moveBuff[*count];
+    Move* m = &moveBuff[*count];
 
-        PUSH_MOVE(m, from, to, pawn, captures, PROMOTE_Q);
-        m++;
+    PUSH_MOVE(m, from, to, pawn, captures, PROMOTE_Q);
+    m++;
 
-        PUSH_MOVE(m, from, to, pawn, captures, PROMOTE_N);
-        m++;
+    PUSH_MOVE(m, from, to, pawn, captures, PROMOTE_N);
+    m++;
 
-        PUSH_MOVE(m, from, to, pawn, captures, PROMOTE_R);
-        m++;
+    PUSH_MOVE(m, from, to, pawn, captures, PROMOTE_R);
+    m++;
 
-        PUSH_MOVE(m, from, to, pawn, captures, PROMOTE_B);
+    PUSH_MOVE(m, from, to, pawn, captures, PROMOTE_B);
 
-        (*count) += 4;
+    (*count) += 4;
 }
 
 static void whitePawnPromote(const int sq, const Piece** board, Move* moveBuff, int* count) {
@@ -190,7 +190,7 @@ static void whitePawn(const int sq, const Piece** board, Move* moveBuff, int* co
     }
 
     if (sq <= SQ_H2
-        && board[sq + (2 * OFFSET_N)] == &EMPTY) {
+            && board[sq + (2 * OFFSET_N)] == &EMPTY) {
         PUSH_MOVE(m, sq, sq + (OFFSET_N * 2), &WPAWN, &EMPTY, NO_MOVE_CODE);
         (*count)++;
         m++;
@@ -224,7 +224,7 @@ static void blackPawn(const int sq, const Piece** board, Move* moveBuff, int* co
     }
 
     if (sq >= SQ_A7
-        && board[sq + (2 * OFFSET_S)] == &EMPTY) {
+            && board[sq + (2 * OFFSET_S)] == &EMPTY) {
         PUSH_MOVE(m, sq, sq + (2 * OFFSET_S), &BPAWN, &EMPTY, NO_MOVE_CODE);
         (*count)++;
         m++;
@@ -250,19 +250,19 @@ static void blackKingCastle(GameState* gs, const Piece** board, Move* moveArr, i
     Move* m = &moveArr[*count];
 
     if ((castleFlags & CASTLE_BK)
-        && board[SQ_F8] == &EMPTY
-        && board[SQ_G8] == &EMPTY
-        && !canAttack(COLOR_WHITE, SQ_F8, gs)) {
+            && board[SQ_F8] == &EMPTY
+            && board[SQ_G8] == &EMPTY
+            && !canAttack(COLOR_WHITE, SQ_F8, gs)) {
         PUSH_MOVE(m, SQ_E8, SQ_G8, &BKING, &EMPTY, NO_MOVE_CODE);
         (*count)++;
         m++;
     }
 
     if ((castleFlags & CASTLE_BQ)
-        && board[SQ_D8] == &EMPTY
-        && board[SQ_C8] == &EMPTY
-        && board[SQ_B8] == &EMPTY
-        && !canAttack(COLOR_WHITE, SQ_D8, gs)) {
+            && board[SQ_D8] == &EMPTY
+            && board[SQ_C8] == &EMPTY
+            && board[SQ_B8] == &EMPTY
+            && !canAttack(COLOR_WHITE, SQ_D8, gs)) {
         PUSH_MOVE(m, SQ_E8, SQ_C8, &BKING, &EMPTY, NO_MOVE_CODE);
         (*count)++;
     }
@@ -273,19 +273,19 @@ static void whiteKingCastle(GameState* gs, const Piece** board, Move* moveArr, i
     Move* m = &moveArr[*count];
 
     if ((castleFlags & CASTLE_WK)
-        && board[SQ_F1] == &EMPTY
-        && board[SQ_G1] == &EMPTY
-        && !canAttack(COLOR_BLACK, SQ_F1, gs)) {
+            && board[SQ_F1] == &EMPTY
+            && board[SQ_G1] == &EMPTY
+            && !canAttack(COLOR_BLACK, SQ_F1, gs)) {
         PUSH_MOVE(m, SQ_E1, SQ_G1, &WKING, &EMPTY, NO_MOVE_CODE);
         (*count)++;
         m++;
     }
 
     if ((castleFlags & CASTLE_WQ)
-        && board[SQ_D1] == &EMPTY
-        && board[SQ_C1] == &EMPTY
-        && board[SQ_B1] == &EMPTY
-        && !canAttack(COLOR_BLACK, SQ_D1, gs)) {
+            && board[SQ_D1] == &EMPTY
+            && board[SQ_C1] == &EMPTY
+            && board[SQ_B1] == &EMPTY
+            && !canAttack(COLOR_BLACK, SQ_D1, gs)) {
         PUSH_MOVE(m, SQ_E1, SQ_C1, &WKING, &EMPTY, NO_MOVE_CODE);
         (*count)++;
     }
@@ -297,41 +297,41 @@ int generatePseudoMovesBlack(GameState* gs, MoveBuffer* moveBuff) {
     const int epFile = gs->current->epFile;
     Move* moveArr = moveBuff->moves;
 
-    for(int i=0; i<64; i++) {
+    for (int i = 0; i < 64; i++) {
         const int sq = BOARD_SQUARES[i];
         const Piece* p = board[sq];
 
-        switch(p->ordinal) {
-            case ORD_BPAWN:
-                if (sq <= SQ_H2) {
-                    blackPawnPromote(sq, board, moveArr, &count);
-                } else {
-                    blackPawn(sq, board, moveArr, &count);
-                    if (epFile != NO_EP_FILE) {
-                        blackPawnEp(sq, board, moveArr, &count, epFile);
-                    }
+        switch (p->ordinal) {
+        case ORD_BPAWN:
+            if (sq <= SQ_H2) {
+                blackPawnPromote(sq, board, moveArr, &count);
+            } else {
+                blackPawn(sq, board, moveArr, &count);
+                if (epFile != NO_EP_FILE) {
+                    blackPawnEp(sq, board, moveArr, &count, epFile);
                 }
-                break;
-            case ORD_BKNIGHT:
-                knight(sq, board, moveArr, &count, COLOR_WHITE);
-                break;
-            case ORD_BBISHOP:
-                bishop(sq, board, moveArr, &count, COLOR_WHITE);
-                break;
-            case ORD_BROOK:
-                rook(sq, board, moveArr, &count, COLOR_WHITE);
-                break;
-            case ORD_BQUEEN:
-                bishop(sq, board, moveArr, &count, COLOR_WHITE);
-                rook(sq, board, moveArr, &count, COLOR_WHITE);
-                break;
-            case ORD_BKING:
-                king(sq, board, moveArr, &count, COLOR_WHITE);
-                if ((gs->current->castleFlags & (CASTLE_BK | CASTLE_BQ))
-                        && !canAttack(COLOR_WHITE, SQ_E8, gs)) {
-                    blackKingCastle(gs, board, moveArr, &count);
-                }
-                break;
+            }
+            break;
+        case ORD_BKNIGHT:
+            knight(sq, board, moveArr, &count, COLOR_WHITE);
+            break;
+        case ORD_BBISHOP:
+            bishop(sq, board, moveArr, &count, COLOR_WHITE);
+            break;
+        case ORD_BROOK:
+            rook(sq, board, moveArr, &count, COLOR_WHITE);
+            break;
+        case ORD_BQUEEN:
+            bishop(sq, board, moveArr, &count, COLOR_WHITE);
+            rook(sq, board, moveArr, &count, COLOR_WHITE);
+            break;
+        case ORD_BKING:
+            king(sq, board, moveArr, &count, COLOR_WHITE);
+            if ((gs->current->castleFlags & (CASTLE_BK | CASTLE_BQ))
+                    && !canAttack(COLOR_WHITE, SQ_E8, gs)) {
+                blackKingCastle(gs, board, moveArr, &count);
+            }
+            break;
         }
     }
 
@@ -345,41 +345,41 @@ int generatePseudoMovesWhite(GameState* gs, MoveBuffer* moveBuff) {
     const int epFile = gs->current->epFile;
     Move* moveArr = moveBuff->moves;
 
-    for(int i=0; i<64; i++) {
+    for (int i = 0; i < 64; i++) {
         const int sq = BOARD_SQUARES[i];
         const Piece* p = board[sq];
 
-        switch(p->ordinal) {
-            case ORD_WPAWN:
-                if (sq >= SQ_A7) {
-                    whitePawnPromote(sq, board, moveArr, &count);
-                } else {
-                    whitePawn(sq, board, moveArr, &count);
-                    if (epFile != NO_EP_FILE) {
-                        whitePawnEp(sq, board, moveArr, &count, epFile);
-                    }
+        switch (p->ordinal) {
+        case ORD_WPAWN:
+            if (sq >= SQ_A7) {
+                whitePawnPromote(sq, board, moveArr, &count);
+            } else {
+                whitePawn(sq, board, moveArr, &count);
+                if (epFile != NO_EP_FILE) {
+                    whitePawnEp(sq, board, moveArr, &count, epFile);
                 }
-                break;
-            case ORD_WKNIGHT:
-                knight(sq, board, moveArr, &count, COLOR_BLACK);
-                break;
-            case ORD_WBISHOP:
-                bishop(sq, board, moveArr, &count, COLOR_BLACK);
-                break;
-            case ORD_WROOK:
-                rook(sq, board, moveArr, &count, COLOR_BLACK);
-                break;
-            case ORD_WQUEEN:
-                bishop(sq, board, moveArr, &count, COLOR_BLACK);
-                rook(sq, board, moveArr, &count, COLOR_BLACK);
-                break;
-            case ORD_WKING:
-                king(sq, board, moveArr, &count, COLOR_BLACK);
-                if ((gs->current->castleFlags & (CASTLE_WK | CASTLE_WQ))
-                        && !canAttack(COLOR_BLACK, SQ_E1, gs)) {
-                    whiteKingCastle(gs, board, moveArr, &count);
-                }
-                break;
+            }
+            break;
+        case ORD_WKNIGHT:
+            knight(sq, board, moveArr, &count, COLOR_BLACK);
+            break;
+        case ORD_WBISHOP:
+            bishop(sq, board, moveArr, &count, COLOR_BLACK);
+            break;
+        case ORD_WROOK:
+            rook(sq, board, moveArr, &count, COLOR_BLACK);
+            break;
+        case ORD_WQUEEN:
+            bishop(sq, board, moveArr, &count, COLOR_BLACK);
+            rook(sq, board, moveArr, &count, COLOR_BLACK);
+            break;
+        case ORD_WKING:
+            king(sq, board, moveArr, &count, COLOR_BLACK);
+            if ((gs->current->castleFlags & (CASTLE_WK | CASTLE_WQ))
+                    && !canAttack(COLOR_BLACK, SQ_E1, gs)) {
+                whiteKingCastle(gs, board, moveArr, &count);
+            }
+            break;
         }
     }
 
@@ -405,7 +405,7 @@ int generateLegalMoves(GameState* gameState, MoveBuffer* destination) {
     generatePseudoMoves(gameState, &pseudoMoves);
     int count = 0;
 
-    for (int i=0; i<pseudoMoves.length; i++) {
+    for (int i = 0; i < pseudoMoves.length; i++) {
         Move* m = &pseudoMoves.moves[i];
         makeMove(gameState, m);
         if (isLegalPosition(gameState)) {
@@ -426,7 +426,7 @@ int countLegalMoves(GameState* gameState) {
     generatePseudoMoves(gameState, &pseudoMoves);
     int count = 0;
 
-    for (int i=0; i<pseudoMoves.length; i++) {
+    for (int i = 0; i < pseudoMoves.length; i++) {
         Move* m = &pseudoMoves.moves[i];
         makeMove(gameState, m);
         if (isLegalPosition(gameState)) {

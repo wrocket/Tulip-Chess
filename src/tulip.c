@@ -52,7 +52,7 @@ static GameState parseFenOrQuit(char* str) {
     GameState gs;
     initializeGamestate(&gs);
 
-    if(!parseFen(&gs, str)) {
+    if (!parseFen(&gs, str)) {
         fprintf(stderr, "Unable to parse FEN \"%s\"\n", str);
         destroyGamestate(&gs);
         exit(EXIT_FAILURE);
@@ -62,7 +62,7 @@ static GameState parseFenOrQuit(char* str) {
 }
 
 static void printState(int argc, char** argv) {
-    if(argc != 2) {
+    if (argc != 2) {
         fprintf(stderr, "Usage: -printstate \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
@@ -74,7 +74,7 @@ static void printState(int argc, char** argv) {
 }
 
 static void listAttacks(int argc, char** argv) {
-    if(argc != 2) {
+    if (argc != 2) {
         fprintf(stderr, "Usage: -listattacks \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
@@ -82,8 +82,8 @@ static void listAttacks(int argc, char** argv) {
     GameState gs = parseFenOrQuit(argv[1]);
 
     bool* attackGrid = ALLOC(144, bool, attackGrid, "Unable to allocate attack grid.");
-    for(int rank=RANK_1; rank <= RANK_8; rank++) {
-        for(int file=FILE_A; file <= FILE_H; file++) {
+    for (int rank = RANK_1; rank <= RANK_8; rank++) {
+        for (int file = FILE_A; file <= FILE_H; file++) {
             int idx = B_IDX(file, rank);
             attackGrid[idx] = canAttack(gs.current->toMove, idx, &gs);
         }
@@ -96,7 +96,7 @@ static void listAttacks(int argc, char** argv) {
 }
 
 static void listMoves(int argc, char** argv) {
-    if(argc != 3) {
+    if (argc != 3) {
         fprintf(stderr, "Usage: -listmoves [pseudo/legal] \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
@@ -106,7 +106,7 @@ static void listMoves(int argc, char** argv) {
     MoveBuffer buffer;
     createMoveBuffer(&buffer);
 
-    if(0 == strcmp("pseudo", argv[1])) {
+    if (0 == strcmp("pseudo", argv[1])) {
         generatePseudoMoves(&gs, &buffer);
     } else if (0 == strcmp("legal", argv[1])) {
         generateLegalMoves(&gs, &buffer);
@@ -122,7 +122,7 @@ static void listMoves(int argc, char** argv) {
 }
 
 static void printMoveResult(int argc, char** argv) {
-    if(argc != 3) {
+    if (argc != 3) {
         fprintf(stderr, "Usage: -makemove [moveString] \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
@@ -141,7 +141,7 @@ static void printMoveResult(int argc, char** argv) {
 }
 
 static void checkStatus(int argc, char** argv) {
-    if(argc != 2) {
+    if (argc != 2) {
         fprintf(stderr, "Usage: -checkstatus \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
@@ -156,7 +156,7 @@ static void checkStatus(int argc, char** argv) {
 }
 
 static void printMakeUnmakeMoveResult(int argc, char** argv) {
-    if(argc != 3) {
+    if (argc != 3) {
         fprintf(stderr, "Usage: -makeunmake [moveString] \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
@@ -177,7 +177,7 @@ static void printMakeUnmakeMoveResult(int argc, char** argv) {
 }
 
 static void printMatchMove(int argc, char** argv) {
-    if(argc != 3) {
+    if (argc != 3) {
         fprintf(stderr, "Usage: -matchmove [moveString] \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
@@ -195,7 +195,7 @@ static void printMatchMove(int argc, char** argv) {
 }
 
 static void printGameResultStatus(int argc, char** argv) {
-    if(argc != 2) {
+    if (argc != 2) {
         fprintf(stderr, "Usage: -gamestatus \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
@@ -213,22 +213,22 @@ int main(int argc, char** argv) {
     argc--;
     argv++;
 
-    if(argc >= 1) {
-        if(0 == strcmp("-listmoves", argv[0])) {
+    if (argc >= 1) {
+        if (0 == strcmp("-listmoves", argv[0])) {
             listMoves(argc, argv);
-        } else if(0 == strcmp("-printstate", argv[0])) {
+        } else if (0 == strcmp("-printstate", argv[0])) {
             printState(argc, argv);
-        } else if(0 == strcmp("-listattacks", argv[0])) {
+        } else if (0 == strcmp("-listattacks", argv[0])) {
             listAttacks(argc, argv);
-        } else if(0 == strcmp("-makemove", argv[0])) {
+        } else if (0 == strcmp("-makemove", argv[0])) {
             printMoveResult(argc, argv);
-        } else if(0 == strcmp("-checkstatus", argv[0])) {
+        } else if (0 == strcmp("-checkstatus", argv[0])) {
             checkStatus(argc, argv);
-        } else if(0 == strcmp("-makeunmake", argv[0])) {
+        } else if (0 == strcmp("-makeunmake", argv[0])) {
             printMakeUnmakeMoveResult(argc, argv);
-        } else if(0 == strcmp("-matchmove", argv[0])) {
+        } else if (0 == strcmp("-matchmove", argv[0])) {
             printMatchMove(argc, argv);
-        } else if(0 == strcmp("-gamestatus", argv[0])) {
+        } else if (0 == strcmp("-gamestatus", argv[0])) {
             printGameResultStatus(argc, argv);
         } else {
             printBanner();

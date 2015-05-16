@@ -49,8 +49,8 @@ static bool slide(const int startSq, const int offset, const Piece** board, cons
 bool isCheck(GameState* state) {
     StateData* data = state->current;
     return data->toMove == COLOR_WHITE ?
-                canAttack(COLOR_BLACK, data->whiteKingSquare, state) :
-                canAttack(COLOR_WHITE, data->blackKingSquare, state);
+           canAttack(COLOR_BLACK, data->whiteKingSquare, state) :
+           canAttack(COLOR_WHITE, data->blackKingSquare, state);
 }
 
 bool canAttack(const int color, const int sq, GameState* state) {
@@ -86,7 +86,7 @@ bool canAttack(const int color, const int sq, GameState* state) {
     }
 
     // Check for pawn attacks.
-    if(BITS(pawn) & pawnMask) {
+    if (BITS(pawn) & pawnMask) {
         return true;
     }
 
@@ -99,9 +99,9 @@ bool canAttack(const int color, const int sq, GameState* state) {
     mask = BITS_ROOK[sq];
     if ((BITS(rook) & mask) || BITS(queen) & mask) {
         result = slide(sq, OFFSET_N, b, rook, queen)
-            || slide(sq, OFFSET_S, b, rook, queen)
-            || slide(sq, OFFSET_E, b, rook, queen)
-            || slide(sq, OFFSET_W, b, rook, queen);
+                 || slide(sq, OFFSET_S, b, rook, queen)
+                 || slide(sq, OFFSET_E, b, rook, queen)
+                 || slide(sq, OFFSET_W, b, rook, queen);
 
         if (result) {
             return true;
@@ -111,9 +111,9 @@ bool canAttack(const int color, const int sq, GameState* state) {
     mask = BITS_BISHOP[sq];
     if ((BITS(bishop) & mask) || BITS(queen) & mask) {
         result = slide(sq, OFFSET_NE, b, bishop, queen)
-            || slide(sq, OFFSET_NW, b, bishop, queen)
-            || slide(sq, OFFSET_SE, b, bishop, queen)
-            || slide(sq, OFFSET_SW, b, bishop, queen);
+                 || slide(sq, OFFSET_NW, b, bishop, queen)
+                 || slide(sq, OFFSET_SE, b, bishop, queen)
+                 || slide(sq, OFFSET_SW, b, bishop, queen);
 
         if (result) {
             return true;

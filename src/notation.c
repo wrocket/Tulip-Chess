@@ -35,9 +35,9 @@
 #include "tulip.h"
 
 static bool doMoveCollide(Move* legalMove, Move* candidate) {
-    return legalMove->from != candidate->from
-        && legalMove->movingPiece == candidate->movingPiece
-        && legalMove->to == candidate->to;
+	return legalMove->from != candidate->from
+	       && legalMove->movingPiece == candidate->movingPiece
+	       && legalMove->to == candidate->to;
 }
 
 static int printMoveDisambiguation(GameState* g, Move* move, char* buffer) {
@@ -51,7 +51,7 @@ static int printMoveDisambiguation(GameState* g, Move* move, char* buffer) {
 
 	collidingMoves = ALLOC((unsigned long) legalMoves.length, int, collidingMoves, "Unable to allocate ambiguous move buffer.");
 
-	for (int i=0; i < legalMoves.length; i++) {
+	for (int i = 0; i < legalMoves.length; i++) {
 		Move* candidate = &legalMoves.moves[i];
 		if (doMoveCollide(move, candidate)) {
 			collidingMoves[collidingMoveCnt++] = candidate->from;
@@ -75,7 +75,7 @@ static int printMoveDisambiguation(GameState* g, Move* move, char* buffer) {
 			c = printSquareIndex(move->from, buffer);
 		} else if (sameRank || !sameFile) {
 			buffer[c++] = fileToChar(fromFile);
-		} else if(sameFile) {
+		} else if (sameFile) {
 			buffer[c++] = rankToChar(fromRank);
 		}
 	}
@@ -136,33 +136,33 @@ add_check:
 }
 
 static void normalizeMove(char* original, char* normalized) {
-    char* c = original;
-    char* start = normalized;
-    int cnt = 0;
-    while (*c) {
-        if (isalnum(*c) && tolower(*c) != 'x') {
-        	char cv = *c;
+	char* c = original;
+	char* start = normalized;
+	int cnt = 0;
+	while (*c) {
+		if (isalnum(*c) && tolower(*c) != 'x') {
+			char cv = *c;
 
-        	// Normalize algebraic castling to "oh" instead of "zero"
-        	if (cv == '0') {
-        		cv = 'O';
-        	}
+			// Normalize algebraic castling to "oh" instead of "zero"
+			if (cv == '0') {
+				cv = 'O';
+			}
 
-            *normalized = (char) tolower(cv);
-            normalized++;
-            cnt++;
-        }
-        c++;
-    }
+			*normalized = (char) tolower(cv);
+			normalized++;
+			cnt++;
+		}
+		c++;
+	}
 
-    *normalized = '\0';
+	*normalized = '\0';
 
-    // Lop off trailing 'ep' designating pawn en passant captures.
-    if (cnt >= 3) {
-	    char* ep_file = strstr(start, "ep");
-	    if (ep_file && ep_file == normalized - 2) {
-	    	*(normalized - 2) = '\0';
-	    }
+	// Lop off trailing 'ep' designating pawn en passant captures.
+	if (cnt >= 3) {
+		char* ep_file = strstr(start, "ep");
+		if (ep_file && ep_file == normalized - 2) {
+			*(normalized - 2) = '\0';
+		}
 	}
 }
 
@@ -177,14 +177,14 @@ bool matchMove(char* str, GameState* gs, Move* m) {
 
 	normalizeMove(str, normalizedInputMove);
 
-	for (int i=0; i<buffer.length; i++) {
+	for (int i = 0; i < buffer.length; i++) {
 		Move currentMove = buffer.moves[i];
 
 		// Fist match with algebraic notation
 		printShortAlg(&currentMove, gs, moveStr);
 		normalizeMove(moveStr, normalizedMove);
 		// printf("%s to %s\n", normalizedMove, normalizedInputMove);
-		if(strcmp(normalizedMove, normalizedInputMove) == 0) {
+		if (strcmp(normalizedMove, normalizedInputMove) == 0) {
 			result = true;
 			*m = currentMove;
 			break;
@@ -194,7 +194,7 @@ bool matchMove(char* str, GameState* gs, Move* m) {
 		printMoveCoordinate(&currentMove, moveStr);
 		normalizeMove(moveStr, normalizedMove);
 		// printf("%s to %s\n", normalizedMove, normalizedInputMove);
-		if(strcmp(normalizedMove, normalizedInputMove) == 0) {
+		if (strcmp(normalizedMove, normalizedInputMove) == 0) {
 			result = true;
 			*m = currentMove;
 			break;
