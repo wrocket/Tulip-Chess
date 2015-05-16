@@ -22,16 +22,14 @@
 
 // Script for generating the bitmask header file.
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
-#include "tulip.h"
-#include "bitboard.h"
 #include "attack.h"
+#include "bitboard.h"
 #include "movegen.h"
 #include "piece.h"
-
-#define BITS(p) state->bitboards[(p)->ordinal]
+#include "tulip.h"
 
 static bool slide(const int startSq, const int offset, const Piece** board, const Piece* slider, const Piece* queen) {
     const Piece* p;
@@ -62,10 +60,10 @@ bool canAttack(const int color, const int sq, GameState* state) {
     const Piece* king;
     const Piece* pawn;
     uint64_t pawnMask;
-
+    bool result;
     const Piece** b = state->board;
 
-    bool result;
+#define BITS(p) state->bitboards[(p)->ordinal]
 
     if (color == COLOR_BLACK) {
         rook = &BROOK;
@@ -125,16 +123,22 @@ bool canAttack(const int color, const int sq, GameState* state) {
         return true;
     }
 
+#undef BITS
+
     // No pawn attacks, no rook attacks, no bishop attacks, or knight attacks, or queen attacks...
     // Guess they can't attack.
     return false;
 }
 
 bool isLegalPosition(GameState* state) {
+    bool result;
+
     if (state->current->toMove == COLOR_WHITE) {
-        return !canAttack(COLOR_WHITE, state->current->blackKingSquare, state);
+        result = !canAttack(COLOR_WHITE, state->current->blackKingSquare, state);
     } else {
-        return !canAttack(COLOR_BLACK, state->current->whiteKingSquare, state);
+        result = !canAttack(COLOR_BLACK, state->current->whiteKingSquare, state);
     }
+
+    return result;
 }
 
