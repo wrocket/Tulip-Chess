@@ -35,11 +35,10 @@ class TestGameResultDetection(unittest.TestCase):
         None
 
     def get_status(self, fen):
-        result = call_tulip(['-gamestatus', fen])
-        return json.loads(result)['status']
+        return self.get_status_after_moves(fen, [])
 
     def get_status_after_moves(self, fen, moves):
-        args = ['-movegamestatus', fen]
+        args = ['-gamestatus', fen]
         args.extend(moves)
         result = call_tulip(args)
         return json.loads(result)['status']
