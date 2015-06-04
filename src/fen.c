@@ -55,18 +55,24 @@ static bool parseToMove(char * t, int* result) {
     return true;
 }
 
-static bool parseFiftyMove(char* t, long* result) {
+static bool parseFiftyMove(char* t, int* result) {
     char* endToken;
     long parsed = strtol(t, &endToken, 10);
+    int intVal;
+    if (parsed >= 0 && parsed <= INT_MAX) {
+        intVal = (int) parsed;
+    }
+    else {
+        fprintf(stderr, "Fifty-move token \"%s\" out of range.", t);
+        return false;
+    }
 
     if (endToken == t) {
         fprintf(stderr, "Missing fifty-move token.\n");
         return false;
     }
 
-    if (parsed < 0
-            || parsed > INT_MAX
-            || errno != 0) {
+    if (parsed < 0 || errno != 0) {
         fprintf(stderr, "Invalid fifty-move token \"%s\"", t);
         if (errno != 0) {
             fprintf(stderr, ": %s\n", strerror(errno));
@@ -76,7 +82,7 @@ static bool parseFiftyMove(char* t, long* result) {
         return false;
     }
 
-    *result = parsed;
+    *result = intVal;
     return true;
 }
 
@@ -217,7 +223,7 @@ int parseFen(GameState* state, char* fenStr) {
     int toMove = COLOR_WHITE;
     int castleFlags = 0;
     int epFile = NO_EP_FILE;
-    long fiftyMove = 0;
+    int fiftyMove = 0;
 
     tokenBuffer = createTokenBuffer(_FEN_MAX_TOKENS, _FEN_MAX_TOKEN_LEN);
 

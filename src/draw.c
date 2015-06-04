@@ -23,6 +23,7 @@
 #include "bitboard.h"
 #include "draw.h"
 #include "gamestate.h"
+#include "hashconsts.h"
 #include "piece.h"
 #include "tulip.h"
 
@@ -93,6 +94,28 @@ bool isMaterialDraw(GameState* g) {
     default:
         result = moreThanFourPieces(g, total);
         break;
+    }
+
+    return result;
+}
+
+bool isThreefoldDraw(GameState* g) {
+    StateData* currentData = g->current;
+    const uint64_t startingHash = currentData->hash;
+    bool result = false;
+    int repeatCount = 1;
+    const int limit = MIN(currentData->fiftyMoveCount, currentData->halfMoveCount);
+
+    for (int i = 0; i < limit; i++) {
+        currentData--;
+        const uint64_t currentHash = currentData->hash;
+        if (currentHash == startingHash || (currentHash ^ HASH_WHITE_TO_MOVE) == startingHash) {
+            repeatCount++;
+            if (repeatCount == 3) {
+                result = true;
+                break;
+            }
+        }
     }
 
     return result;

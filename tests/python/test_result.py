@@ -38,6 +38,12 @@ class TestGameResultDetection(unittest.TestCase):
         result = call_tulip(['-gamestatus', fen])
         return json.loads(result)['status']
 
+    def get_status_after_moves(self, fen, moves):
+        args = ['-movegamestatus', fen]
+        args.extend(moves)
+        result = call_tulip(args)
+        return json.loads(result)['status']
+
     def test_black_checkmated(self):
         result = self.get_status('4R1k1/5ppp/8/8/8/8/8/4K3 b - - 0 1')
         self.assertEqual('blackCheckmated', result)
@@ -100,6 +106,26 @@ class TestGameResultDetection(unittest.TestCase):
 
     def test_material_draw_many_bishops_only_one_side_with_bishops_b(self):
         result = self.get_status('3k4/8/1b6/8/7b/4b1b1/5b2/3K4 b - - 0 1')
+        self.assertEqual('none', result)
+
+    def test_threefold_draw_simple_draw(self):
+        moves = ['Rh2', 'Ke8', 'Rh1', 'Ke7', 'Rh2', 'Ke8', 'Rh1', 'Ke7']
+        result = self.get_status_after_moves('8/4k3/8/8/8/8/4K3/7R w - - 0 1', moves)
+        self.assertEqual('threefoldDraw', result)
+
+    def test_threefold_draw_simple_not_repeated(self):
+        moves = ['Rh2', 'Ke8', 'Rh1', 'Ke7', 'Rh2', 'Ke8', 'Rh1', 'Kf8']
+        result = self.get_status_after_moves('8/4k3/8/8/8/8/4K3/7R w - - 0 1', moves)
+        self.assertEqual('none', result)
+
+    def test_threefold_draw_pawn_breaks_draw(self):
+        moves = ['Rh2', 'Ke8', 'Rh1', 'Ke7', 'b5', 'Ke8', 'Rh2', 'Ke7', 'Rh1']
+        result = self.get_status_after_moves('8/4k3/8/8/1P6/8/4K3/7R w - - 0 1', moves)
+        self.assertEqual('none', result)
+
+    def test_threefold_draw_capture_breaks_draw(self):
+        moves = ['Rh2', 'Ke8', 'Rh1', 'Ke7', 'Rxb5', 'Ke8', 'Rb4', 'Ke7', 'Rh2', 'Ke8', 'Rh1', 'Ke7']
+        result = self.get_status_after_moves('8/4k3/8/1p6/1R6/8/4K3/7R w - - 0 1', moves)
         self.assertEqual('none', result)
 
 if __name__ == '__main__':

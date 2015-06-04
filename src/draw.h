@@ -26,5 +26,6 @@
 #include "gamestate.h"
 
 bool isMaterialDraw(GameState* g);
+bool isThreefoldDraw(GameState* g);
 
 #endif

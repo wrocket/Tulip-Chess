@@ -33,6 +33,10 @@ int getResult(GameState* g) {
         return STATUS_MATERIAL_DRAW;
     }
 
+    if (isThreefoldDraw(g)) {
+        return STATUS_THREEFOLD_DRAW;
+    }
+
     const int moves = countLegalMoves(g);
 
     if (moves == 0) {

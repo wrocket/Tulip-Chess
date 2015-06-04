@@ -187,7 +187,7 @@ void printGameState(char* position, GameState* state) {
     printSq(squareStr, stateData->blackKingSquare);
     printf("\"blackKingSquare\": \"%s\", ", squareStr);
 
-    printf("\"fiftyMoveCount\": %ld, ", stateData->fiftyMoveCount);
+    printf("\"fiftyMoveCount\": %i, ", stateData->fiftyMoveCount);
     printf("\"halfMoveCount\": %i, ", stateData->halfMoveCount);
 
     const int flags = stateData->castleFlags;
