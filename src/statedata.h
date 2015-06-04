@@ -39,13 +39,18 @@
 // position.
 #define NO_EP_FILE  INVALID_FILE
 
+// Structure to define the notion of StateData.
+// This is a structure of "small" things (integers, booleans, etc) that change with each move on the chessboard.
+// The idea is that we can keep a stack of these, pushing a new item on each move, providing a handy way to
+// peek back in history (e.g. threefold detection) or undo a move.
+// There should be no heap-allocated members in this structure.
 typedef struct {
     int toMove;                 // The side to move, either COLOR_WHITE or COLOR_BLACK
     int castleFlags;            // The castle flags as a bitmap; see CASTLE_WK and others.
     int whiteKingSquare;        // The current square index of the white king.
     int blackKingSquare;        // The current square index of the black king.
     int epFile;                 // The current en passant file, if any.
-    int fiftyMoveCount;        // The fifty move count. This is the number of half-moves since a capture or pawn move.
+    int fiftyMoveCount;         // The fifty move count. This is the number of half-moves since a capture or pawn move.
     int halfMoveCount;          // The half move count. This increments by one after every move.
     uint64_t hash;              // The current state hash.
     int whitePieceCount;        // The current white piece count.

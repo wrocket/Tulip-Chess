@@ -32,11 +32,13 @@
 #include "bitboard.h"
 
 void initializeGamestate(GameState* gs) {
+    // Allocate memory space for arrays.
     gs->bitboards = ALLOC_ZERO(ORD_MAX + 1, uint64_t, gs->bitboards, "Unable to allocate bitboards.");
     gs->dataStack = ALLOC(_GS_STACK_SIZE, StateData, gs->dataStack, "Unable to allocate state data stack.");
     gs->board = ALLOC(144, Piece*, gs->board, "Error allocating board array.");
     gs->pieceCounts = ALLOC_ZERO(ORD_MAX + 1, int, gs->pieceCounts, "Error allocating piece count array.");
 
+    // Allocate memory for each element in the state data stack.
     for (int i = 0; i < _GS_STACK_SIZE; i++) {
         createStateData(&gs->dataStack[i]);
     }
@@ -44,6 +46,7 @@ void initializeGamestate(GameState* gs) {
     gs->current = &(gs->dataStack[0]);
     gs->created = true;
 
+    // Set the board to be a 8x8 square of EMPTY with a 2-square border of OFF_BOARD.
     for (int i = 0; i < 144; i++) {
         gs->board[i] = &OFF_BOARD;
     }
@@ -56,12 +59,13 @@ void initializeGamestate(GameState* gs) {
 }
 
 void reinitBitboards(GameState* gs) {
+    // Zero out all current bitboards.
     for (int i = 0; i <= ORD_MAX; i++) {
         gs->bitboards[i] = 0;
     }
 
+    // Iterate over all squares in the board, set appropriate bits in the appropriate bitboard.
     const Piece** board = gs->board;
-
     for (int i = 0; i < 64; i++) {
         int sq = BOARD_SQUARES[i];
         int ord = board[sq]->ordinal;
