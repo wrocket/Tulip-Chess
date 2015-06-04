@@ -46,6 +46,9 @@
 // Fifty-move draw.
 #define STATUS_FIFTY_MOVE_DRAW 6
 
+// Retrieves the current result of the game.
+// If the game is *not* over, STATUS_NONE will be returned.
+// Otherwise, the appropriate status flag (see above) will be returned.
 int getResult(GameState* g);
 
 #endif

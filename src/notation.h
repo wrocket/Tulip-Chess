@@ -32,6 +32,13 @@
 // Returns the number of characters printed, not including the null char.
 int printShortAlg(Move* move, GameState* gameState, char* buffer);
 
+// Matches a human-input string against legal moves.
+// This method isn't terribly fast, but it uses "fuzzy" matching logic.
+// It will match with both coordinate notation (e.g. e2e4) and short
+// algebraic notation (e.g. Ne6, Qd7#), accounting for differences in
+// "decoration" (e.g. '++' instead of '#' for checkmate).
+// Returns false if no match is made, else returns true, and places the
+// relevant move information in the move argument.
 bool matchMove(char* str, GameState* gs, Move* move);
 
 #endif

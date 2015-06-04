@@ -30,20 +30,31 @@
 #include "piece.h"
 #include "statedata.h"
 
+// This is the maximum number of half-moves supportable in a game.
 #define _GS_STACK_SIZE  512
 
+// This structure defines a GameState object.
+// It will contain all the information needed to describe the current
+// position and state of a game of chess.
+// This is the "thread-safe" boundary. Do not share GameState objects
+// between threads, as most methods that operate on a GameState will
+// mutate it or rely on the non-mutation for correct functionality.
 typedef struct {
     int* pieceCounts;       // The current piece counts, indexed by the piece ordinal.
     const Piece** board;    // A 144 element array that corresponds to a 12x12 board.
-    StateData* dataStack;
-    StateData* current;
-    bool created;
-    uint64_t* bitboards;
+    StateData* dataStack;   // A stack structure storing "small" data that changes with each move.
+    StateData* current;     // The current state data object.
+    bool created;           // Indicates that this structure has been initialized.
+    uint64_t* bitboards;    // An array of bitboards, indexable by piece ordinal.
 } GameState;
 
+// Allocate memory and otherwise initialize a GameState to a default state.
 void initializeGamestate(GameState*);
+
+// Free memory and otherwise release resources of a GameState.
 void destroyGamestate(GameState*);
-void fillBitboards(GameState*);
+
+// Recalculate the bitboards array on the given state. Not performant.
 void reinitBitboards(GameState* gs);
 
 #endif
