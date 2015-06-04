@@ -211,6 +211,7 @@ static void printGameResultStatus(int argc, char** argv) {
 
 static void makeMovesAndPrintGameResultStatus(int argc, char** argv) {
     Move m;
+
     if (argc < 2) {
         fprintf(stderr, "Usage: -movegamestatus \"[FEN string]\" move1 move2 moveN\n");
         exit(EXIT_FAILURE);
@@ -218,8 +219,8 @@ static void makeMovesAndPrintGameResultStatus(int argc, char** argv) {
 
     GameState gs = parseFenOrQuit(argv[1]);
 
-    for(int i=2; i<argc; i++) {
-        if(!matchMove(argv[i], &gs, &m)) {
+    for (int i = 2; i < argc; i++) {
+        if (!matchMove(argv[i], &gs, &m)) {
             fprintf(stderr, "Unplayable move: %s\n", argv[i]);
             exit(EXIT_FAILURE);
         }
