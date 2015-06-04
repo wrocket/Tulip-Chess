@@ -198,7 +198,7 @@ static void makeMovesAndPrintGameResultStatus(int argc, char** argv) {
     Move m;
 
     if (argc < 2) {
-        fprintf(stderr, "Usage: -movegamestatus \"[FEN string]\" move1 move2 moveN\n");
+        fprintf(stderr, "Usage: -gamestatus \"[FEN string]\" move1 move2 moveN\n");
         exit(EXIT_FAILURE);
     }
 
