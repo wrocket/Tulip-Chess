@@ -23,8 +23,16 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-int tokenize(const char*, char**, const int);
-char** createTokenBuffer(const int, const int);
-void freeTokenBuffer(char**, const int);
+// A "simple" tokenizer for strings.
+// Given an input string, and a token buffer, and a maximum number of tokens,
+// this will split the string on whitespace. See createTokenBuffer() to create
+// the token buffer. This returns the number of tokens found.
+int tokenize(const char* str, char** tokenBuffer, const int maxTokens);
+
+// Creates an array of arrays to store token data.
+char** createTokenBuffer(const int maxTokens, const int maxTokenLength);
+
+// Free the array of arrays storing token data.
+void freeTokenBuffer(char** tokenBuffer, const int numberOfTokens);
 
 #endif

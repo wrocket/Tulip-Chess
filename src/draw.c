@@ -82,17 +82,17 @@ bool isMaterialDraw(GameState* g) {
     const int total = g->current->whitePieceCount + g->current->blackPieceCount;
     bool result;
     switch (total) {
-    case 4:
+    case 4: // Exactly four pieces looks for KBvKB with same-color bishops.
         result = fourPieces(g, total);
         break;
     case 3:
-        result = threePieces(g, total);
+        result = threePieces(g, total); // Look for KNvK or KBvK
         break;
     case 2:
-        result = true;
+        result = true; // Two pieces means KvK, a draw.
         break;
     default:
-        result = moreThanFourPieces(g, total);
+        result = moreThanFourPieces(g, total); // Look for kings and bishops where bishops are same-color.
         break;
     }
 
@@ -103,15 +103,16 @@ bool isThreefoldDraw(GameState* g) {
     StateData* currentData = g->current;
     const uint64_t startingHash = currentData->hash;
     bool result = false;
-    int repeatCount = 1;
+    int repeatCount = 0;
     const int limit = MIN(currentData->fiftyMoveCount, currentData->halfMoveCount);
 
     for (int i = 0; i < limit; i++) {
         currentData--;
         const uint64_t currentHash = currentData->hash;
+        // Hash changes with toMove, so compare the hash with either white to move or black to move.
         if (currentHash == startingHash || (currentHash ^ HASH_WHITE_TO_MOVE) == startingHash) {
             repeatCount++;
-            if (repeatCount == 3) {
+            if (repeatCount == 2) {
                 result = true;
                 break;
             }
