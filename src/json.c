@@ -307,3 +307,19 @@ void printGameStatus(char* position, int status) {
     printf("\"status\": \"%s\"", resultStr);
     printf("}\n");
 }
+
+void printHashSequence(HashSeqItem* items, int length, uint64_t initialHash) {
+    printf("{");
+    printf("\"initialHash\": \"%016"PRIX64"\", ", initialHash);
+    printf("\"hashSequence\": [");
+    for(int i=0; i<length; i++){
+        HashSeqItem item = items[i];
+        if(i > 0) {
+            printf(", ");
+        }
+
+        printf("{\"move\":\"%s\", \"resultingHash\": \"%016"PRIX64"\"}", item.move, item.data.hash);
+    }
+    printf("]");
+    printf("}\n");
+}

@@ -25,6 +25,7 @@
 
 #include "move.h"
 #include "gamestate.h"
+#include "statedata.h"
 
 void printMovelistJson(char*, char*, GameState*, MoveBuffer*);
 void printGameState(char*, GameState*);
@@ -33,5 +34,12 @@ void printMakeMoveResult(char* position, Move* m, GameState* state);
 void printAttackList(char* position, bool* attackGrid, GameState* state);
 void printMatchMoveResult(Move* move);
 void printGameStatus(char* position, int status);
+
+typedef struct {
+    char move[8];
+    StateData data;
+} HashSeqItem;
+
+void printHashSequence(HashSeqItem* items, int count, uint64_t initialHash);
 
 #endif

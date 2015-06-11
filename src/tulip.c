@@ -218,6 +218,36 @@ static void makeMovesAndPrintGameResultStatus(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
+static void hashSequence(int argc, char** argv) {
+    Move m;
+    HashSeqItem* seqItems = ALLOC(512, HashSeqItem, seqItems, "Unable to allocate hash seq items array");
+    int count = 0;
+
+    if (argc < 2) {
+        fprintf(stderr, "Usage: -hashseq \"[FEN string]\" move1 move2 moveN\n");
+        exit(EXIT_FAILURE);
+    }
+
+    GameState gs = parseFenOrQuit(argv[1]);
+
+    const uint64_t initialHash = gs.current->hash;
+
+    for (int i = 2; i < argc; i++) {
+        if (!matchMove(argv[i], &gs, &m)) {
+            fprintf(stderr, "Unplayable move: %s\n", argv[i]);
+            exit(EXIT_FAILURE);
+        }
+        makeMove(&gs, &m);
+        printMoveCoordinate(&m, seqItems[count].move);
+        seqItems[count].data = *gs.current;
+        count++;
+    }
+
+    printHashSequence(seqItems, count, initialHash);
+    destroyGamestate(&gs);
+    free(seqItems);
+}
+
 int main(int argc, char** argv) {
     argc--;
     argv++;
@@ -239,6 +269,8 @@ int main(int argc, char** argv) {
             printMatchMove(argc, argv);
         } else if (0 == strcmp("-gamestatus", argv[0])) {
             makeMovesAndPrintGameResultStatus(argc, argv);
+        } else if (0 == strcmp("-hashseq", argv[0])) {
+            hashSequence(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);
