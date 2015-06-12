@@ -1,4 +1,5 @@
 *.o
+*.sqlite
 src/tulip
 src/sqlite/*.o
 src/sqlite/*.h

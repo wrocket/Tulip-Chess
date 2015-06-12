@@ -28,12 +28,13 @@
 # The idea is to use this in conjunction with the digest_pgn.py script, e.g.:
 # $ ./digest_pgn.py my_openings.pgn | ./build_book.py
 
-import subprocess
+import datetime
 import json
-import sqlite3 as lite
-import sys
-import re
 import os
+import re
+import sqlite3 as lite
+import subprocess
+import sys
 
 
 class MoveLine:
@@ -75,8 +76,14 @@ def write_to_database(data, database_name):
         os.remove(database_name)
     with lite.connect(database_name) as con:
         cur = con.cursor()
+        cur.execute('create table BOOK_METADATA(PROPERTY_KEY VARCHAR2(32), PROPERTY_VALUE VARCHAR2(200))')
         cur.execute('create table OPENING_BOOK(POSITION_HASH VARCHAR2(16), MOVE VARCHAR2(8))')
         cur.execute('create index POSITION_IDX on OPENING_BOOK(POSITION_HASH)')
+        properties = {}
+        properties['version'] = '1'
+        properties['created'] = str(datetime.datetime.now())
+        for kvp in properties.items():
+            cur.execute('insert into BOOK_METADATA values(?, ?)', kvp)
         move_count = 0
         for (position, moves) in data.items():
             move_count += len(moves)
@@ -94,4 +101,4 @@ all_lines = read_input()
 print("Read %i line(s) from stdin." % len(all_lines))
 digested_lines = [digest_line(build_line(x)) for x in all_lines]
 file_lines = combine_lines(digested_lines)
-write_to_database(file_lines, 'tulip_openings.db')
+write_to_database(file_lines, 'tulip_openings.sqlite')
