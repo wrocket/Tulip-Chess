@@ -33,7 +33,7 @@ debug: CFLAGS += -g
 debug: tulip
 
 tulip: $(OBJ_FILES)
-	$(CC) $(OBJ_FILES) -o tulip
+	$(CC) sqlite/sqlite3.o $(OBJ_FILES) -o tulip
 
 tulip.o: tulip.c tulip.h
 	$(CC) $(CFLAGS) -c tulip.c

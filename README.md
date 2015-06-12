@@ -9,13 +9,19 @@ Requirements
 ------------
 The application is intended to be built on any UNIX-ish system using a GCC-like C compiler.
 
+SQLite is used as a storage engine. A version of SQLite 3.10 or greater will need to be provided.
+
+Place the compiled sqlite3.o and sqlite3.h files in src/sqlite before running the build.
+
+The relevant source files can be obtained from http://sqlite.org.
+
 Principles
 ----------
 * Tulip should be reasonably self-contained.
   * Ideally, the only dependencies would be standard POSIX headers and programs supplied by the OS.
   * SQLite is used as an opening book storage engine.
 * Tulip should be readily portable to any UNIX-like system.
-* Tulip should be buildable with a one-step invocation of 'make'.
+* Tulip should be buildable, ideally with a one-step invocation of 'make'.
 
 Current Status
 --------------

@@ -26,6 +26,8 @@
 #include <limits.h>
 #include <string.h>
 
+#include "sqlite/sqlite3.h"
+
 #include "attack.h"
 #include "board.h"
 #include "draw.h"
@@ -46,6 +48,7 @@
 static void printBanner() {
     printf("Tulip Chess Engine 0.001\n");
     printf("Size of uint64: %lu bits\n", CHAR_BIT * sizeof(uint64_t));
+    printf("Using SQLite %s\n", sqlite3_libversion());
 }
 
 static GameState parseFenOrQuit(char* str) {
