@@ -34,6 +34,7 @@
 #include "fen.h"
 #include "gamestate.h"
 
+#include "book.h"
 #include "json.h"
 #include "makemove.h"
 #include "move.h"
@@ -158,6 +159,27 @@ static void checkStatus(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
+static void findBookMoves(int argc, char** argv) {
+    char* fen = argv[1];
+    const char* bookFile = "tulip_openings.sqlite"; // TODO: Make configurable
+    OpenBook book;
+    GameState gs = parseFenOrQuit(fen);
+    MoveBuffer buff;
+    createMoveBuffer(&buff);
+
+    if(!openBook(bookFile, &book)) {
+        fprintf(stderr, "Unable to open book: %s\n", bookFile);
+        exit(EXIT_FAILURE);
+    }
+
+    getMovesFromBook(&gs, &buff, &book);
+    closeBook(&book);
+
+    printMovelistJson(fen, "legal", &gs, &buff);
+
+    destroyMoveBuffer(&buff);
+}
+
 static void printMakeUnmakeMoveResult(int argc, char** argv) {
     if (argc != 3) {
         fprintf(stderr, "Usage: -makeunmake [moveString] \"[FEN string]\"\n");
@@ -274,6 +296,8 @@ int main(int argc, char** argv) {
             makeMovesAndPrintGameResultStatus(argc, argv);
         } else if (0 == strcmp("-hashseq", argv[0])) {
             hashSequence(argc, argv);
+        } else if (0 == strcmp("-bookmoves", argv[0])) {
+            findBookMoves(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);

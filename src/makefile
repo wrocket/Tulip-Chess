@@ -22,7 +22,7 @@
 
 CC=gcc
 CFLAGS=-Wall -Werror -Wconversion -pedantic -std=c99
-OBJ_FILES = tulip.o board.o piece.o statedata.o movegen.o move.o util.o gamestate.o json.o fen.o bitboard.o attack.o makemove.o notation.o hash.o hashconsts.o draw.o result.o
+OBJ_FILES = tulip.o board.o piece.o statedata.o movegen.o move.o util.o gamestate.o json.o fen.o bitboard.o attack.o makemove.o notation.o hash.o hashconsts.o draw.o result.o book.o
 
 all: tulip
 
@@ -88,6 +88,9 @@ draw.o: draw.c draw.h
 
 result.o: result.c result.h
 	$(CC) $(CFLAGS) -c result.c
+
+book.o: book.c book.h
+	$(CC) $(CFLAGS) -c book.c
 
 clean:
 	rm *.o tulip
