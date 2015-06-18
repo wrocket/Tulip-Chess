@@ -172,7 +172,7 @@ static void findBookMoves(int argc, char** argv) {
     MoveBuffer buff;
     createMoveBuffer(&buff);
 
-    if(!openBook(bookFile, &book)) {
+    if (!openBook(bookFile, &book)) {
         fprintf(stderr, "Unable to open book [%s]\n", bookFile);
         exit(EXIT_FAILURE);
     }
