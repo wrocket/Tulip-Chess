@@ -160,15 +160,20 @@ static void checkStatus(int argc, char** argv) {
 }
 
 static void findBookMoves(int argc, char** argv) {
-    char* fen = argv[1];
-    const char* bookFile = "tulip_openings.sqlite"; // TODO: Make configurable
+    if (argc != 3) {
+        fprintf(stderr, "Usage: -bookmoves [book file] \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char* bookFile = argv[1];
+    char* fen = argv[2];
     OpenBook book;
     GameState gs = parseFenOrQuit(fen);
     MoveBuffer buff;
     createMoveBuffer(&buff);
 
     if(!openBook(bookFile, &book)) {
-        fprintf(stderr, "Unable to open book: %s\n", bookFile);
+        fprintf(stderr, "Unable to open book [%s]\n", bookFile);
         exit(EXIT_FAILURE);
     }
 
