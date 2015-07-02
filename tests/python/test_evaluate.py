@@ -81,5 +81,15 @@ class TestBasicMoveApplication(unittest.TestCase):
         not_on_same_rank = self.zero_depth_eval('2q1k3/8/8/8/8/8/8/1r2K3 w - - 0 1')
         self.assert_score_better_than_b(on_same_rank, not_on_same_rank)
 
+    def test_wpawn_better_central_pawn(self):
+        better = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1')
+        worse = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/8/4P3/PPPP1PPP/RNBQKBNR b KQkq - 0 1')
+        self.assert_score_better_than_w(better, worse, by_no_more_than=50)
+
+    def test_bpawn_better_central_pawn(self):
+        better = self.zero_depth_eval('rnbqkbnr/pppp1ppp/8/4p3/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 1')
+        worse = self.zero_depth_eval('rnbqkbnr/pppp1ppp/4p3/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 1')
+        self.assert_score_better_than_b(better, worse, by_no_more_than=50)
+
 if __name__ == '__main__':
     unittest.main()

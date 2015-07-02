@@ -48,9 +48,11 @@ static int evaluateOpening(GameState* state) {
         switch (p->ordinal) {
         case ORD_WPAWN:
             score += SCORE_PAWN;
+            score += SQ_SCORE_PAWN_OPENING_WHITE[sq];
             break;
         case ORD_BPAWN:
             score -= SCORE_PAWN;
+            score -= SQ_SCORE_PAWN_OPENING_BLACK[sq];
             break;
         case ORD_WKNIGHT:
             score += SCORE_KNIGHT;
