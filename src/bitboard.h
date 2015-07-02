@@ -586,4 +586,7 @@ extern const uint64_t BITS_QUEEN[144];
 extern const uint64_t BITS_KING[144];
 extern const uint64_t BITS_WPAWN[144];
 extern const uint64_t BITS_BPAWN[144];
+
+// Bitmasks for ranks, files, etc, indexed by rank/file index.
+extern const uint64_t BITS_FILES[8];
 #endif

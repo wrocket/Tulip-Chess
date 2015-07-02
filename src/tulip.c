@@ -33,7 +33,7 @@
 #include "draw.h"
 #include "fen.h"
 #include "gamestate.h"
-
+#include "eval.h"
 #include "book.h"
 #include "json.h"
 #include "makemove.h"
@@ -183,6 +183,22 @@ static void findBookMoves(int argc, char** argv) {
     printMovelistJson(fen, "legal", &gs, &buff);
 
     destroyMoveBuffer(&buff);
+    destroyGamestate(&gs);
+}
+
+static void evalPosition(int argc, char** argv) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: -evalposition \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char* fen = argv[1];
+    GameState gs = parseFenOrQuit(fen);
+
+    int result = evaluate(&gs);
+
+    printEvaluation(fen, result);
+    destroyGamestate(&gs);
 }
 
 static void printMakeUnmakeMoveResult(int argc, char** argv) {
@@ -303,6 +319,8 @@ int main(int argc, char** argv) {
             hashSequence(argc, argv);
         } else if (0 == strcmp("-bookmoves", argv[0])) {
             findBookMoves(argc, argv);
+        } else if (0 == strcmp("-evalposition", argv[0])) {
+            evalPosition(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);

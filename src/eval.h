@@ -20,27 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef JSON_H
-#define JSON_H
+#ifndef EVAL_H
+#define EVAL_H
 
-#include "move.h"
 #include "gamestate.h"
-#include "statedata.h"
 
-void printMovelistJson(char*, char*, GameState*, MoveBuffer*);
-void printGameState(char*, GameState*);
-void printCheckStatus(char*, bool isCheck);
-void printMakeMoveResult(char* position, Move* m, GameState* state);
-void printAttackList(char* position, bool* attackGrid, GameState* state);
-void printMatchMoveResult(Move* move);
-void printGameStatus(char* position, int status);
-void printEvaluation(char* position, int score);
-
-typedef struct {
-    char move[8];
-    StateData data;
-} HashSeqItem;
-
-void printHashSequence(HashSeqItem* items, int count, uint64_t initialHash);
+int evaluate(GameState* state);
 
 #endif

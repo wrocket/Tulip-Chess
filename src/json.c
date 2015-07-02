@@ -323,3 +323,10 @@ void printHashSequence(HashSeqItem* items, int length, uint64_t initialHash) {
     printf("]");
     printf("}\n");
 }
+
+void printEvaluation(char* position, int score) {
+    printf("{");
+    printf("\"fenString\": \"%s\", ", position);
+    printf("\"score\": %i", score);
+    printf("}\n");
+}
