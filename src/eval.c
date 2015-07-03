@@ -49,10 +49,16 @@ static int evaluateOpening(GameState* state) {
         case ORD_WPAWN:
             score += SCORE_PAWN;
             score += SQ_SCORE_PAWN_OPENING_WHITE[sq];
+            if (board[sq + OFFSET_N] == &WPAWN) {
+                score += PENALTY_DOUBLED_PAWN;
+            }
             break;
         case ORD_BPAWN:
             score -= SCORE_PAWN;
             score -= SQ_SCORE_PAWN_OPENING_BLACK[sq];
+            if (board[sq + OFFSET_S] == &BPAWN) {
+                score -= PENALTY_DOUBLED_PAWN;
+            }
             break;
         case ORD_WKNIGHT:
             score += SCORE_KNIGHT;

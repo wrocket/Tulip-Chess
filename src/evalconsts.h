@@ -29,6 +29,8 @@
 #define SCORE_ROOK      500
 #define SCORE_QUEEN     900
 
+#define PENALTY_DOUBLED_PAWN -24
+
 #define BONUS_RQ_SHARE_RANK 25
 
 extern const int SQ_SCORE_PAWN_OPENING_WHITE[144];

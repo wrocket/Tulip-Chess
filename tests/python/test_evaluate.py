@@ -45,12 +45,12 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def assert_score_better_than_w(self, better, worse, by_at_least=1, by_no_more_than=100):
         diff = better - worse
-        self.assertTrue(diff >= by_at_least, "Expected score to be better than %i by at least %i, got score %i" % (worse, by_at_least, better))
+        self.assertTrue(diff >= by_at_least, "Expected score to be better than %i by at least %i, got score %i (difference of %i)" % (worse, by_at_least, better, diff))
         self.assertTrue(diff <= by_no_more_than, "Expected score to be better than %i by no more than %i, got score %i" % (worse, by_no_more_than, better))
 
     def assert_score_better_than_b(self, better, worse, by_at_least=1, by_no_more_than=100):
         diff = abs(better - worse)
-        self.assertTrue(diff >= by_at_least, "Expected score to be better than %i by at least %i, got score %i" % (worse, by_at_least, better))
+        self.assertTrue(diff >= by_at_least, "Expected score to be better than %i by at least %i, got score %i (difference of %i)" % (worse, by_at_least, better, diff))
         self.assertTrue(diff <= by_no_more_than, "Expected score to be better than %i by no more than %i, got score %i" % (worse, by_no_more_than, better))
 
     def test_zerodepth_initial_position(self):
@@ -109,6 +109,16 @@ class TestBasicMoveApplication(unittest.TestCase):
     def test_bknight_better_developed(self):
         better = self.zero_depth_eval('r1bqkbnr/pppppppp/2n5/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 1 1')
         worse = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1')
+        self.assert_score_better_than_b(better, worse, by_at_least = 10, by_no_more_than=50)
+
+    def test_opening_doubled_wpawns(self):
+        better = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/5P2/6P1/PPPPP2P/RNBQKBNR w KQkq - 0 1')
+        worse = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/5P2/5P2/PPPPP2P/RNBQKBNR w KQkq - 0 1')
+        self.assert_score_better_than_w(better, worse, by_at_least = 10, by_no_more_than=50)
+
+    def test_opening_doubled_bpawns(self):
+        better = self.zero_depth_eval('rnbqkbnr/p2ppppp/1p6/2p5/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+        worse = self.zero_depth_eval('rnbqkbnr/p2ppppp/2p5/2p5/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
         self.assert_score_better_than_b(better, worse, by_at_least = 10, by_no_more_than=50)
 
 if __name__ == '__main__':
