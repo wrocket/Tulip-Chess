@@ -33,5 +33,7 @@
 
 extern const int SQ_SCORE_PAWN_OPENING_WHITE[144];
 extern const int SQ_SCORE_PAWN_OPENING_BLACK[144];
+extern const int SQ_SCORE_KNIGHT_OPENING_BLACK[144];
+extern const int SQ_SCORE_KNIGHT_OPENING_WHITE[144];
 
 #endif

@@ -45,13 +45,13 @@ class TestBasicMoveApplication(unittest.TestCase):
 
     def assert_score_better_than_w(self, better, worse, by_at_least=1, by_no_more_than=100):
         diff = better - worse
-        self.assertTrue(diff > by_at_least, "Expected score to be better than %i by at least %i, got %i" % (worse, by_at_least, better))
-        self.assertTrue(diff <= by_no_more_than, "Expected score to be better than %i by no more than %i, got %i" % (worse, by_no_more_than, better))
+        self.assertTrue(diff >= by_at_least, "Expected score to be better than %i by at least %i, got score %i" % (worse, by_at_least, better))
+        self.assertTrue(diff <= by_no_more_than, "Expected score to be better than %i by no more than %i, got score %i" % (worse, by_no_more_than, better))
 
     def assert_score_better_than_b(self, better, worse, by_at_least=1, by_no_more_than=100):
         diff = abs(better - worse)
-        self.assertTrue(diff > by_at_least, "Expected score to be better than %i by at least %i, got %i" % (worse, by_at_least, better))
-        self.assertTrue(diff <= by_no_more_than, "Expected score to be better than %i by no more than %i, got %i" % (worse, by_no_more_than, better))
+        self.assertTrue(diff >= by_at_least, "Expected score to be better than %i by at least %i, got score %i" % (worse, by_at_least, better))
+        self.assertTrue(diff <= by_no_more_than, "Expected score to be better than %i by no more than %i, got score %i" % (worse, by_no_more_than, better))
 
     def test_zerodepth_initial_position(self):
         result = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
@@ -90,6 +90,26 @@ class TestBasicMoveApplication(unittest.TestCase):
         better = self.zero_depth_eval('rnbqkbnr/pppp1ppp/8/4p3/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 1')
         worse = self.zero_depth_eval('rnbqkbnr/pppp1ppp/4p3/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 1')
         self.assert_score_better_than_b(better, worse, by_no_more_than=50)
+
+    def test_wknight_on_rim_is_dim(self):
+        better = self.zero_depth_eval('rnbqkbn1/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBN1 b KQkq - 0 1')
+        worse = self.zero_depth_eval('rnbqkbn1/pppppppp/8/8/8/8/PPPPPPPP/RNBQKB1N w KQkq - 0 1')
+        self.assert_score_better_than_w(better, worse, by_at_least = 15, by_no_more_than=50)
+
+    def test_wknight_better_developed(self):
+        better = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/8/2N5/PPPPPPPP/R1BQKBNR b KQkq - 1 1')
+        worse = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
+        self.assert_score_better_than_w(better, worse, by_at_least = 10, by_no_more_than=50)
+
+    def test_bknight_on_rim_is_dim(self):
+        better = self.zero_depth_eval('1nbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBN1 b KQkq - 0 1')
+        worse = self.zero_depth_eval('n1bqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBN1 b KQkq - 0 1')
+        self.assert_score_better_than_b(better, worse, by_at_least = 15, by_no_more_than=50)
+
+    def test_bknight_better_developed(self):
+        better = self.zero_depth_eval('r1bqkbnr/pppppppp/2n5/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 1 1')
+        worse = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1')
+        self.assert_score_better_than_b(better, worse, by_at_least = 10, by_no_more_than=50)
 
 if __name__ == '__main__':
     unittest.main()

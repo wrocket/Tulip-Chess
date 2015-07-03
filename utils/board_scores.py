@@ -69,7 +69,7 @@ def write_array(name, whiteVersion):
 	print('\n'.join(lines))
 
 
-white_pawn_scores = {
+white_pawn_opening_scores = {
 	8: [0, 0, 0, 0, 0, 0, 0, 0],
 	7: [0, 0, 0, 0, 0, 0, 0, 0],
 	6: [0, 0, 0, 0, 0, 0, 0, 0],
@@ -80,4 +80,19 @@ white_pawn_scores = {
 	1: [0, 0, 0, 0, 0, 0, 0, 0]
 }
 
-write_array('PAWN_OPENING', white_pawn_scores)
+write_array('PAWN_OPENING', white_pawn_opening_scores)
+
+white_knight_opening_scores = {
+	8: [0, 0, 0, 0, 0, 0, 0, 0],
+	7: [0, 0, 0, 0, 0, 0, 0, 0],
+	6: [0, 0, 0, 0, 0, 0, 0, 0],
+	5: [0, 0, 0, 0, 0, 0, 0, 0],
+	4: [0, 0, 0, 0, 0, 0, 0, 0],
+	3: [-10, 0, 10, 0, 0, 10, 0, -10],
+	2: [-10, 0, 0, 5, 0, 5, 0, -10],
+	1: [-20, -5, 0, 0, 0, 0, -5, -20]
+}
+
+write_array('KNIGHT_OPENING', white_knight_opening_scores)
+
+

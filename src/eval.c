@@ -56,9 +56,11 @@ static int evaluateOpening(GameState* state) {
             break;
         case ORD_WKNIGHT:
             score += SCORE_KNIGHT;
+            score += SQ_SCORE_KNIGHT_OPENING_WHITE[sq];
             break;
         case ORD_BKNIGHT:
             score -= SCORE_KNIGHT;
+            score -= SQ_SCORE_KNIGHT_OPENING_BLACK[sq];
             break;
         case ORD_WBISHOP:
             score += SCORE_BISHOP;
