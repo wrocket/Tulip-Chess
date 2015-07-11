@@ -31,6 +31,7 @@
 #include "move.h"
 #include "json.h"
 #include "result.h"
+#include "search.h"
 
 #define __STDC_FORMAT_MACROS
 
@@ -272,35 +273,37 @@ void printCheckStatus(char* position, bool isCheck) {
     printf("}\n");
 }
 
-void printGameStatus(char* position, int status) {
-    const char* resultStr;
-
+static const char* gameStatusToStr(int status) {
     switch (status) {
     case STATUS_NONE:
-        resultStr = "none";
+        return "none";
         break;
     case STATUS_WHITE_CHECKMATED:
-        resultStr = "whiteCheckmated";
+        return "whiteCheckmated";
         break;
     case STATUS_BLACK_CHECKMATED:
-        resultStr = "blackCheckmated";
+        return "blackCheckmated";
         break;
     case STATUS_STALEMATE:
-        resultStr = "stalemate";
+        return "stalemate";
         break;
     case STATUS_MATERIAL_DRAW:
-        resultStr = "materialDraw";
+        return "materialDraw";
         break;
     case STATUS_THREEFOLD_DRAW:
-        resultStr = "threefoldDraw";
+        return "threefoldDraw";
         break;
     case STATUS_FIFTY_MOVE_DRAW:
-        resultStr = "fiftyMoveDraw";
+        return "fiftyMoveDraw";
         break;
     default:
-        resultStr = "unknown";
+        return "unknown";
         break;
     }
+}
+
+void printGameStatus(char* position, int status) {
+    const char* resultStr = gameStatusToStr(status);
 
     printf("{");
     printf("\"fenString\": \"%s\", ", position);
@@ -312,9 +315,9 @@ void printHashSequence(HashSeqItem* items, int length, uint64_t initialHash) {
     printf("{");
     printf("\"initialHash\": \"%016"PRIX64"\", ", initialHash);
     printf("\"hashSequence\": [");
-    for(int i=0; i<length; i++){
+    for (int i = 0; i < length; i++) {
         HashSeqItem item = items[i];
-        if(i > 0) {
+        if (i > 0) {
             printf(", ");
         }
 
@@ -329,4 +332,47 @@ void printEvaluation(char* position, int score) {
     printf("\"fenString\": \"%s\", ", position);
     printf("\"score\": %i", score);
     printf("}\n");
+}
+
+void printSearchResult(SearchResult* result, GameState* state) {
+    char moveStr[16];
+    const bool printMove = result->searchStatus == SEARCH_STATUS_NONE;
+
+    if (printMove) {
+        printShortAlg(&result->move, state, moveStr);
+    }
+
+    const char* statusStr = result->searchStatus == SEARCH_STATUS_NONE ? "none" : "noLegalMoves";
+
+    printf("{\"searchResult\": {");
+    printf("\"move\": ");
+    if (printMove) {
+        printf("\"%s\",", moveStr);
+    } else {
+        printf("null,");
+    }
+
+    // Mini-hack: Treat NaN nodes per second as zero.
+    double nps;
+    if (result->durationMs > 0) {
+        nps = (double) result->nodes / (double) result->durationMs * 1000.0;
+    } else {
+        nps = 0.0;
+    }
+
+    printf("\"score\": %i,", result->score);
+    printf("\"status\": \"%s\",", statusStr);
+    printf("\"nodes\": %ld,", result->nodes);
+    printf("\"elapsedMs\": %ld,", result->durationMs);
+    printf("\"nodesPerSecond\": %0.2f,", nps);
+    printf("\"rootNodeScores\": [");
+    for(int i=0; i<result->moveScoreLength; i++) {
+        if(i != 0) {
+            printf(", ");
+        }
+
+        printShortAlg(&result->moveScores[i].move, state, moveStr);
+        printf("{\"move\":\"%s\", \"score\":%i}", moveStr, result->moveScores[i].score);
+    }
+    printf("]}}");
 }

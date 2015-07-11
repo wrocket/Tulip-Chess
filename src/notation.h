@@ -41,4 +41,14 @@ int printShortAlg(Move* move, GameState* gameState, char* buffer);
 // relevant move information in the move argument.
 bool matchMove(char* str, GameState* gs, Move* move);
 
+// Prints a move in coordinate notation to a given char buffer.
+// The char buffer must be at least 7 characters in size.
+// Returns the number of characters printed to the buffer.
+// The result will be null-terminated.
+int printMoveCoordinate(Move*, char*);
+
+// Matches a *pseudo*move in coordinate algebraic form to a Move object for
+// the given game state. Returns false if no such move exists.
+bool matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m);
+
 #endif

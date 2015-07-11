@@ -28,10 +28,13 @@
 
 #include "tulip.h"
 #include "piece.h"
+#include "move.h"
 #include "statedata.h"
 
 // This is the maximum number of half-moves supportable in a game.
 #define _GS_STACK_SIZE  512
+
+#define MAX_MOVE_BUFFER 64
 
 // This structure defines a GameState object.
 // It will contain all the information needed to describe the current
@@ -46,6 +49,7 @@ typedef struct {
     StateData* current;     // The current state data object.
     bool created;           // Indicates that this structure has been initialized.
     uint64_t* bitboards;    // An array of bitboards, indexable by piece ordinal.
+    MoveBuffer* moveBuffers;     // A series of move buffers for efficient search storage
 } GameState;
 
 // Allocate memory and otherwise initialize a GameState to a default state.

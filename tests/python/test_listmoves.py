@@ -322,6 +322,18 @@ class TestBasicMoveList(unittest.TestCase):
         self.assertTrue('e1g1' not in moves.keys(), 'e1g1 incorrectly in move list.')
         self.assertTrue('e1c1' not in moves.keys(), 'e1c1 incorrectly in move list.')
 
+    def test_black_pawn_blocked(self):
+        moves = self.listLegalMoves('6k1/6p1/6K1/8/8/8/8/8 b - - 0 1')
+        self.assertTrue('g8f8' in moves)
+        self.assertTrue('g8h8' in moves)
+        self.assertEqual(2, len(moves))
+
+    def test_white_pawn_blocked(self):
+        moves = self.listLegalMoves('8/8/8/8/8/6k1/6P1/6K1 w - - 0 1')
+        self.assertTrue('g1f1' in moves)
+        self.assertTrue('g1h1' in moves)
+        self.assertEqual(2, len(moves))
+
     def test_legal_moves_01(self):
         moves = self.listLegalMoves('5k2/8/5K2/8/8/1Q6/8/8 w - - 0 1')
         self.assertFalse('f6f7' in moves)

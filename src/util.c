@@ -24,9 +24,28 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
+#include <inttypes.h>
+#include <math.h>
 #include <stdio.h>
-
+#include <time.h>
 #include "tulip.h"
+
+#ifdef __MACH__
+// Thanks to http://stackoverflow.com/a/9781275
+#include <sys/time.h>
+#define CLOCK_REALTIME 0
+#define CLOCK_MONOTONIC 0
+//clock_gettime is not implemented on OSX
+int clock_gettime(int *clk_id, struct timespec* t) {
+    struct timeval now;
+    int rv = gettimeofday(&now, NULL);
+    if (rv) return rv;
+    t->tv_sec  = now.tv_sec;
+    t->tv_nsec = now.tv_usec * 1000;
+    return 0;
+}
+#endif
 
 int tokenize(const char* str, char** tokenBuffers, const int maxTokens) {
     char* currentBuffer = tokenBuffers[0];
@@ -75,5 +94,13 @@ void freeTokenBuffer(char** buffer, const int length) {
     }
 
     free(buffer);
+}
+
+long getCurrentTimeMillis() {
+    time_t s;
+    struct timespec spec;
+    clock_gettime(CLOCK_REALTIME, &spec);
+    s  = spec.tv_sec;
+    return (long)((s * 1000.0) + round(spec.tv_nsec / 1.0e6));
 }
 

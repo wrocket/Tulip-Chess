@@ -215,3 +215,60 @@ bool matchMove(char* str, GameState* gs, Move* m) {
 	destroyMoveBuffer(&buffer);
 	return result;
 }
+
+
+bool matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m) {
+    MoveBuffer moveBuff;
+    int moveCount;
+    bool result = false;
+    char moveStrBuff[8];
+
+    createMoveBuffer(&moveBuff);
+    moveCount = generatePseudoMoves(gameState, &moveBuff);
+
+    for (int i = 0; i < moveCount; i++) {
+        Move current = moveBuff.moves[i];
+        printMoveCoordinate(&current, moveStrBuff);
+
+        if (strcasecmp(moveStrBuff, moveStr) == 0) {
+            result = true;
+            *m = current;
+            break;
+        }
+    }
+
+    destroyMoveBuffer(&moveBuff);
+
+    return result;
+}
+
+int printMoveCoordinate(Move* move, char* buffer) {
+    int index = 0;
+
+    index += printSquareIndex(move->from, buffer);
+    index += printSquareIndex(move->to, buffer + index);
+
+    switch (move->moveCode) {
+    case PROMOTE_N:
+        buffer[index++] = '=';
+        buffer[index++] = 'n';
+        break;
+    case PROMOTE_R:
+        buffer[index++] = '=';
+        buffer[index++] = 'r';
+        break;
+    case PROMOTE_B:
+        buffer[index++] = '=';
+        buffer[index++] = 'b';
+        break;
+    case PROMOTE_Q:
+        buffer[index++] = '=';
+        buffer[index++] = 'q';
+        break;
+    }
+
+    buffer[index++] = '\0';
+
+    return index;
+}
+

@@ -20,29 +20,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef JSON_H
-#define JSON_H
+#ifndef SEARCH_H
+#define SEARCH_H
 
 #include "move.h"
 #include "gamestate.h"
-#include "statedata.h"
-#include "search.h"
+#include "notation.h"
 
-void printMovelistJson(char*, char*, GameState*, MoveBuffer*);
-void printGameState(char*, GameState*);
-void printCheckStatus(char*, bool isCheck);
-void printMakeMoveResult(char* position, Move* m, GameState* state);
-void printAttackList(char* position, bool* attackGrid, GameState* state);
-void printMatchMoveResult(Move* move);
-void printGameStatus(char* position, int status);
-void printEvaluation(char* position, int score);
-void printSearchResult(SearchResult* result, GameState* state);
+#define INFINITY 10000
 
+#define SEARCH_STATUS_NONE              0
+#define SEARCH_STATUS_NO_LEGAL_MOVES    1
+
+// Used for sorting moves by their score.
 typedef struct {
-    char move[8];
-    StateData data;
-} HashSeqItem;
+    Move move;
+    int score;
+} MoveScore;
 
-void printHashSequence(HashSeqItem* items, int count, uint64_t initialHash);
+// Structure to define the output of the search method.
+typedef struct {
+    int score;              // The current game score, from the perspective of the side to move.
+    Move move;              // The best move.
+    long durationMs;        // The search duration.
+    long nodes;             // The number of positions processed.
+    int searchStatus;       // SEARCH_STATUS_NO_LEGAL_MOVES if no moves could be considered.
+    MoveScore* moveScores;  // A list of the moves considered and their scores.
+    int moveScoreLength;    // The length of moveScores.
+} SearchResult;
+
+// Allocate resources for a search result.
+void createSearchResult(SearchResult* result);
+
+// Release resources for a search result.
+void destroySearchResult(SearchResult* result);
+
+// Think. Figure out the best move. This is a blocking operation at the moment.
+bool search(GameState* state, SearchResult* result);
 
 #endif

@@ -29,6 +29,7 @@
 #include "gamestate.h"
 #include "piece.h"
 #include "statedata.h"
+#include "move.h"
 #include "bitboard.h"
 
 void initializeGamestate(GameState* gs) {
@@ -56,6 +57,11 @@ void initializeGamestate(GameState* gs) {
             gs->board[B_IDX(file, rank)] = &EMPTY;
         }
     }
+
+    gs->moveBuffers = ALLOC(MAX_MOVE_BUFFER, MoveBuffer, gs->moveBuffers, "Unable to allocate move buffers.");
+    for(int i=0; i<MAX_MOVE_BUFFER; i++) {
+        createMoveBuffer(&gs->moveBuffers[i]);
+    }
 }
 
 void reinitBitboards(GameState* gs) {
@@ -82,5 +88,12 @@ void destroyGamestate(GameState* gs) {
     free(gs->dataStack);
     free(gs->board);
     free(gs->pieceCounts);
+
+    for (int i=0; i<MAX_MOVE_BUFFER; i++) {
+        destroyMoveBuffer(&gs->moveBuffers[i]);
+    }
+
+    free(gs->moveBuffers);
+
     gs->created = false;
 }

@@ -24,7 +24,7 @@
 #define MOVE_H
 
 #include <stdbool.h>
-#include "gamestate.h"
+
 #include "piece.h"
 
 #define NO_MOVE_CODE	0	// Indicates nothing special about this move.
@@ -54,26 +54,19 @@ typedef struct {
 
 // A simple list structure that knows its current length.
 typedef struct {
-	Move* moves;	// The list of moves in this buffer.
-	int length;		// The current length of this buffer.
-	bool created;	// Indicating proper allocation/destruction.
+    Move* moves;    // The list of moves in this buffer.
+    int length;     // The current length of this buffer.
+    bool created;   // Indicating proper allocation/destruction.
 } MoveBuffer;
+
+// Move that indicates a non-move.
+extern Move NULL_MOVE;
 
 // Initialize a new move buffer to a given address.
 void createMoveBuffer(MoveBuffer*);
 
 // Deallocate a move buffer at a given address.
 void destroyMoveBuffer(MoveBuffer*);
-
-// Prints a move in coordinate notation to a given char buffer.
-// The char buffer must be at least 7 characters in size.
-// Returns the number of characters printed to the buffer.
-// The result will be null-terminated.
-int printMoveCoordinate(Move*, char*);
-
-// Matches a *pseudo*move in coordinate algebraic form to a Move object for
-// the given game state. Returns false if no such move exists.
-bool matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m);
 
 const Piece* getPromotePiece(const int color, const int moveCode);
 #endif

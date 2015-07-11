@@ -24,8 +24,8 @@
 #include <stdlib.h>
 
 #include "tulip.h"
-#include "move.h"
 #include "gamestate.h"
+#include "move.h"
 #include "attack.h"
 #include "board.h"
 #include "makemove.h"
@@ -187,13 +187,13 @@ static void whitePawn(const int sq, const Piece** board, Move* moveBuff, int* co
         PUSH_MOVE(m, sq, target, &WPAWN, &EMPTY, NO_MOVE_CODE);
         (*count)++;
         m++;
-    }
 
-    if (sq <= SQ_H2
-            && board[sq + (2 * OFFSET_N)] == &EMPTY) {
-        PUSH_MOVE(m, sq, sq + (OFFSET_N * 2), &WPAWN, &EMPTY, NO_MOVE_CODE);
-        (*count)++;
-        m++;
+        if (sq <= SQ_H2
+                && board[target + OFFSET_N] == &EMPTY) {
+            PUSH_MOVE(m, sq, target + OFFSET_N, &WPAWN, &EMPTY, NO_MOVE_CODE);
+            (*count)++;
+            m++;
+        }
     }
 
     target = sq + OFFSET_NE;
@@ -221,13 +221,13 @@ static void blackPawn(const int sq, const Piece** board, Move* moveBuff, int* co
         PUSH_MOVE(m, sq, target, &BPAWN, &EMPTY, NO_MOVE_CODE);
         (*count)++;
         m++;
-    }
 
-    if (sq >= SQ_A7
-            && board[sq + (2 * OFFSET_S)] == &EMPTY) {
-        PUSH_MOVE(m, sq, sq + (2 * OFFSET_S), &BPAWN, &EMPTY, NO_MOVE_CODE);
-        (*count)++;
-        m++;
+        if (sq >= SQ_A7
+                && board[target + OFFSET_S] == &EMPTY) {
+            PUSH_MOVE(m, sq, target + OFFSET_S, &BPAWN, &EMPTY, NO_MOVE_CODE);
+            (*count)++;
+            m++;
+        }
     }
 
     target = sq + OFFSET_SE;

@@ -45,6 +45,7 @@
 #include "statedata.h"
 #include "tulip.h"
 #include "util.h"
+#include "search.h"
 
 static void printBanner() {
     printf("Tulip Chess Engine 0.001\n");
@@ -294,6 +295,25 @@ static void hashSequence(int argc, char** argv) {
     free(seqItems);
 }
 
+static void simpleSearch(int argc, char** argv) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: -simplesearch \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char* fen = argv[1];
+    GameState gs = parseFenOrQuit(fen);
+
+    SearchResult result;
+    createSearchResult(&result);
+    search(&gs, &result);
+
+    printSearchResult(&result, &gs);
+
+    destroyGamestate(&gs);
+    destroySearchResult(&result);
+}
+
 int main(int argc, char** argv) {
     argc--;
     argv++;
@@ -321,6 +341,8 @@ int main(int argc, char** argv) {
             findBookMoves(argc, argv);
         } else if (0 == strcmp("-evalposition", argv[0])) {
             evalPosition(argc, argv);
+        } else if (0 == strcmp("-simplesearch", argv[0])) {
+            simpleSearch(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);
