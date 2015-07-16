@@ -107,7 +107,7 @@ void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScor
     sortMoveScores(moveScores, legalMoves->length);
 }
 
-bool search(GameState* state, SearchResult* result) {
+bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
     MoveBuffer buffer;
     result->searchStatus = SEARCH_STATUS_NONE;
     createMoveBuffer(&buffer);
@@ -119,8 +119,9 @@ bool search(GameState* state, SearchResult* result) {
     result->score = INT_MIN;
     result->nodes = 0;
     if (moveCount) {
+        const int depth = searchArgs->depth < 0 ? 0 : searchArgs->depth;
         // Well, we're not actually iteratively deepening yet...
-        iterativeDeepen(state, result, result->moveScores, &buffer, 4);
+        iterativeDeepen(state, result, result->moveScores, &buffer, depth);
     } else {
         result->move = NULL_MOVE;
         result->searchStatus = SEARCH_STATUS_NO_LEGAL_MOVES;

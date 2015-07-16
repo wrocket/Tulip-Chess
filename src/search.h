@@ -49,6 +49,10 @@ typedef struct {
     int moveScoreLength;    // The length of moveScores.
 } SearchResult;
 
+typedef struct {
+    int depth;      // The maximum search depth.
+} SearchArgs;
+
 // Allocate resources for a search result.
 void createSearchResult(SearchResult* result);
 
@@ -56,6 +60,6 @@ void createSearchResult(SearchResult* result);
 void destroySearchResult(SearchResult* result);
 
 // Think. Figure out the best move. This is a blocking operation at the moment.
-bool search(GameState* state, SearchResult* result);
+bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result);
 
 #endif

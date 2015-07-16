@@ -38,4 +38,7 @@ void freeTokenBuffer(char** tokenBuffer, const int numberOfTokens);
 // Retrieve the current UNIX epoch time in milliseconds.
 long getCurrentTimeMillis();
 
+// Parse a given string as an integer, return success or failure.
+// On failure, this will print an error message to stderr.
+bool parseInteger(const char* str, int* result);
 #endif

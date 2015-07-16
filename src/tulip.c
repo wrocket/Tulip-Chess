@@ -25,6 +25,7 @@
 #include <inttypes.h>
 #include <limits.h>
 #include <string.h>
+#include <errno.h>
 
 #include "sqlite/sqlite3.h"
 
@@ -51,6 +52,21 @@ static void printBanner() {
     printf("Tulip Chess Engine 0.001\n");
     printf("Size of uint64: %lu bits\n", CHAR_BIT * sizeof(uint64_t));
     printf("Using SQLite %s\n", sqlite3_libversion());
+}
+
+// Simple alternative to getopt(). Consider using getopt anyway...
+static const char* findArg(int argc, char** argv, const char* argName) {
+    const char* result = NULL;
+
+    for (int i = 0; i < argc; i++) {
+        char* arg = argv[i];
+        if (strcmp(arg, argName) == 0 && i < argc - 1) {
+            result = argv[i + 1];
+            break;
+        }
+    }
+
+    return result;
 }
 
 static GameState parseFenOrQuit(char* str) {
@@ -296,17 +312,31 @@ static void hashSequence(int argc, char** argv) {
 }
 
 static void simpleSearch(int argc, char** argv) {
-    if (argc != 2) {
+    if (argc < 2) {
         fprintf(stderr, "Usage: -simplesearch \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    char* fen = argv[1];
+    int depth = 4; // Configure default?
+    const char* depthStr = findArg(argc, argv, "-depth");
+    if (depthStr != NULL && !parseInteger(depthStr, &depth)) {
+        exit(EXIT_FAILURE);
+    }
+
+    if (depth < 0) {
+        fprintf(stderr, "Depth must be non-negative.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char* fen = argv[argc - 1];
     GameState gs = parseFenOrQuit(fen);
+
+    SearchArgs args = {.depth = depth};
 
     SearchResult result;
     createSearchResult(&result);
-    search(&gs, &result);
+
+    search(&gs, &args, &result);
 
     printSearchResult(&result, &gs);
 

@@ -31,6 +31,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
+#include <errno.h>
+#include <limits.h>
+
 #include "tulip.h"
 
 #ifdef __MACH__
@@ -106,3 +109,22 @@ long getCurrentTimeMillis() {
     return (long)((seconds * 1000.0) + round((double) nanos));
 }
 
+bool parseInteger(char* str, int* result) {
+    char* endToken = NULL;
+    long longResult = strtol(str, &endToken, 10);
+
+    if (errno != 0) {
+        fprintf(stderr, "Invalid integer: %s\n", strerror(errno));
+        return false;
+    }
+
+    if ((endToken != NULL && strlen(endToken) > 0)
+            || longResult >= INT_MAX
+            || longResult <= INT_MIN) {
+        fprintf(stderr, "Invalid integer: %s\n", str);
+        return false;
+    }
+
+    *result = (int) longResult;
+    return true;
+}
