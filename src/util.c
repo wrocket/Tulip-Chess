@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#define _POSIX_C_SOURCE 200112L // Needed on Linux systems using GCC for clock_gettime() with -std=c99
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
@@ -97,10 +99,10 @@ void freeTokenBuffer(char** buffer, const int length) {
 }
 
 long getCurrentTimeMillis() {
-    time_t s;
     struct timespec spec;
     clock_gettime(CLOCK_REALTIME, &spec);
-    s  = spec.tv_sec;
-    return (long)((s * 1000.0) + round(spec.tv_nsec / 1.0e6));
+    const double seconds = (double) spec.tv_sec;
+    const long nanos = spec.tv_nsec / 1000000;
+    return (long)((seconds * 1000.0) + round((double) nanos));
 }
 

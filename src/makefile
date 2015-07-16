@@ -23,6 +23,7 @@
 CC=gcc
 CFLAGS=-Wall -Werror -Wconversion -pedantic -std=c99
 OBJ_FILES = tulip.o board.o piece.o statedata.o movegen.o move.o util.o gamestate.o json.o fen.o bitboard.o attack.o makemove.o notation.o hash.o hashconsts.o draw.o result.o book.o eval.o evalconsts.o search.o
+FINAL_LINK_FLAGS=-lm
 
 all: tulip
 
@@ -33,7 +34,7 @@ debug: CFLAGS += -g
 debug: tulip
 
 tulip: $(OBJ_FILES)
-	$(CC) sqlite/sqlite3.o $(OBJ_FILES) -o tulip
+	$(CC) $(FINAL_LINK_FLAGS) sqlite/sqlite3.o $(OBJ_FILES) -o tulip
 
 tulip.o: tulip.c tulip.h
 	$(CC) $(CFLAGS) -c tulip.c

@@ -35,6 +35,7 @@ char** createTokenBuffer(const int maxTokens, const int maxTokenLength);
 // Free the array of arrays storing token data.
 void freeTokenBuffer(char** tokenBuffer, const int numberOfTokens);
 
+// Retrieve the current UNIX epoch time in milliseconds.
 long getCurrentTimeMillis();
 
 #endif

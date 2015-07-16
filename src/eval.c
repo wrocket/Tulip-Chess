@@ -35,7 +35,7 @@ static inline int onSameFileWithPowerPiece(GameState* gs, int sq, int ordinalRoo
     uint64_t* bb = gs->bitboards;
     const int file = FILE_IDX(sq);
     const uint64_t fileMask = BITS_FILES[file] & ~BITS_SQ[sq];
-    const bool onRank = (fileMask & bb[ordinalRook]) != 0 | (fileMask & bb[ordinalQueen]) != 0;
+    const bool onRank = ((fileMask & bb[ordinalRook]) != 0) | ((fileMask & bb[ordinalQueen]) != 0);
     return onRank ? BONUS_RQ_SHARE_RANK : 0;
 }
 

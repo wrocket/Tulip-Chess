@@ -24,6 +24,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef __linux__
+#include <strings.h>
+#endif
+
 #include "attack.h"
 #include "board.h"
 #include "gamestate.h"
@@ -35,185 +39,191 @@
 #include "tulip.h"
 
 static bool doMoveCollide(Move* legalMove, Move* candidate) {
-	return legalMove->from != candidate->from
-	       && legalMove->movingPiece == candidate->movingPiece
-	       && legalMove->to == candidate->to;
+    return legalMove->from != candidate->from
+           && legalMove->movingPiece == candidate->movingPiece
+           && legalMove->to == candidate->to;
 }
 
 static int printMoveDisambiguation(GameState* g, Move* move, char* buffer) {
-	int c = 0;
-	MoveBuffer legalMoves;
-	int* collidingMoves;
-	int collidingMoveCnt = 0;
+    int c = 0;
+    MoveBuffer legalMoves;
+    int* collidingMoves;
+    int collidingMoveCnt = 0;
 
-	createMoveBuffer(&legalMoves);
-	generateLegalMoves(g, &legalMoves);
+    createMoveBuffer(&legalMoves);
+    generateLegalMoves(g, &legalMoves);
 
-	collidingMoves = ALLOC((unsigned long) legalMoves.length, int, collidingMoves, "Unable to allocate ambiguous move buffer.");
+    collidingMoves = ALLOC((unsigned long) legalMoves.length, int, collidingMoves, "Unable to allocate ambiguous move buffer.");
 
-	// Look for moves where both the moving piece and destination square are the same.
-	// See http://en.wikipedia.org/wiki/Algebraic_notation_(chess)#Disambiguating_moves for rules.
-	for (int i = 0; i < legalMoves.length; i++) {
-		Move* candidate = &legalMoves.moves[i];
-		if (doMoveCollide(move, candidate)) {
-			collidingMoves[collidingMoveCnt++] = candidate->from;
-		}
-	}
+    // Look for moves where both the moving piece and destination square are the same.
+    // See http://en.wikipedia.org/wiki/Algebraic_notation_(chess)#Disambiguating_moves for rules.
+    for (int i = 0; i < legalMoves.length; i++) {
+        Move* candidate = &legalMoves.moves[i];
+        if (doMoveCollide(move, candidate)) {
+            collidingMoves[collidingMoveCnt++] = candidate->from;
+        }
+    }
 
-	if (collidingMoveCnt > 0) {
-		bool sameRank = false;
-		bool sameFile = false;
+    if (collidingMoveCnt > 0) {
+        bool sameRank = false;
+        bool sameFile = false;
 
-		const int fromRank = RANK_IDX(move->from);
-		const int fromFile = FILE_IDX(move->from);
+        const int fromRank = RANK_IDX(move->from);
+        const int fromFile = FILE_IDX(move->from);
 
-		for (int i = 0; i < collidingMoveCnt; i++) {
-			const int ambigSq = collidingMoves[i];
-			sameRank |= fromRank == RANK_IDX(ambigSq);
-			sameFile |= fromFile == FILE_IDX(ambigSq);
-		}
+        for (int i = 0; i < collidingMoveCnt; i++) {
+            const int ambigSq = collidingMoves[i];
+            sameRank |= fromRank == RANK_IDX(ambigSq);
+            sameFile |= fromFile == FILE_IDX(ambigSq);
+        }
 
-		// Disambiguate in the following order:
-		// 1. First by file. If that doesn't fix it...
-		// 2. Next by rank. If that doesn't fix it...
-		// 3. File and rank. That has to fix it.
-		if (sameFile && sameRank) {
-			c = printSquareIndex(move->from, buffer);
-		} else if (sameRank || !sameFile) {
-			buffer[c++] = fileToChar(fromFile);
-		} else if (sameFile) {
-			buffer[c++] = rankToChar(fromRank);
-		}
-	}
+        // Disambiguate in the following order:
+        // 1. First by file. If that doesn't fix it...
+        // 2. Next by rank. If that doesn't fix it...
+        // 3. File and rank. That has to fix it.
+        if (sameFile && sameRank) {
+            c = printSquareIndex(move->from, buffer);
+        } else if (sameRank || !sameFile) {
+            buffer[c++] = fileToChar(fromFile);
+        } else if (sameFile) {
+            buffer[c++] = rankToChar(fromRank);
+        }
+    }
 
-	free(collidingMoves);
-	destroyMoveBuffer(&legalMoves);
+    free(collidingMoves);
+    destroyMoveBuffer(&legalMoves);
 
-	return c;
+    return c;
 }
 
 int printShortAlg(Move* move, GameState* gameState, char* buffer) {
-	int count = 0;
-	const Piece* movingPiece = move->movingPiece;
-	bool isPawn = movingPiece == &WPAWN || movingPiece == &BPAWN;
+    int count = 0;
+    const Piece* movingPiece = move->movingPiece;
+    bool isPawn = movingPiece == &WPAWN || movingPiece == &BPAWN;
 
-	if (movingPiece == &WKING || movingPiece == &BKING) {
-		int moveOffset = move->from - move->to;
-		if (moveOffset == 2) {
-			count = sprintf(buffer, "O-O-O");
-			goto add_check;
-		} else if (moveOffset == -2) {
-			count = sprintf(buffer, "O-O");
-			goto add_check;
-		}
-	}
+    if (movingPiece == &WKING || movingPiece == &BKING) {
+        int moveOffset = move->from - move->to;
+        if (moveOffset == 2) {
+            count = sprintf(buffer, "O-O-O");
+            goto add_check;
+        } else if (moveOffset == -2) {
+            count = sprintf(buffer, "O-O");
+            goto add_check;
+        }
+    }
 
-	if (!isPawn) {
-		buffer[count++] = (char) toupper(movingPiece->name);
-		count += printMoveDisambiguation(gameState, move, &buffer[count]);
-	}
+    if (!isPawn) {
+        buffer[count++] = (char) toupper(movingPiece->name);
+        count += printMoveDisambiguation(gameState, move, &buffer[count]);
+    }
 
-	if (move->captures != &EMPTY) {
-		if (isPawn) {
-			buffer[count++] = indexToFileChar(move->from);
-		}
+    if (move->captures != &EMPTY) {
+        if (isPawn) {
+            buffer[count++] = indexToFileChar(move->from);
+        }
 
-		buffer[count++] = 'x';
-	}
+        buffer[count++] = 'x';
+    }
 
-	count += printSquareIndex(move->to, buffer + count);
+    count += printSquareIndex(move->to, buffer + count);
 
-	if (IS_PROMOTE(move->moveCode)) {
-		buffer[count++] = '=';
-		buffer[count++] = (char) toupper(getPromotePiece(movingPiece->color, move->moveCode)->name);
-	}
+    if (IS_PROMOTE(move->moveCode)) {
+        buffer[count++] = '=';
+        buffer[count++] = (char) toupper(getPromotePiece(movingPiece->color, move->moveCode)->name);
+    }
 
 add_check:
 
-	makeMove(gameState, move);
-	if (isCheck(gameState)) {
-		buffer[count++] = countLegalMoves(gameState) == 0 ? '#' : '+';
-	}
+    makeMove(gameState, move);
+    if (isCheck(gameState)) {
+        buffer[count++] = countLegalMoves(gameState) == 0 ? '#' : '+';
+    }
 
-	unmakeMove(gameState, move);
+    unmakeMove(gameState, move);
 
-	buffer[count] = '\0';
-	return count;
+    buffer[count] = '\0';
+    return count;
 }
 
 // The idea here is to strip a move down to an easy form to "fuzzy" match move strings.
 // By removing extra decorations (check status, capture notation, whitespace) and such,
 // we can do a reasonable job of matching against move strings generated by other programs.
 static void normalizeMove(char* original, char* normalized) {
-	char* c = original;
-	char* start = normalized;
-	int cnt = 0;
-	while (*c) {
-		if (isalnum(*c) && tolower(*c) != 'x') {
-			// Normalize algebraic castling to "oh" instead of "zero"
-			const char cv = *c == '0' ? 'O' : *c;
-			*normalized = (char) tolower(cv);
-			normalized++;
-			cnt++;
-		}
-		c++;
-	}
+    char* c = original;
+    char* start = normalized;
+    int cnt = 0;
+    while (*c) {
+        if (isalnum(*c) && tolower(*c) != 'x') {
+            // Normalize algebraic castling to "oh" instead of "zero"
+            char cv;
+            if (*c == '0') {
+                cv = 'O';
+            } else {
+                cv = *c;
+            }
 
-	*normalized = '\0';
+            *normalized = (char) tolower(cv);
+            normalized++;
+            cnt++;
+        }
+        c++;
+    }
 
-	// Lop off trailing 'ep' designating pawn en passant captures.
-	if (cnt >= 3) {
-		char* ep_file = strstr(start, "ep");
-		if (ep_file && ep_file == normalized - 2) {
-			*(normalized - 2) = '\0';
-		}
-	}
+    *normalized = '\0';
+
+    // Lop off trailing 'ep' designating pawn en passant captures.
+    if (cnt >= 3) {
+        char* ep_file = strstr(start, "ep");
+        if (ep_file && ep_file == normalized - 2) {
+            *(normalized - 2) = '\0';
+        }
+    }
 }
 
 static bool checkMoveMatch(char* normalizedGeneratedMove, char* normalizedInputMove, Move currentMove, Move* resultMove) {
-	bool result = false;
-	if (strcmp(normalizedGeneratedMove, normalizedInputMove) == 0) {
-		result = true;
-		*resultMove = currentMove;
-	}
+    bool result = false;
+    if (strcmp(normalizedGeneratedMove, normalizedInputMove) == 0) {
+        result = true;
+        *resultMove = currentMove;
+    }
 
-	return result;
+    return result;
 }
 
 bool matchMove(char* str, GameState* gs, Move* m) {
-	MoveBuffer buffer;
-	char moveStr[16];
-	char normalizedMove[16];
-	char normalizedInputMove[16];
-	bool result = false;
+    MoveBuffer buffer;
+    char moveStr[16];
+    char normalizedMove[16];
+    char normalizedInputMove[16];
+    bool result = false;
 
-	createMoveBuffer(&buffer);
-	generateLegalMoves(gs, &buffer);
+    createMoveBuffer(&buffer);
+    generateLegalMoves(gs, &buffer);
 
-	normalizeMove(str, normalizedInputMove);
+    normalizeMove(str, normalizedInputMove);
 
-	for (int i = 0; i < buffer.length; i++) {
-		Move currentMove = buffer.moves[i];
+    for (int i = 0; i < buffer.length; i++) {
+        Move currentMove = buffer.moves[i];
 
-		// Fist match with algebraic notation
-		printShortAlg(&currentMove, gs, moveStr);
-		normalizeMove(moveStr, normalizedMove);
-		result = checkMoveMatch(normalizedMove, normalizedInputMove, currentMove, m);
-		if (result) {
-			break;
-		}
+        // Fist match with algebraic notation
+        printShortAlg(&currentMove, gs, moveStr);
+        normalizeMove(moveStr, normalizedMove);
+        result = checkMoveMatch(normalizedMove, normalizedInputMove, currentMove, m);
+        if (result) {
+            break;
+        }
 
-		// Next match with coordinate notation
-		printMoveCoordinate(&currentMove, moveStr);
-		normalizeMove(moveStr, normalizedMove);
-		result = checkMoveMatch(normalizedMove, normalizedInputMove, currentMove, m);
-		if (result) {
-			break;
-		}
-	}
+        // Next match with coordinate notation
+        printMoveCoordinate(&currentMove, moveStr);
+        normalizeMove(moveStr, normalizedMove);
+        result = checkMoveMatch(normalizedMove, normalizedInputMove, currentMove, m);
+        if (result) {
+            break;
+        }
+    }
 
-	destroyMoveBuffer(&buffer);
-	return result;
+    destroyMoveBuffer(&buffer);
+    return result;
 }
 
 
