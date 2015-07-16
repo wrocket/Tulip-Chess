@@ -36,6 +36,7 @@
 typedef struct {
     Move move;
     int score;
+    int depth;
 } MoveScore;
 
 // Structure to define the output of the search method.

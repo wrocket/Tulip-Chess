@@ -97,6 +97,7 @@ void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScor
 
         moveScores[i].move = m;
         moveScores[i].score = score;
+        moveScores[i].depth = maxDepth;
 
         if (score > result->score) {
             result->score = score;
@@ -105,6 +106,22 @@ void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScor
     }
 
     sortMoveScores(moveScores, legalMoves->length);
+}
+
+static void reorderMovesFromMoveScores(MoveScore* scores, int scoreLength, MoveBuffer* moveBuffer) {
+    if (scoreLength != moveBuffer->length) {
+        fprintf(stderr, "Move score buffer length and move buffer length disagree.\n");
+    }
+
+    int limit = scoreLength > moveBuffer->length ? scoreLength : moveBuffer->length;
+
+    for (int i = 0; i < limit; i++) {
+        moveBuffer->moves[i] = scores[i].move;
+    }
+}
+
+static bool isEarlyCheckmate(int score) {
+    return score >= (INFINITY - 1000);
 }
 
 bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
@@ -119,9 +136,17 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
     result->score = INT_MIN;
     result->nodes = 0;
     if (moveCount) {
-        const int depth = searchArgs->depth < 0 ? 0 : searchArgs->depth;
-        // Well, we're not actually iteratively deepening yet...
-        iterativeDeepen(state, result, result->moveScores, &buffer, depth);
+        for (int depth = 1; depth <= searchArgs->depth; depth++) {
+            iterativeDeepen(state, result, result->moveScores, &buffer, depth);
+
+            // After each iteration, reorder the move search order "best moves first."
+            // This speeds up successive searches by creating beta cutoffs faster.
+            reorderMovesFromMoveScores(result->moveScores, result->moveScoreLength, &buffer);
+
+            if (isEarlyCheckmate(result->moveScores[0].score)) {
+                break;
+            }
+        }
     } else {
         result->move = NULL_MOVE;
         result->searchStatus = SEARCH_STATUS_NO_LEGAL_MOVES;
@@ -146,4 +171,3 @@ void createSearchResult(SearchResult* result) {
 void destroySearchResult(SearchResult* result) {
     free(result->moveScores);
 }
-

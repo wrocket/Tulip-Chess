@@ -371,8 +371,9 @@ void printSearchResult(SearchResult* result, GameState* state) {
             printf(", ");
         }
 
-        printShortAlg(&result->moveScores[i].move, state, moveStr);
-        printf("{\"move\":\"%s\", \"score\":%i}", moveStr, result->moveScores[i].score);
+        MoveScore score = result->moveScores[i];
+        printShortAlg(&score.move, state, moveStr);
+        printf("{\"move\":\"%s\", \"score\":%i, \"depth\":%i}", moveStr, score.score, score.depth);
     }
     printf("]}}");
 }

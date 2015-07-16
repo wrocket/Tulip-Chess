@@ -78,10 +78,6 @@ class TestSearch(unittest.TestCase):
         instant_checkmates = result.move_scores[:4]
         non_instant_checkmates = result.move_scores[4:]
 
-        # Verify every legal move leads to checkmate
-        for move in result.move_scores:
-            self.assert_score_is_checkmate(move[1])
-
         # Verify the four instant wins are present
         instant_win_moves = [x[0] for x in instant_checkmates]
         self.assertTrue('Qg1#' in instant_win_moves)
