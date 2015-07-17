@@ -114,7 +114,7 @@ bool parseInteger(char* str, int* result) {
     long longResult = strtol(str, &endToken, 10);
 
     if (errno != 0) {
-        fprintf(stderr, "Invalid integer: %s\n", strerror(errno));
+        fprintf(stderr, "Invalid integer: %s (%s)\n", str, strerror(errno));
         return false;
     }
 

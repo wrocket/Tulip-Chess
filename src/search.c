@@ -131,19 +131,22 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 
     const long start = getCurrentTimeMillis();
 
-    int moveCount = generateLegalMoves(state, &buffer);
+    const int moveCount = generateLegalMoves(state, &buffer);
     result->moveScoreLength = moveCount;
     result->score = INT_MIN;
     result->nodes = 0;
+    MoveScore* scores = result->moveScores;
+
     if (moveCount) {
         for (int depth = 1; depth <= searchArgs->depth; depth++) {
-            iterativeDeepen(state, result, result->moveScores, &buffer, depth);
+            iterativeDeepen(state, result, scores, &buffer, depth);
 
             // After each iteration, reorder the move search order "best moves first."
             // This speeds up successive searches by creating beta cutoffs faster.
-            reorderMovesFromMoveScores(result->moveScores, result->moveScoreLength, &buffer);
+            reorderMovesFromMoveScores(scores, result->moveScoreLength, &buffer);
 
-            if (isEarlyCheckmate(result->moveScores[0].score)) {
+            // If we found a checkmate, just play that immediately. No need to deepen further!
+            if (isEarlyCheckmate(scores[0].score)) {
                 break;
             }
         }
