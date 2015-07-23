@@ -30,6 +30,16 @@
 #define EVAL_SHARE_RANK_RQ_WHITE() onSameFileWithPowerPiece(state, sq, ORD_WROOK, ORD_WQUEEN)
 #define EVAL_SHARE_RANK_RQ_BLACK() onSameFileWithPowerPiece(state, sq, ORD_BROOK, ORD_BQUEEN)
 
+static inline int countBits(uint64_t n) {
+    // Thank you, Brian Kernighan!
+    int c;
+    for (c = 0; n; c++)
+    {
+        n &= n - 1;
+    }
+    return c;
+}
+
 // Determine if the given square shares a rank with the given rook or queen.
 static inline int onSameFileWithPowerPiece(GameState* gs, int sq, int ordinalRook, int ordinalQueen) {
     uint64_t* bb = gs->bitboards;
@@ -42,6 +52,11 @@ static inline int onSameFileWithPowerPiece(GameState* gs, int sq, int ordinalRoo
 static int evaluateOpening(GameState* state) {
     const Piece** board = state->board;
     int score = 0;
+    uint64_t* bb = state->bitboards;
+
+    uint64_t mobilityWhite = 0;
+    uint64_t mobilityBlack = 0;
+
     for (int sq = SQ_A1; sq <= SQ_H8; sq++) {
         const Piece* p = board[sq];
 
@@ -63,10 +78,12 @@ static int evaluateOpening(GameState* state) {
         case ORD_WKNIGHT:
             score += SCORE_KNIGHT;
             score += SQ_SCORE_KNIGHT_OPENING_WHITE[sq];
+            mobilityWhite |= BITS_KNIGHT[sq];
             break;
         case ORD_BKNIGHT:
             score -= SCORE_KNIGHT;
             score -= SQ_SCORE_KNIGHT_OPENING_BLACK[sq];
+            mobilityBlack |= BITS_KNIGHT[sq];
             break;
         case ORD_WBISHOP:
             score += SCORE_BISHOP;
@@ -91,12 +108,21 @@ static int evaluateOpening(GameState* state) {
         }
     }
 
+    // Remove any mobility score that refers to a square covered by a friendly pawn.
+    mobilityWhite &= ~bb[ORD_WPAWN];
+    mobilityBlack &= ~bb[ORD_BPAWN];
+
+    score += MINOR_PIECE_MOBILITY_BONUS * (countBits(mobilityWhite) - countBits(mobilityBlack));
+
     return score;
 }
 
 static int evaluateMidgame(GameState* state) {
     const Piece** board = state->board;
     int score = 0;
+    uint64_t* bb = state->bitboards;
+    uint64_t mobilityWhite = 0;
+    uint64_t mobilityBlack = 0;
     for (int sq = SQ_A1; sq <= SQ_H8; sq++) {
         const Piece* p = board[sq];
 
@@ -109,9 +135,11 @@ static int evaluateMidgame(GameState* state) {
             break;
         case ORD_WKNIGHT:
             score += SCORE_KNIGHT;
+            mobilityWhite |= BITS_KNIGHT[sq];
             break;
         case ORD_BKNIGHT:
             score -= SCORE_KNIGHT;
+            mobilityBlack |= BITS_KNIGHT[sq];
             break;
         case ORD_WBISHOP:
             score += SCORE_BISHOP;
@@ -135,6 +163,12 @@ static int evaluateMidgame(GameState* state) {
             break;
         }
     }
+
+    // Remove any mobility score that refers to a square covered by a friendly pawn.
+    mobilityWhite &= ~bb[ORD_WPAWN];
+    mobilityBlack &= ~bb[ORD_BPAWN];
+
+    score += MINOR_PIECE_MOBILITY_BONUS * (countBits(mobilityWhite) - countBits(mobilityBlack));
 
     return score;
 }

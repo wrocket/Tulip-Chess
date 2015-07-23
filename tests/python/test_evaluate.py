@@ -99,7 +99,7 @@ class TestBasicMoveApplication(unittest.TestCase):
     def test_wknight_better_developed(self):
         better = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/8/2N5/PPPPPPPP/R1BQKBNR b KQkq - 1 1')
         worse = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
-        self.assert_score_better_than_w(better, worse, by_at_least = 10, by_no_more_than=50)
+        self.assert_score_better_than_w(better, worse, by_at_least = 10, by_no_more_than=70)
 
     def test_bknight_on_rim_is_dim(self):
         better = self.zero_depth_eval('1nbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBN1 b KQkq - 0 1')
@@ -109,7 +109,7 @@ class TestBasicMoveApplication(unittest.TestCase):
     def test_bknight_better_developed(self):
         better = self.zero_depth_eval('r1bqkbnr/pppppppp/2n5/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 1 1')
         worse = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1')
-        self.assert_score_better_than_b(better, worse, by_at_least = 10, by_no_more_than=50)
+        self.assert_score_better_than_b(better, worse, by_at_least = 10, by_no_more_than=70)
 
     def test_opening_doubled_wpawns(self):
         better = self.zero_depth_eval('rnbqkbnr/pppppppp/8/8/5P2/6P1/PPPPP2P/RNBQKBNR w KQkq - 0 1')
@@ -120,6 +120,11 @@ class TestBasicMoveApplication(unittest.TestCase):
         better = self.zero_depth_eval('rnbqkbnr/p2ppppp/1p6/2p5/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
         worse = self.zero_depth_eval('rnbqkbnr/p2ppppp/2p5/2p5/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
         self.assert_score_better_than_b(better, worse, by_at_least = 10, by_no_more_than=50)
+
+    def knight_mobility_white(self):
+        better = self.zero_depth_eval('r4k1r/pppppppp/2P1P3/1P3P2/4N3/1P3P2/2P1P3/5K2 w - - 0 1')
+        worse = self.zero_depth_eval('r4k1r/pppppppp/2P1P3/1P3P2/3N4/1P3P2/2P1P3/5K2 w - - 0 1')
+        self.assert_score_better_than_b(better, worse, by_at_least = 50, by_no_more_than=100)
 
 if __name__ == '__main__':
     unittest.main()
