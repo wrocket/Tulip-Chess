@@ -54,6 +54,11 @@ class TestSearch(unittest.TestCase):
         sorted_scores = sorted(parsed_scores, key=lambda x: -1* x[1]) # sort move scores by score
         return SearchResult(move=json_obj['move'], score=json_obj['score'], move_scores=sorted_scores)
 
+    def get_mvv_lva(self, fen):
+        result = call_tulip(['-ordermoves', fen])
+        parsed_output = json.loads(result)
+        return parsed_output['shortAlgebraicMoves']
+
     def test_easy_backrank(self):
         result = self.get_result('6k1/5ppp/8/8/8/8/4R3/4K3 w - - 0 1')
         self.assertEqual('Re8#', result.move)
@@ -72,6 +77,11 @@ class TestSearch(unittest.TestCase):
         result = self.get_result('7k/5Kp1/5p1p/5P1P/8/8/8/8 w - - 0 1')
         self.assertEqual('Kg6', result.move)
         self.assertEqual(0, result.score)
+
+    def test_mate_in_two_puzzle01(self):
+        result = self.get_result('6k1/5pbp/6pB/8/7P/6P1/5PK1/r2R4 w - - 0 1')
+        self.assertEqual('Rd8+', result.move)
+        self.assert_is_checkmate(result)
 
     def test_multiple_checkmates(self):
         result = self.get_result('k7/8/6q1/8/8/8/r6r/3K4 b - - 0 1')
@@ -93,6 +103,18 @@ class TestSearch(unittest.TestCase):
         for instant_win in instant_checkmates:
             for later_win in non_instant_checkmates:
                 self.assertTrue(instant_win[1] > later_win[1])
+
+    def test_get_mvv_lva_order_1(self):
+        result = self.get_mvv_lva('4q2k/5P2/2b5/8/1N2Q3/8/8/6K1 w - - 0 1')
+        attack_queen_with_pawn = result[:4]
+        self.assertTrue('fxe8=B' in attack_queen_with_pawn)
+        self.assertTrue('fxe8=N' in attack_queen_with_pawn)
+        self.assertTrue('fxe8=R+' in attack_queen_with_pawn)
+        self.assertTrue('fxe8=Q+' in attack_queen_with_pawn)
+        self.assertEqual('Qxe8+', result[4])
+        self.assertEqual('Nxc6', result[5])
+        self.assertEqual('Qxc6', result[6])
+
 
 if __name__ == '__main__':
     unittest.main()

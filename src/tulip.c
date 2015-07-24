@@ -317,7 +317,7 @@ static void simpleSearch(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
-    int depth = 4; // Configure default?
+    int depth = 5; // Configure default?
     const char* depthStr = findArg(argc, argv, "-depth");
     if (depthStr != NULL && !parseInteger(depthStr, &depth)) {
         exit(EXIT_FAILURE);
@@ -342,6 +342,26 @@ static void simpleSearch(int argc, char** argv) {
 
     destroyGamestate(&gs);
     destroySearchResult(&result);
+}
+
+static void printMoveOrder(int argc, char** argv) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: -ordermoves \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    GameState gs = parseFenOrQuit(argv[1]);
+
+    MoveBuffer buffer;
+    createMoveBuffer(&buffer);
+    generateLegalMoves(&gs, &buffer);
+
+    orderByMvvLva(&buffer);
+
+    printMovelistJson(argv[1], "moveOrder", &gs, &buffer);
+
+    destroyMoveBuffer(&buffer);
+    destroyGamestate(&gs);
 }
 
 int main(int argc, char** argv) {
@@ -373,6 +393,8 @@ int main(int argc, char** argv) {
             evalPosition(argc, argv);
         } else if (0 == strcmp("-simplesearch", argv[0])) {
             simpleSearch(argc, argv);
+        } else if (0 == strcmp("-ordermoves", argv[0])) {
+            printMoveOrder(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);

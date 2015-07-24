@@ -39,8 +39,28 @@ static int compareMoveScore(const void* a, const void* b) {
     return ((MoveScore*) b)->score - ((MoveScore*) a)->score; // Underflow issues? Hopefully our scores are on the order of 1e5...
 }
 
+static int compareMvvLva(const void* a, const void* b) {
+    Move* aMove = (Move*) a;
+    Move* bMove = (Move*) b;
+
+    int result;
+
+    // First order by captured piece, most valuable first.
+    result = (bMove->captures->relativeValue) - (aMove->captures->relativeValue);
+    if (result == 0) {
+        // Next order by moving piece, least valuable first.
+        result = (aMove->movingPiece->relativeValue) - (bMove->movingPiece->relativeValue);
+    }
+
+    return result;
+}
+
 static void sortMoveScores(MoveScore* scores, const int length) {
     qsort(scores, (size_t) length, sizeof(MoveScore), compareMoveScore);
+}
+
+void orderByMvvLva(MoveBuffer* buffer) {
+    qsort(buffer->moves, ((size_t) buffer->length), sizeof(Move), compareMvvLva);
 }
 
 static int alphaBeta(GameState* state, SearchResult* result, const int depth, const int maxDepth, int alpha, int beta) {
@@ -52,6 +72,12 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
 
     MoveBuffer* buffer = &state->moveBuffers[depth];
     const int moveCount = generatePseudoMoves(state, buffer);
+
+    // If we're early in the search, sort the moves a bit nicer.
+    if (depth < 3) {
+        orderByMvvLva(buffer);
+    }
+
     int legalMoveCount = 0;
 
     for (int i = 0; i < moveCount; i++) {
@@ -124,6 +150,42 @@ static bool isEarlyCheckmate(int score) {
     return score >= (INFINITY - 1000);
 }
 
+// This is called once per search. It orders the moves at the root level thusly:
+// 1. Checks and captures first. A move that is both should be first.
+// 2. More valuable captured pieces before less valuable pieces.
+static void orderRootNode(GameState* state, MoveBuffer* buffer) {
+    const int moveCount = buffer->length;
+    MoveScore* scores = ALLOC((unsigned int) moveCount, MoveScore, scores, "Error allocating move scores in root node.");
+
+    for (int i = 0; i < moveCount; i++) {
+        Move* m = &buffer->moves[i];
+        int score = 0;
+
+        // Loosely sort by captured piece value
+        if (m->captures != &EMPTY) {
+            score += m->captures->relativeValue;
+        }
+
+        // Add special bonus to checks.
+        makeMove(state, m);
+        if (isCheck(state)) {
+            score += 10; // Arbitrary value; high enough to put checks before captures.
+        }
+        unmakeMove(state, m);
+
+        scores[i].move = *m;
+        scores[i].score = score;
+    }
+
+    sortMoveScores(scores, moveCount);
+
+    for (int i = 0; i < moveCount; i++) {
+        buffer->moves[i] = scores[i].move;
+    }
+
+    free(scores);
+}
+
 bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
     MoveBuffer buffer;
     result->searchStatus = SEARCH_STATUS_NONE;
@@ -132,6 +194,10 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
     const long start = getCurrentTimeMillis();
 
     const int moveCount = generateLegalMoves(state, &buffer);
+
+    // Put captures and checks at the top.
+    orderRootNode(state, &buffer);
+
     result->moveScoreLength = moveCount;
     result->score = INT_MIN;
     result->nodes = 0;

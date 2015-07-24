@@ -63,4 +63,6 @@ void destroySearchResult(SearchResult* result);
 // Think. Figure out the best move. This is a blocking operation at the moment.
 bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result);
 
+// Do a zero-depth move ordering, first by most valuable victim (Mvv) and then by least valuable attacker (lva).
+void orderByMvvLva(MoveBuffer* buffer);
 #endif

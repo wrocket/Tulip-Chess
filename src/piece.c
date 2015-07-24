@@ -28,85 +28,99 @@
 const Piece WPAWN = {
     .ordinal = ORD_WPAWN,
     .color = COLOR_WHITE,
-    .name = 'P'
+    .name = 'P',
+    .relativeValue = 1
 };
 
 const Piece BPAWN = {
     .ordinal = ORD_BPAWN,
     .color = COLOR_BLACK,
-    .name = 'p'
+    .name = 'p',
+    .relativeValue = 1
 };
 
 const Piece WKNIGHT = {
     .ordinal = ORD_WKNIGHT,
     .color = COLOR_WHITE,
-    .name = 'N'
+    .name = 'N',
+    .relativeValue = 2
 };
 
 const Piece BKNIGHT = {
     .ordinal = ORD_BKNIGHT,
     .color = COLOR_BLACK,
-    .name = 'n'
+    .name = 'n',
+    .relativeValue = 2
 };
 
 const Piece WBISHOP = {
     .ordinal = ORD_WBISHOP,
     .color = COLOR_WHITE,
-    .name = 'B'
+    .name = 'B',
+    .relativeValue = 3
 };
 
 const Piece BBISHOP = {
     .ordinal = ORD_BBISHOP,
     .color = COLOR_BLACK,
-    .name = 'b'
+    .name = 'b',
+    .relativeValue = 3
 };
 
 const Piece WROOK = {
     .ordinal = ORD_WROOK,
     .color = COLOR_WHITE,
-    .name = 'R'
+    .name = 'R',
+    .relativeValue = 4
 };
 
 const Piece BROOK = {
     .ordinal = ORD_BROOK,
     .color = COLOR_BLACK,
-    .name = 'r'
+    .name = 'r',
+    .relativeValue = 4
 };
 
 const Piece WQUEEN = {
     .ordinal = ORD_WQUEEN,
     .color = COLOR_WHITE,
-    .name = 'Q'
+    .name = 'Q',
+    .relativeValue = 5
 };
 
 const Piece BQUEEN = {
     .ordinal = ORD_BQUEEN,
     .color = COLOR_BLACK,
-    .name = 'q'
+    .name = 'q',
+    .relativeValue = 5
 };
 
 const Piece WKING = {
     .ordinal = ORD_WKING,
     .color = COLOR_WHITE,
-    .name = 'K'
+    .name = 'K',
+    .relativeValue = 6
 };
 
 const Piece BKING = {
     .ordinal = ORD_BKING,
     .color = COLOR_BLACK,
-    .name = 'k'
+    .name = 'k',
+    .relativeValue = 6
 };
 
 const Piece EMPTY = {
     .ordinal = ORD_EMPTY,
     .color = COLOR_NEITHER,
-    .name = '-'
+    .name = '-',
+    .relativeValue = 0
 };
 
 const Piece OFF_BOARD = {
     .ordinal = ORD_OFFB,
     .color = COLOR_OFFBOARD,
-    .name = 'X'
+    .name = 'X',
+    .relativeValue = 0
 };
 
 const Piece* ALL_PIECES[13] = {&WPAWN, &BPAWN, &WKNIGHT, &BKNIGHT, &WBISHOP, &BBISHOP, &WROOK, &BROOK, &WQUEEN, &BQUEEN, &WKING, &BKING, &EMPTY};

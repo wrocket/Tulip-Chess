@@ -56,9 +56,10 @@
 
 // Structure describing a piece on the board.
 typedef struct {
-    int ordinal;    // A unique positive integer for this piece.
-    int color;      // The color of this piece.
-    char name;      // The human-readable character for this piece.
+    int ordinal;        // A unique positive integer for this piece.
+    int color;          // The color of this piece.
+    char name;          // The human-readable character for this piece.
+    int relativeValue;  // A positive integer describing the general value of this piece compare to others.
 } Piece;
 
 extern const Piece WPAWN;
