@@ -59,7 +59,7 @@ void initializeGamestate(GameState* gs) {
     }
 
     gs->moveBuffers = ALLOC(MAX_MOVE_BUFFER, MoveBuffer, gs->moveBuffers, "Unable to allocate move buffers.");
-    for(int i=0; i<MAX_MOVE_BUFFER; i++) {
+    for (int i = 0; i < MAX_MOVE_BUFFER; i++) {
         createMoveBuffer(&gs->moveBuffers[i]);
     }
 }
@@ -89,7 +89,7 @@ void destroyGamestate(GameState* gs) {
     free(gs->board);
     free(gs->pieceCounts);
 
-    for (int i=0; i<MAX_MOVE_BUFFER; i++) {
+    for (int i = 0; i < MAX_MOVE_BUFFER; i++) {
         destroyMoveBuffer(&gs->moveBuffers[i]);
     }
 
