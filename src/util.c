@@ -36,12 +36,13 @@
 
 #include "tulip.h"
 
+// Turns out that clock_gettime() is not implemented on OSX.
+// Here's a handy replacement found here: http://stackoverflow.com/a/9781275
+// Thanks, StackOverflow!
 #ifdef __MACH__
-// Thanks to http://stackoverflow.com/a/9781275
 #include <sys/time.h>
 #define CLOCK_REALTIME 0
 #define CLOCK_MONOTONIC 0
-//clock_gettime is not implemented on OSX
 int clock_gettime(int *clk_id, struct timespec* t) {
     struct timeval now;
     int rv = gettimeofday(&now, NULL);

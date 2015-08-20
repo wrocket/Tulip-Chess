@@ -33,8 +33,7 @@
 static inline int countBits(uint64_t n) {
     // Thank you, Brian Kernighan!
     int c;
-    for (c = 0; n; c++)
-    {
+    for (c = 0; n; c++) {
         n &= n - 1;
     }
     return c;

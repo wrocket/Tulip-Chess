@@ -23,6 +23,8 @@
 #ifndef FEN_H
 #define FEN_H
 
-int parseFen(GameState*, char*);
+// Parses a FEN string representing a board state into a GameState object.
+// Returns false if the FEN is invalid.
+bool parseFen(GameState* state, char* fenStr);
 
 #endif

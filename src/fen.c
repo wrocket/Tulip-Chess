@@ -217,7 +217,7 @@ parse_board_err:
     return result;
 }
 
-int parseFen(GameState* state, char* fenStr) {
+bool parseFen(GameState* state, char* fenStr) {
     bool result = true;
     char** tokenBuffer;
     int toMove = COLOR_WHITE;
