@@ -41,4 +41,10 @@ void makeMove(GameState* gameState, Move* move);
 // game state/
 void unmakeMove(GameState* gameState, Move* move);
 
+// Applies the null move to the board.
+void makeNullMove(GameState* gameState);
+
+// Applies the null move to the board.
+void unmakeNullMove(GameState* gameState);
+
 #endif

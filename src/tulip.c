@@ -161,6 +161,18 @@ static void printMoveResult(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
+static void printNullMoveResult(int argc, char** argv) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: -nullmove \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    GameState gs = parseFenOrQuit(argv[1]);
+    makeNullMove(&gs);
+    printMakeMoveResult(argv[2], NULL, &gs);
+    destroyGamestate(&gs);
+}
+
 static void checkStatus(int argc, char** argv) {
     if (argc != 2) {
         fprintf(stderr, "Usage: -checkstatus \"[FEN string]\"\n");
@@ -377,6 +389,8 @@ int main(int argc, char** argv) {
             listAttacks(argc, argv);
         } else if (0 == strcmp("-makemove", argv[0])) {
             printMoveResult(argc, argv);
+        } else if (0 == strcmp("-nullmove", argv[0])) {
+            printNullMoveResult(argc, argv);
         } else if (0 == strcmp("-checkstatus", argv[0])) {
             checkStatus(argc, argv);
         } else if (0 == strcmp("-makeunmake", argv[0])) {

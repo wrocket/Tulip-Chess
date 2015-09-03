@@ -132,6 +132,26 @@ static void enPassant(GameState* gs, Move* move, const int attackSq, uint64_t* r
     *runningHash = hash;
 }
 
+void makeNullMove(GameState* gameState) {
+    // Copy the state data to the next item in the stack, move the pointer to the next element.
+    StateData* nextData = (gameState->current) + 1;
+    copyStateData(gameState->current, nextData);
+    gameState->current = nextData;
+
+    uint64_t hash = nextData->hash;
+
+    // Adjust half-move, flip to-move
+    nextData->halfMoveCount++;
+    nextData->toMove = INVERT_COLOR(nextData->toMove);
+    APPLY_MASK(HASH_WHITE_TO_MOVE);
+
+    nextData->hash = hash;
+}
+
+void unmakeNullMove(GameState* gameState) {
+    gameState->current--;
+}
+
 void makeMove(GameState* gameState, Move* move) {
     // Copy the state data to the next item in the stack, move the pointer to the next element.
     StateData* nextData = (gameState->current) + 1;
@@ -143,7 +163,6 @@ void makeMove(GameState* gameState, Move* move) {
     const bool isCapture = capturedPiece != &EMPTY;
     const int sqTo = move->to;
     const int sqFrom = move->from;
-
     uint64_t* movingPieceBitboard = &gameState->bitboards[movingPiece->ordinal];
     uint64_t* capturedPieceBitboard = &gameState->bitboards[capturedPiece->ordinal];
     uint64_t bitboardSqTo = BITS_SQ[sqTo];

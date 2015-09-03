@@ -59,9 +59,6 @@ typedef struct {
     bool created;   // Indicating proper allocation/destruction.
 } MoveBuffer;
 
-// Move that indicates a non-move.
-extern Move NULL_MOVE;
-
 // Initialize a new move buffer to a given address.
 void createMoveBuffer(MoveBuffer*);
 

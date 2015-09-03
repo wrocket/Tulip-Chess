@@ -29,6 +29,8 @@
 
 #define INFINITY 10000
 
+#define NULL_MOVE_RADIUS 2
+
 #define SEARCH_STATUS_NONE              0
 #define SEARCH_STATUS_NO_LEGAL_MOVES    1
 

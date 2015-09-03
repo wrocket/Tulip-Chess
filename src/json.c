@@ -161,7 +161,12 @@ void printAttackList(char* position, bool* attackGrid, GameState* state) {
 
 void printMakeMoveResult(char* position, Move* m, GameState* state) {
     char moveStr[8];
-    printMoveCoordinate(m, moveStr);
+
+    if (!m) {
+        sprintf(moveStr, "NullMv");
+    } else {
+        printMoveCoordinate(m, moveStr);
+    }
 
     printf("{");
     printf("\"move\": \"%s\", ", moveStr);

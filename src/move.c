@@ -29,8 +29,6 @@
 #include "board.h"
 #include "move.h"
 
-Move NULL_MOVE = {0, 0, NO_MOVE_CODE, NULL, NULL};
-
 void createMoveBuffer(MoveBuffer* buff) {
     Move* moves = ALLOC(MOVE_BUFFER_LENGTH, Move, moves, "Moves not allocated.");
     buff->moves = moves;

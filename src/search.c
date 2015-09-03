@@ -63,11 +63,21 @@ void orderByMvvLva(MoveBuffer* buffer) {
     qsort(buffer->moves, ((size_t) buffer->length), sizeof(Move), compareMvvLva);
 }
 
-static int alphaBeta(GameState* state, SearchResult* result, const int depth, const int maxDepth, int alpha, int beta) {
+static int alphaBeta(GameState* state, SearchResult* result, const int depth, const int maxDepth, int alpha, int beta, bool allowNullMove) {
     result->nodes++;
 
     if (depth >= maxDepth) {
         return evaluate(state);
+    }
+
+    // Apply the null move heuristic.
+    // Do not allow subsequent nodes in the move tree to apply the null move.
+    makeNullMove(state);
+    const int nullScore = alphaBeta(state, result, depth + 1 + NULL_MOVE_RADIUS, maxDepth, -beta, -beta + 1, false);
+    unmakeNullMove(state);
+
+    if (nullScore > beta) {
+        return beta;
     }
 
     MoveBuffer* buffer = &state->moveBuffers[depth];
@@ -87,7 +97,7 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
 
         if (isLegalPosition(state)) {
             legalMoveCount++;
-            const int moveScore =  -1 * alphaBeta(state, result, depth + 1, maxDepth, -1 * beta, -1 * alpha);
+            const int moveScore =  -1 * alphaBeta(state, result, depth + 1, maxDepth, -1 * beta, -1 * alpha, allowNullMove);
             unmakeMove(state, &m);
 
             if (moveScore >= beta) {
@@ -118,7 +128,7 @@ void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScor
         Move m = legalMoves->moves[i];
 
         makeMove(state, &m);
-        const int score = -1 * alphaBeta(state, result, 0, maxDepth, -1 * INFINITY, INFINITY);
+        const int score = -1 * alphaBeta(state, result, 0, maxDepth, -1 * INFINITY, INFINITY, true);
         unmakeMove(state, &m);
 
         moveScores[i].move = m;
@@ -217,7 +227,6 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
             }
         }
     } else {
-        result->move = NULL_MOVE;
         result->searchStatus = SEARCH_STATUS_NO_LEGAL_MOVES;
     }
 
