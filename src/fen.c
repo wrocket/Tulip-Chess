@@ -40,14 +40,14 @@
 #define _FEN_MAX_TOKENS     16
 #define _FEN_MAX_TOKEN_LEN  64
 
-static bool parseToMove(char * t, int* result) {
+static bool parseToMove(char * t, int* result, bool printErr) {
     if (strlen(t) != 1) {
-        fprintf(stderr, "Invalid to-move string: %s\n", t);
+        if (printErr) fprintf(stderr, "Invalid to-move string: %s\n", t);
         return false;
     }
 
     if (!strstr("bw", t)) {
-        fprintf(stderr, "Invalid to-move string: %s\n", t);
+        if (printErr) fprintf(stderr, "Invalid to-move string: %s\n", t);
         return false;
     }
 
@@ -55,7 +55,7 @@ static bool parseToMove(char * t, int* result) {
     return true;
 }
 
-static bool parseFiftyMove(char* t, int* result) {
+static bool parseFiftyMove(char* t, int* result, bool printErr) {
     char* endToken;
     long parsed = strtol(t, &endToken, 10);
     int intVal;
@@ -63,21 +63,21 @@ static bool parseFiftyMove(char* t, int* result) {
         intVal = (int) parsed;
     }
     else {
-        fprintf(stderr, "Fifty-move token \"%s\" out of range.", t);
+        if (printErr) fprintf(stderr, "Fifty-move token \"%s\" out of range.", t);
         return false;
     }
 
     if (endToken == t) {
-        fprintf(stderr, "Missing fifty-move token.\n");
+        if (printErr) fprintf(stderr, "Missing fifty-move token.\n");
         return false;
     }
 
     if (parsed < 0 || errno != 0) {
-        fprintf(stderr, "Invalid fifty-move token \"%s\"", t);
+        if (printErr) fprintf(stderr, "Invalid fifty-move token \"%s\"", t);
         if (errno != 0) {
-            fprintf(stderr, ": %s\n", strerror(errno));
+            if (printErr) fprintf(stderr, ": %s\n", strerror(errno));
         } else {
-            fprintf(stderr, ".\n");
+            if (printErr) fprintf(stderr, ".\n");
         }
         return false;
     }
@@ -130,7 +130,7 @@ static bool parseCastleFlags(char* t, int* result) {
     return true;
 }
 
-static bool parseBoard(char* t, GameState* gs) {
+static bool parseBoard(char* t, GameState* gs, bool printErr) {
     const Piece** board = gs->board;
     int* pCounts = gs->pieceCounts;
     bool result = true;
@@ -155,7 +155,7 @@ static bool parseBoard(char* t, GameState* gs) {
         } else {
             const Piece* p = parsePiece(*c);
             if (!p) {
-                fprintf(stderr, "Invalid FEN. Unknown piece found: %c\n", *c);
+                if (printErr) fprintf(stderr, "Invalid FEN. Unknown piece found: %c\n", *c);
                 result = false;
                 goto parse_board_err;
             }
@@ -164,7 +164,7 @@ static bool parseBoard(char* t, GameState* gs) {
 
             if (p == &WKING) {
                 if (sqwk >= 0) {
-                    fprintf(stderr, "Invalid FEN. Multiple white kings on the board.\n");
+                    if (printErr) fprintf(stderr, "Invalid FEN. Multiple white kings on the board.\n");
                     result = false;
                     goto parse_board_err;
                 }
@@ -172,7 +172,7 @@ static bool parseBoard(char* t, GameState* gs) {
                 sqwk = idx;
             } else if (p == &BKING) {
                 if (sqbk >= 0) {
-                    fprintf(stderr, "Invalid FEN. Multiple black kings on the board.\n");
+                    if (printErr) fprintf(stderr, "Invalid FEN. Multiple black kings on the board.\n");
                     result = false;
                     goto parse_board_err;
                 }
@@ -190,17 +190,17 @@ static bool parseBoard(char* t, GameState* gs) {
     }
 
     if (sqbk < 0) {
-        fprintf(stderr, "Invalid FEN. No black king on the board.\n");
+        if (printErr) fprintf(stderr, "Invalid FEN. No black king on the board.\n");
         result = false;
     }
 
     if (sqwk < 0) {
-        fprintf(stderr, "Invalid FEN. No white king on the board.\n");
+        if (printErr) fprintf(stderr, "Invalid FEN. No white king on the board.\n");
         result = false;
     }
 
     if (squares != 64) {
-        fprintf(stderr, "Invalid FEN. Expected to parse 64 squares, instead parsed %d.\n", squares);
+        if (printErr) fprintf(stderr, "Invalid FEN. Expected to parse 64 squares, instead parsed %d.\n", squares);
         result = false;
     }
 
@@ -217,7 +217,7 @@ parse_board_err:
     return result;
 }
 
-bool parseFen(GameState* state, char* fenStr) {
+bool parseFenWithPrint(GameState* state, char* fenStr, bool printErrors) {
     bool result = true;
     char** tokenBuffer;
     int toMove = COLOR_WHITE;
@@ -230,17 +230,20 @@ bool parseFen(GameState* state, char* fenStr) {
     int tokenCount = tokenize(fenStr, tokenBuffer, _FEN_MAX_TOKENS);
 
     if (tokenCount != 6) {
-        fprintf(stderr, "Invalid FEN string; invalid token count (should be 6): %i.", tokenCount);
+        if (printErrors) {
+            fprintf(stderr, "Invalid FEN string; invalid token count (should be 6): %i.", tokenCount);
+        }
+
         result = false;
         goto clean_tokens;
     }
 
-    if (!parseBoard(tokenBuffer[0], state)) {
+    if (!parseBoard(tokenBuffer[0], state, printErrors)) {
         result = false;
         goto clean_tokens;
     }
 
-    if (!parseToMove(tokenBuffer[1], &toMove)) {
+    if (!parseToMove(tokenBuffer[1], &toMove, printErrors)) {
         result = false;
         goto clean_tokens;
     }
@@ -255,7 +258,7 @@ bool parseFen(GameState* state, char* fenStr) {
         goto clean_tokens;
     }
 
-    if (!parseFiftyMove(tokenBuffer[4], &fiftyMove)) {
+    if (!parseFiftyMove(tokenBuffer[4], &fiftyMove, printErrors)) {
         result = false;
         goto clean_tokens;
     }
@@ -299,3 +302,8 @@ clean_tokens:
 
     return result;
 }
+
+bool parseFen(GameState* state, char* fenStr) {
+    return parseFenWithPrint(state, fenStr, true);
+}
+

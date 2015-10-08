@@ -20,13 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef FEN_H
-#define FEN_H
+#ifndef XBOARD_H
+#define XBOARD_H
 
-// Parses a FEN string representing a board state into a GameState object.
-// Returns false if the FEN is invalid.
-bool parseFen(GameState* state, char* fenStr);
+#include <stdbool.h>
 
-// As parseFen, with optional suppressing of errors to stdout/err.
-bool parseFenWithPrint(GameState* state, char* fenStr, bool printErrors);
+#include "gamestate.h"
+
+typedef struct {
+    GameState gameState;
+    bool forceMode;
+} XBoardState;
+
+bool startXBoard(void);
+
 #endif

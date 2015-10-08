@@ -60,7 +60,7 @@ int tokenize(const char* str, char** tokenBuffers, const int maxTokens) {
     unsigned long len = strlen(str);
     int isInToken = false;
 
-    for (int idx = 0; idx < len && currentBufferIdx < maxTokens; idx++) {
+    for (int idx = 0; idx < len && currentBufferIdx < maxTokens - 1; idx++) {
         const char c = str[idx];
         if (isspace(c)) {
             if (isInToken) {

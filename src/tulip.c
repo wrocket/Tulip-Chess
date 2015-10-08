@@ -47,6 +47,7 @@
 #include "tulip.h"
 #include "util.h"
 #include "search.h"
+#include "xboard.h"
 
 static void printBanner() {
     printf("Tulip Chess Engine 0.001\n");
@@ -329,7 +330,7 @@ static void simpleSearch(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
-    int depth = 5; // Configure default?
+    int depth = 6; // Configure default?
     const char* depthStr = findArg(argc, argv, "-depth");
     if (depthStr != NULL && !parseInteger(depthStr, &depth)) {
         exit(EXIT_FAILURE);
@@ -415,7 +416,8 @@ int main(int argc, char** argv) {
         }
     } else {
         printBanner();
-        printf("No operation mode specified, quitting.\n");
+        printf(">> No operation mode specified, entering XBoard mode.\n");
+        startXBoard();
     }
 
     return EXIT_SUCCESS;
