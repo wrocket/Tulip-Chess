@@ -26,6 +26,7 @@
 #include <limits.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
 #include "sqlite/sqlite3.h"
 
@@ -380,6 +381,9 @@ static void printMoveOrder(int argc, char** argv) {
 int main(int argc, char** argv) {
     argc--;
     argv++;
+
+    // Randomness needn't be cryptographic strength for our purposes.
+    srand((unsigned int) time(NULL));
 
     if (argc >= 1) {
         if (0 == strcmp("-listmoves", argv[0])) {

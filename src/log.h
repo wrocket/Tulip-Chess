@@ -20,25 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef XBOARD_H
-#define XBOARD_H
+#ifndef LOG_H
+#define LOG_H
 
+#include <stdio.h>
 #include <stdbool.h>
 
-#include "gamestate.h"
-#include "book.h"
-#include "log.h"
-
-#define XBOARD_BUFF_LEN 1024
-
 typedef struct {
-    GameState gameState;
-    bool forceMode;
-    OpenBook currentBook;
-    GameLog log;
-    char* outputBuffer;
-} XBoardState;
+	FILE* fh;
+} GameLog;
 
-bool startXBoard(void);
+bool openLog(GameLog* log);
+void writeEntry(GameLog* log, const char* message);
+void closeLog(GameLog* log);
 
 #endif

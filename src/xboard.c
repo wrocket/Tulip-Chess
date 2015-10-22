@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 #include "util.h"
 #include "xboard.h"
@@ -31,10 +32,50 @@
 #include "fen.h"
 #include "notation.h"
 #include "makeMove.h"
+#include "book.h"
+#include "move.h"
+#include "search.h"
+#include "log.h"
+
+static void xBoardWrite(XBoardState* xbs, const char* format, ...) {
+    char* outputMessage;
+
+    outputMessage = malloc(XBOARD_BUFF_LEN + 32);
+    if (!outputMessage) {
+        printf("Error: Unable to allocate log message buffer.");
+        exit(-1);
+    }
+
+    va_list argptr;
+    va_start(argptr, format);
+    vsprintf(xbs->outputBuffer, format, argptr);
+    va_end(argptr);
+
+    sprintf(outputMessage, "<<\t%s", xbs->outputBuffer);
+    writeEntry(&xbs->log, outputMessage); // Write to the log.
+    printf("%s\n", xbs->outputBuffer); // Write to stdout.
+    fflush(stdout);
+
+    free(outputMessage);
+}
+
+static void logInput(XBoardState* xbs, char* message) {
+    char* outputMessage;
+    outputMessage = malloc(XBOARD_BUFF_LEN + 32);
+
+    if (!outputMessage) {
+        printf("Error: Unable to allocate log message buffer.");
+        exit(-1);
+    }
+
+    sprintf(outputMessage, ">>\t%s", message);
+    writeEntry(&xbs->log, outputMessage);
+    free(outputMessage);
+}
 
 static void xBoardNew(XBoardState* xbs) {
-    if (!parseFenWithPrint(&xbs->gameState, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", false)) {
-        printf("Error: Unable to set initial board position; invalid FEN. (?!?!)\n");
+    if (!parseFenWithPrint(&xbs->gameState, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true)) {
+        xBoardWrite(xbs, "Error: Unable to set initial board position; invalid FEN. (?!?!)");
     }
 
     xbs->forceMode = false;
@@ -44,8 +85,54 @@ static void xBoardForce(XBoardState* xbs) {
     xbs->forceMode = true;
 }
 
+static void xBoardApplyMove(XBoardState* xbs, Move* move) {
+    makeMove(&xbs->gameState, move);
+}
+
+static bool xBoardThinkAndMove(XBoardState* xbs) {
+    MoveBuffer mb;
+    char moveStr[16];
+    bool foundMove = false;
+    Move move;
+
+    // First check the book for this position.
+    createMoveBuffer(&mb);
+    const int bookMoveCount = getMovesFromBook(&xbs->gameState, &mb, &xbs->currentBook);
+    if (bookMoveCount > 0) {
+        foundMove = true;
+        move = mb.moves[rand() % bookMoveCount];
+    }
+    destroyMoveBuffer(&mb);
+
+    // If nothing was found in the book, perform a search.
+    if (!foundMove) {
+        SearchResult searchResult;
+        SearchArgs args;
+        args.depth = 3;
+        createSearchResult(&searchResult);
+
+        search(&xbs->gameState, &args, &searchResult);
+
+        if (searchResult.searchStatus != SEARCH_STATUS_NO_LEGAL_MOVES) {
+            move = searchResult.move;
+            foundMove = true;
+        }
+
+        destroySearchResult(&searchResult);
+    }
+
+    if (foundMove) {
+        printShortAlg(&move, &xbs->gameState, moveStr);
+        xBoardWrite(xbs, "move %s", moveStr);
+        xBoardApplyMove(xbs, &move);
+    }
+
+    return foundMove;
+}
+
 static void xBoardGo(XBoardState* xbs) {
     xbs->forceMode = false;
+    xBoardThinkAndMove(xbs);
 }
 
 static void xBoardMove(XBoardState* xbs, char* move) {
@@ -53,27 +140,52 @@ static void xBoardMove(XBoardState* xbs, char* move) {
 
     if (matchMove(move, &xbs->gameState, &m)) {
         makeMove(&xbs->gameState, &m);
+
+        if (!xbs->forceMode) {
+            xBoardThinkAndMove(xbs);
+        }
     } else {
-        printf("Illegal move: %s\n", move);
+        xBoardWrite(xbs, "Illegal move: %s", move);
     }
 }
 
 static void xBoardProtover(XBoardState* xbs) {
-    printf("ping=1\n");
-    printf("san=1\n");
-    printf("time=1\n");
-    printf("sigint=0\n");
-    printf("sigterm=0\n");
-    printf("done=1\n");
+    xBoardWrite(xbs, "ping=1");
+    xBoardWrite(xbs, "san=1");
+    xBoardWrite(xbs, "time=1");
+    xBoardWrite(xbs, "sigint=0");
+    xBoardWrite(xbs, "sigterm=0");
+    xBoardWrite(xbs, "done=1");
+}
+
+static void xBoardPing(XBoardState* xbs, char** tokens, int tokenCount) {
+    if (tokenCount >= 2) {
+        xBoardWrite(xbs, "pong %s", tokens[1]);
+    }
 }
 
 static void xBoardSetboard(XBoardState* xbs, char** tokens, int tokenCount) {
-    const int fenStrSize = 1024;
     char* fenStr;
 
-    fenStr = malloc(fenStrSize * sizeof(char));
+    // Computing the length of the joined string.
+    unsigned long bufferSize = 0;
+
+    // Add the lengths of all the token strings.
+    for (int i = 0; i < tokenCount; i++) {
+        bufferSize += strlen(tokens[i]);
+    }
+
+    // Add the number of spaces needed to join them.
+    if (bufferSize > 0) {
+        bufferSize += ((unsigned long) tokenCount - 1);
+    }
+
+    // Add one for the null char.
+    bufferSize++;
+
+    fenStr = malloc(bufferSize * sizeof(char));
     if (!fenStr) {
-        printf("Error: Unable to allocate memory for FEN.\n");
+        xBoardWrite(xbs, "Error: Unable to allocate memory for FEN.");
         return;
     }
 
@@ -92,7 +204,7 @@ static void xBoardSetboard(XBoardState* xbs, char** tokens, int tokenCount) {
     fenStr[idx] = '\0';
 
     if (!parseFenWithPrint(&xbs->gameState, fenStr, false)) {
-        printf("Error: Illegal position: %s\n", fenStr);
+        xBoardWrite(xbs, "Error: Illegal position: %s", fenStr);
     }
 
     free(fenStr);
@@ -113,26 +225,55 @@ bool startXBoard() {
 
     inputBuffer = malloc(inputBufferSize * sizeof(char));
     if (!inputBuffer) {
-        perror("Unable to allocate memory for XBoard input buffer.\n");
+        perror("Error: Unable to allocate memory for XBoard input buffer.");
         result = false;
         goto cleanup_inputBuff;
     }
 
+    xbState.outputBuffer = malloc(XBOARD_BUFF_LEN * sizeof(char));
+    if (!xbState.outputBuffer) {
+        perror("Error: Unable to allocate memory for XBoard output buffer.");
+        result = false;
+        goto cleanup_outputBuff;
+    }
+
     tb = createTokenBuffer(maxTokens, maxTokenLen);
     if (!tb) {
-        goto cleanup_tokenBuff;
+        goto cleanup_inputBuff;
     }
 
     initializeGamestate(&xbState.gameState);
 
+    if (!openBook("tulip_openings.sqlite", &xbState.currentBook)) {
+        xBoardWrite(&xbState, "Error: Unable to open book.");
+        goto cleanup_gamestate;
+    }
+
     bool done = false;
+
+    if (!openLog(&xbState.log)) {
+        xBoardWrite(&xbState, "Error: Unable to open game log.");
+        goto cleanup_book;
+    }
 
     while (!done) {
         if (!fgets(inputBuffer, inputBufferSize, stdin)) {
-            perror("Unable to read from stdin.");
+            perror("Error: Unable to read from stdin.");
             result = false;
             goto cleanup_gamestate;
         }
+
+        // Chop off the trailing newline.
+        for (int i = 0; i < inputBufferSize; i++)
+        {
+            char c = inputBuffer[i];
+            if (c == '\n' || c == '\r') {
+                inputBuffer[i] = '\0';
+                break;
+            }
+        }
+
+        logInput(&xbState, inputBuffer);
 
         int tokenCount = tokenize(inputBuffer, tb, maxTokens);
         if (tokenCount > 0) {
@@ -151,16 +292,22 @@ bool startXBoard() {
                 xBoardGo(&xbState);
             } else if (isCommand("setboard", cmd)) {
                 xBoardSetboard(&xbState, tb, tokenCount);
+            } else if (isCommand("ping", cmd)) {
+                xBoardPing(&xbState, tb, tokenCount);
             } else {
                 xBoardMove(&xbState, cmd);
             }
         }
     }
 
+    closeLog(&xbState.log);
+cleanup_book:
+    closeBook(&xbState.currentBook);
 cleanup_gamestate:
     destroyGamestate(&xbState.gameState);
-cleanup_tokenBuff:
     freeTokenBuffer(tb, maxTokens);
+cleanup_outputBuff:
+    free(inputBuffer);
 cleanup_inputBuff:
     return result;
 }

@@ -20,25 +20,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef XBOARD_H
-#define XBOARD_H
-
+#include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 
-#include "gamestate.h"
-#include "book.h"
 #include "log.h"
 
-#define XBOARD_BUFF_LEN 1024
+bool openLog(GameLog* log) {
+    bool result = false;
+    log->fh = fopen("game.log", "w");
 
-typedef struct {
-    GameState gameState;
-    bool forceMode;
-    OpenBook currentBook;
-    GameLog log;
-    char* outputBuffer;
-} XBoardState;
+    if (log->fh) {
+        result = true;
+        writeEntry(log, "Opened log.");
+    } else {
+        perror("Unable to open log file.");
+        goto open_log_fail;
+    }
 
-bool startXBoard(void);
+open_log_fail:
+    return result;
+}
 
-#endif
+void writeEntry(GameLog* log, const char* message) {
+    char dateBuff[32];
+    struct tm* tm_info;
+    time_t timer;
+
+    time(&timer);
+    tm_info = localtime(&timer);
+    strftime(dateBuff, 32, "%F %H:%M:%S%z", tm_info);
+
+    fprintf(log->fh, "%s\t%s\n", dateBuff, message);
+    fflush(log->fh);
+}
+
+void closeLog(GameLog* log) {
+    fclose(log->fh);
+}

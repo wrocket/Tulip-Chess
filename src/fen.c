@@ -225,6 +225,8 @@ bool parseFenWithPrint(GameState* state, char* fenStr, bool printErrors) {
     int epFile = NO_EP_FILE;
     int fiftyMove = 0;
 
+    errno = 0;
+
     tokenBuffer = createTokenBuffer(_FEN_MAX_TOKENS, _FEN_MAX_TOKEN_LEN);
 
     int tokenCount = tokenize(fenStr, tokenBuffer, _FEN_MAX_TOKENS);
