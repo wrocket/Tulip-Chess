@@ -309,3 +309,105 @@ bool parseFen(GameState* state, char* fenStr) {
     return parseFenWithPrint(state, fenStr, true);
 }
 
+static int printBoard(GameState* state, char* buffer, int buffLen, int charsWritten) {
+    int empties = 0;
+    int file, rank;
+
+    for (rank = RANK_8; rank >= RANK_1; rank--) {
+        for (file = FILE_A; file <= FILE_H; file++) {
+            int bindex = B_IDX(file, rank);
+            const Piece* p = state->board[bindex];
+            if (p == &EMPTY) {
+                empties++;
+                if (file == FILE_H) {
+                    buffer[charsWritten++] = (char) ('0' + empties);
+                    empties = 0;
+                }
+            } else {
+                if (empties > 0) {
+                    buffer[charsWritten++] = (char) ('0' + empties);
+                    empties = 0;
+                }
+
+                buffer[charsWritten++] = p->name;
+            }
+        }
+
+        if (rank > RANK_1) {
+            buffer[charsWritten++] = '/';
+        }
+    }
+
+    return charsWritten;
+}
+
+static int printToMove(GameState* state, char* buffer, int buffLen, int charsWritten) {
+    const char c = state->current->toMove == COLOR_WHITE ? 'w' : 'b';
+    buffer[charsWritten++] = c;
+    return charsWritten;
+}
+
+static int printCastleFlags(GameState* state, char* buffer, int buffLen, int charsWritten) {
+    const int flags = state->current->castleFlags;
+    const bool wk = (flags & CASTLE_WK) != 0;
+    const bool wq = (flags & CASTLE_WQ) != 0;
+    const bool bk = (flags & CASTLE_BK) != 0;
+    const bool bq = (flags & CASTLE_BQ) != 0;
+
+    if (!(wk | wq | bk | bq)) {
+        buffer[charsWritten++] = '-';
+    } else {
+        if (wk) buffer[charsWritten++] = 'K';
+        if (wq) buffer[charsWritten++] = 'Q';
+        if (bk) buffer[charsWritten++] = 'k';
+        if (bq) buffer[charsWritten++] = 'q';
+    }
+
+    return charsWritten;
+}
+
+static int printEpFile(GameState* state, char* buffer, int buffLen, int charsWritten) {
+    const int epFile = state->current->epFile;
+
+    if (epFile == NO_EP_FILE) {
+        buffer[charsWritten++] = '-';
+    } else {
+        buffer[charsWritten++] = fileToChar(epFile);
+        const char c = state->current->toMove == COLOR_WHITE ? '6' : '3';
+        buffer[charsWritten++] = c;
+    }
+
+    return charsWritten;
+}
+
+static int printFiftyMove(GameState* state, char* buffer, int buffLen, int charsWritten) {
+    charsWritten += sprintf(buffer + charsWritten, "%i", state->current->fiftyMoveCount);
+    return charsWritten;
+}
+
+static int printFullMove(GameState* state, char* buffer, int buffLen, int charsWritten) {
+    const int moves = 1 + state->current->halfMoveCount / 2;
+    charsWritten += sprintf(buffer + charsWritten, "%i", moves);
+    return charsWritten;
+}
+
+int printFen(GameState* state, char* buffer, int buffLen) {
+    // TODO: Actually use the buffLen to avoid buffer overruns
+    int charsWritten = 0;
+
+    charsWritten = printBoard(state, buffer, buffLen, 0);
+    buffer[charsWritten++] = ' ';
+    charsWritten = printToMove(state, buffer, buffLen, charsWritten);
+    buffer[charsWritten++] = ' ';
+    charsWritten = printCastleFlags(state, buffer, buffLen, charsWritten);
+    buffer[charsWritten++] = ' ';
+    charsWritten = printEpFile(state, buffer, buffLen, charsWritten);
+    buffer[charsWritten++] = ' ';
+    charsWritten = printFiftyMove(state, buffer, buffLen, charsWritten);
+    buffer[charsWritten++] = ' ';
+    charsWritten = printFullMove(state, buffer, buffLen, charsWritten);
+
+    buffer[charsWritten] = '\0';
+    return charsWritten - 1;
+}
+

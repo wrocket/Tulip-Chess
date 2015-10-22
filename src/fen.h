@@ -29,4 +29,9 @@ bool parseFen(GameState* state, char* fenStr);
 
 // As parseFen, with optional suppressing of errors to stdout/err.
 bool parseFenWithPrint(GameState* state, char* fenStr, bool printErrors);
+
+// Prints a FEN to the given buffer, not exceeding the given length.
+// Returns the number of printed characters.
+// Output will be null-terminated.
+int printFen(GameState* state, char* buffer, int buffLen);
 #endif

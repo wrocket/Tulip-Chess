@@ -73,6 +73,20 @@ static void logInput(XBoardState* xbs, char* message) {
     free(outputMessage);
 }
 
+static void logGameState(XBoardState* xbs) {
+    char* outputMessage;
+    outputMessage = malloc(1024);
+    if (!outputMessage) {
+        printf("Error: Unable to allocate log message buffer.");
+        exit(-1);
+    }
+
+    printFen(&xbs->gameState, outputMessage, 1024);
+    writeEntry(&xbs->log, outputMessage);
+
+    free(outputMessage);
+}
+
 static void xBoardNew(XBoardState* xbs) {
     if (!parseFenWithPrint(&xbs->gameState, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", true)) {
         xBoardWrite(xbs, "Error: Unable to set initial board position; invalid FEN. (?!?!)");
@@ -125,6 +139,7 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
         printShortAlg(&move, &xbs->gameState, moveStr);
         xBoardWrite(xbs, "move %s", moveStr);
         xBoardApplyMove(xbs, &move);
+        logGameState(xbs);
     }
 
     return foundMove;
@@ -140,6 +155,7 @@ static void xBoardMove(XBoardState* xbs, char* move) {
 
     if (matchMove(move, &xbs->gameState, &m)) {
         makeMove(&xbs->gameState, &m);
+        logGameState(xbs);
 
         if (!xbs->forceMode) {
             xBoardThinkAndMove(xbs);
