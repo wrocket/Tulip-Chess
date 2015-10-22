@@ -103,6 +103,28 @@ static void xBoardApplyMove(XBoardState* xbs, Move* move) {
     makeMove(&xbs->gameState, move);
 }
 
+static void logSearchResult(XBoardState* xbs, SearchResult* result) {
+    const int buffSize = 1024;
+    char* buff = malloc(buffSize * sizeof(int));
+    if(!buff) {
+        printf("Error: Unable to allocate search result log buffer.");
+        exit(-1);
+    }
+
+    const long nodes = result->nodes;
+    const long duration = result->durationMs;
+    const double knodes = ((double) nodes) / 1000.0;
+    const double seconds = ((double) duration) / 1000.0;
+
+    const int scoreMult = xbs->gameState.current->toMove == COLOR_BLACK ? -1 : 1;
+    const int score = result->score * scoreMult;
+
+    snprintf(buff, buffSize, "Score %+.2f; %ld nodes in %ldms (%.2f KNps)", (double) score / 100.0, nodes, duration, knodes / seconds);
+    writeEntry(&xbs->log, buff);
+
+    free(buff);
+}
+
 static bool xBoardThinkAndMove(XBoardState* xbs) {
     MoveBuffer mb;
     char moveStr[16];
@@ -133,6 +155,7 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
             foundMove = true;
         }
 
+        logSearchResult(xbs, &searchResult);
         destroySearchResult(&searchResult);
     }
 
