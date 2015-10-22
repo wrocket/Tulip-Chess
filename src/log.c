@@ -24,12 +24,35 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "log.h"
 
+static void printDt(char* buff, const char* format) {
+    struct tm* tm_info;
+    time_t timer;
+
+    time(&timer);
+    tm_info = localtime(&timer);
+    strftime(buff, 32, format, tm_info);
+}
+
 bool openLog(GameLog* log) {
+    char* fname;
+    char dateBuff[32];
+    const int buffSize = 128;
+
+    fname = malloc(buffSize * sizeof(char));
+    if (!fname) {
+        perror("Unable allocate memory for log file name.");
+        exit(-1);
+    }
+
+    printDt(dateBuff, "%F-%H%M%S");
+    snprintf(fname, buffSize, "game-%s-p%i.log", dateBuff, getpid());
+
     bool result = false;
-    log->fh = fopen("game.log", "w");
+    log->fh = fopen(fname, "w");
 
     if (log->fh) {
         result = true;
@@ -40,20 +63,18 @@ bool openLog(GameLog* log) {
     }
 
 open_log_fail:
+    free(fname);
     return result;
 }
 
 void writeEntry(GameLog* log, const char* message) {
-    char dateBuff[32];
-    struct tm* tm_info;
-    time_t timer;
+    if (log != NULL) {
+        char dateBuff[32];
+        printDt(dateBuff, "%F %H:%M:%S%z");
 
-    time(&timer);
-    tm_info = localtime(&timer);
-    strftime(dateBuff, 32, "%F %H:%M:%S%z", tm_info);
-
-    fprintf(log->fh, "%s\t%s\n", dateBuff, message);
-    fflush(log->fh);
+        fprintf(log->fh, "%s\t%s\n", dateBuff, message);
+        fflush(log->fh);
+    }
 }
 
 void closeLog(GameLog* log) {

@@ -115,6 +115,7 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
     if (bookMoveCount > 0) {
         foundMove = true;
         move = mb.moves[rand() % bookMoveCount];
+        writeEntry(&xbs->log, "Found move from book.");
     }
     destroyMoveBuffer(&mb);
 
