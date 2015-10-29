@@ -27,4 +27,9 @@
 
 int evaluate(GameState* state);
 
+// Take an internal represntation of a score (integer, according to the side to
+// move) and return a friendly version (double, with white advantage > 0 and
+// black advantage < 0).
+double friendlyScore(GameState* state, int rawScore);
+
 #endif

@@ -267,8 +267,6 @@ bool startXBoard() {
         goto cleanup_book;
     }
 
-    writeLog(&xbState.log, "Some stuff: %s %i", "asdf", 3);
-
     while (!done) {
         if (!fgets(inputBuffer, inputBufferSize, stdin)) {
             perror("Error: Unable to read from stdin.");

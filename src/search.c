@@ -140,14 +140,12 @@ void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScor
         moveScores[i].move = m;
         moveScores[i].score = score;
         moveScores[i].depth = maxDepth;
-
-        if (score > result->score) {
-            result->score = score;
-            result->move = m;
-        }
     }
 
     sortMoveScores(moveScores, legalMoves->length);
+
+    result->score = moveScores[0].score;
+    result->move = moveScores[0].move;
 }
 
 static void reorderMovesFromMoveScores(MoveScore* scores, int scoreLength, MoveBuffer* moveBuffer) {
@@ -207,10 +205,16 @@ static void logSearchResult(SearchArgs* args, SearchResult* result, GameState* s
     const long duration = result->durationMs;
     const double knodes = ((double) nodes) / 1000.0;
     const double seconds = ((double) duration) / 1000.0;
-    const int scoreMult = state->current->toMove == COLOR_BLACK ? -1 : 1;
-    const int score = result->score * scoreMult;
+    const double score = friendlyScore(state, result->score);
 
-    writeLog(args->log, "Search complete. Score %+.2f; %ld nodes in %ldms (%.2f KNps)", (double) score / 100.0, nodes, duration, knodes / seconds);
+    writeLog(args->log, "Search complete. Score %+.2f; %ld nodes in %ldms (%.2f KNps)", score, nodes, duration, knodes / seconds);
+}
+
+static void logIterativeResult(GameState* state, SearchArgs* searchArgs, MoveScore* scores, int depth) {
+    char moveStr[16];
+    printShortAlg(&scores[0].move, state, moveStr);
+    double score = friendlyScore(state, scores[0].score);
+    writeLog(searchArgs->log, "After depth=%i, best move is %s (%+0.2f)", depth, moveStr, score);
 }
 
 bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
@@ -238,6 +242,8 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
             // After each iteration, reorder the move search order "best moves first."
             // This speeds up successive searches by creating beta cutoffs faster.
             reorderMovesFromMoveScores(scores, result->moveScoreLength, &buffer);
+
+            logIterativeResult(state, searchArgs, scores, depth);
 
             // If we found a checkmate, just play that immediately. No need to deepen further!
             if (isEarlyCheckmate(scores[0].score)) {

@@ -237,5 +237,10 @@ int evaluate(GameState* state) {
     return result;
 }
 
+double friendlyScore(GameState* state, int rawScore) {
+    const int multiplier = state->current->toMove == COLOR_WHITE ? 1 : -1;
+    return (double) (rawScore * multiplier) / 100.0;
+}
+
 #undef EVAL_SHARE_RANK_RQ_WHITE
 #undef EVAL_SHARE_RANK_RQ_BLACK
