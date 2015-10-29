@@ -345,7 +345,9 @@ static void simpleSearch(int argc, char** argv) {
     char* fen = argv[argc - 1];
     GameState gs = parseFenOrQuit(fen);
 
-    SearchArgs args = {.depth = depth};
+    SearchArgs args;
+    initSearchArgs(&args);
+    args.depth = depth;
 
     SearchResult result;
     createSearchResult(&result);

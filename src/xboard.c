@@ -103,28 +103,6 @@ static void xBoardApplyMove(XBoardState* xbs, Move* move) {
     makeMove(&xbs->gameState, move);
 }
 
-static void logSearchResult(XBoardState* xbs, SearchResult* result) {
-    const int buffSize = 1024;
-    char* buff = malloc(buffSize * sizeof(int));
-    if (!buff) {
-        printf("Error: Unable to allocate search result log buffer.");
-        exit(-1);
-    }
-
-    const long nodes = result->nodes;
-    const long duration = result->durationMs;
-    const double knodes = ((double) nodes) / 1000.0;
-    const double seconds = ((double) duration) / 1000.0;
-
-    const int scoreMult = xbs->gameState.current->toMove == COLOR_BLACK ? -1 : 1;
-    const int score = result->score * scoreMult;
-
-    snprintf(buff, buffSize, "Score %+.2f; %ld nodes in %ldms (%.2f KNps)", (double) score / 100.0, nodes, duration, knodes / seconds);
-    writeEntry(&xbs->log, buff);
-
-    free(buff);
-}
-
 static bool xBoardThinkAndMove(XBoardState* xbs) {
     MoveBuffer mb;
     char moveStr[16];
@@ -149,7 +127,9 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
     if (!foundMove) {
         SearchResult searchResult;
         SearchArgs args;
+        initSearchArgs(&args);
         args.depth = 3;
+        args.log = &xbs->log;
         createSearchResult(&searchResult);
 
         search(&xbs->gameState, &args, &searchResult);
@@ -159,7 +139,6 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
             foundMove = true;
         }
 
-        logSearchResult(xbs, &searchResult);
         destroySearchResult(&searchResult);
     }
 
@@ -258,6 +237,16 @@ static bool isCommand(const char* command, char* str) {
     return strcmp(command, str) == 0;
 }
 
+static void chopNewline(char* buff, int length) {
+    for (int i = 0; i < length; i++) {
+        char c = buff[i];
+        if (c == '\n' || c == '\r') {
+            buff[i] = '\0';
+            break;
+        }
+    }
+}
+
 bool startXBoard() {
     const int inputBufferSize = 1024;
     const int maxTokens = 32;
@@ -306,16 +295,7 @@ bool startXBoard() {
             goto cleanup_gamestate;
         }
 
-        // Chop off the trailing newline.
-        for (int i = 0; i < inputBufferSize; i++)
-        {
-            char c = inputBuffer[i];
-            if (c == '\n' || c == '\r') {
-                inputBuffer[i] = '\0';
-                break;
-            }
-        }
-
+        chopNewline(inputBuffer, inputBufferSize);
         logInput(&xbState, inputBuffer);
 
         int tokenCount = tokenize(inputBuffer, tb, maxTokens);

@@ -34,6 +34,7 @@
 #include "attack.h"
 #include "result.h"
 #include "util.h"
+#include "log.h"
 
 static int compareMoveScore(const void* a, const void* b) {
     return ((MoveScore*) b)->score - ((MoveScore*) a)->score; // Underflow issues? Hopefully our scores are on the order of 1e5...
@@ -61,6 +62,11 @@ static void sortMoveScores(MoveScore* scores, const int length) {
 
 void orderByMvvLva(MoveBuffer* buffer) {
     qsort(buffer->moves, ((size_t) buffer->length), sizeof(Move), compareMvvLva);
+}
+
+void initSearchArgs(SearchArgs* args) {
+    args->log = NULL;
+    args->depth = 5;
 }
 
 static int alphaBeta(GameState* state, SearchResult* result, const int depth, const int maxDepth, int alpha, int beta, bool allowNullMove) {
@@ -196,13 +202,47 @@ static void orderRootNode(GameState* state, MoveBuffer* buffer) {
     free(scores);
 }
 
+static void logSearchStart(SearchArgs* args) {
+    const int logBuffSize = 1024;
+    char* logBuff = malloc(logBuffSize * sizeof(char));
+    if (!logBuff) {
+        perror("Unable to allocate log buffer.");
+        exit(-1);
+    }
+
+    snprintf(logBuff, 1024, "Root search starting; depth=%i", args->depth);
+    writeEntry(args->log, logBuff);
+    free(logBuff);
+}
+
+static void logSearchResult(SearchArgs* args, SearchResult* result, GameState* state) {
+    const int logBuffSize = 1024;
+    char* logBuff = malloc(logBuffSize * sizeof(char));
+    if (!logBuff) {
+        perror("Unable to allocate log buffer.");
+        exit(-1);
+    }
+
+    const long nodes = result->nodes;
+    const long duration = result->durationMs;
+    const double knodes = ((double) nodes) / 1000.0;
+    const double seconds = ((double) duration) / 1000.0;
+    const int scoreMult = state->current->toMove == COLOR_BLACK ? -1 : 1;
+    const int score = result->score * scoreMult;
+
+    snprintf(logBuff, logBuffSize, "Search complete. Score %+.2f; %ld nodes in %ldms (%.2f KNps)", (double) score / 100.0, nodes, duration, knodes / seconds);
+    writeEntry(args->log, logBuff);
+    free(logBuff);
+}
+
 bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
     MoveBuffer buffer;
     result->searchStatus = SEARCH_STATUS_NONE;
     createMoveBuffer(&buffer);
 
-    const long start = getCurrentTimeMillis();
+    logSearchStart(searchArgs);
 
+    const long start = getCurrentTimeMillis();
     const int moveCount = generateLegalMoves(state, &buffer);
 
     // Put captures and checks at the top.
@@ -234,9 +274,15 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 
     result->durationMs = end - start;
 
+    if (searchArgs->log != NULL) {
+        logSearchResult(searchArgs, result, state);
+    }
+
     destroyMoveBuffer(&buffer);
     return true;
 }
+
+
 
 void createSearchResult(SearchResult* result) {
     result->searchStatus = SEARCH_STATUS_NONE;

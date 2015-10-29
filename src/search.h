@@ -26,6 +26,7 @@
 #include "move.h"
 #include "gamestate.h"
 #include "notation.h"
+#include "log.h"
 
 #define INFINITY 10000
 
@@ -54,7 +55,10 @@ typedef struct {
 
 typedef struct {
     int depth;      // The maximum search depth.
+    GameLog* log;    // The game log.
 } SearchArgs;
+
+void initSearchArgs(SearchArgs* args);
 
 // Allocate resources for a search result.
 void createSearchResult(SearchResult* result);
