@@ -38,39 +38,18 @@
 #include "log.h"
 
 static void xBoardWrite(XBoardState* xbs, const char* format, ...) {
-    char* outputMessage;
-
-    outputMessage = malloc(XBOARD_BUFF_LEN + 32);
-    if (!outputMessage) {
-        printf("Error: Unable to allocate log message buffer.\n");
-        exit(-1);
-    }
-
     va_list argptr;
     va_start(argptr, format);
     vsprintf(xbs->outputBuffer, format, argptr);
     va_end(argptr);
 
-    sprintf(outputMessage, "<<\t%s", xbs->outputBuffer);
-    writeEntry(&xbs->log, outputMessage); // Write to the log.
+    writeLog(&xbs->log, "<<\t%s", xbs->outputBuffer); // Write to the log.
     printf("%s\n", xbs->outputBuffer); // Write to stdout.
     fflush(stdout);
-
-    free(outputMessage);
 }
 
 static void logInput(XBoardState* xbs, char* message) {
-    char* outputMessage;
-    outputMessage = malloc(XBOARD_BUFF_LEN + 32);
-
-    if (!outputMessage) {
-        printf("Error: Unable to allocate log message buffer.\n");
-        exit(-1);
-    }
-
-    sprintf(outputMessage, ">>\t%s", message);
-    writeEntry(&xbs->log, outputMessage);
-    free(outputMessage);
+    writeLog(&xbs->log, ">>\t%s", message);
 }
 
 static void logGameState(XBoardState* xbs) {
@@ -82,7 +61,7 @@ static void logGameState(XBoardState* xbs) {
     }
 
     printFen(&xbs->gameState, outputMessage, 1024);
-    writeEntry(&xbs->log, outputMessage);
+    writeLog(&xbs->log, "Current game state: %s", outputMessage);
 
     free(outputMessage);
 }
@@ -116,11 +95,11 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
         if (bookMoveCount > 0) {
             foundMove = true;
             move = mb.moves[rand() % bookMoveCount];
-            writeEntry(&xbs->log, "Found move from book.");
+            writeLog(&xbs->log, "Found move from book.");
         }
         destroyMoveBuffer(&mb);
     } else {
-        writeEntry(&xbs->log, "Book not open, proceeding to search.");
+        writeLog(&xbs->log, "Book not open, proceeding to search.");
     }
 
     // If nothing was found in the book, perform a search.
@@ -287,6 +266,8 @@ bool startXBoard() {
         xBoardWrite(&xbState, "Error: Unable to open game log.");
         goto cleanup_book;
     }
+
+    writeLog(&xbState.log, "Some stuff: %s %i", "asdf", 3);
 
     while (!done) {
         if (!fgets(inputBuffer, inputBufferSize, stdin)) {

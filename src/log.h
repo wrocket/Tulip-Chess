@@ -31,7 +31,7 @@ typedef struct {
 } GameLog;
 
 bool openLog(GameLog* log);
-void writeEntry(GameLog* log, const char* message);
+void writeLog(GameLog* log, const char* format, ...);
 void closeLog(GameLog* log);
 
 #endif

@@ -202,27 +202,7 @@ static void orderRootNode(GameState* state, MoveBuffer* buffer) {
     free(scores);
 }
 
-static void logSearchStart(SearchArgs* args) {
-    const int logBuffSize = 1024;
-    char* logBuff = malloc(logBuffSize * sizeof(char));
-    if (!logBuff) {
-        perror("Unable to allocate log buffer.");
-        exit(-1);
-    }
-
-    snprintf(logBuff, 1024, "Root search starting; depth=%i", args->depth);
-    writeEntry(args->log, logBuff);
-    free(logBuff);
-}
-
 static void logSearchResult(SearchArgs* args, SearchResult* result, GameState* state) {
-    const int logBuffSize = 1024;
-    char* logBuff = malloc(logBuffSize * sizeof(char));
-    if (!logBuff) {
-        perror("Unable to allocate log buffer.");
-        exit(-1);
-    }
-
     const long nodes = result->nodes;
     const long duration = result->durationMs;
     const double knodes = ((double) nodes) / 1000.0;
@@ -230,9 +210,7 @@ static void logSearchResult(SearchArgs* args, SearchResult* result, GameState* s
     const int scoreMult = state->current->toMove == COLOR_BLACK ? -1 : 1;
     const int score = result->score * scoreMult;
 
-    snprintf(logBuff, logBuffSize, "Search complete. Score %+.2f; %ld nodes in %ldms (%.2f KNps)", (double) score / 100.0, nodes, duration, knodes / seconds);
-    writeEntry(args->log, logBuff);
-    free(logBuff);
+    writeLog(args->log, "Search complete. Score %+.2f; %ld nodes in %ldms (%.2f KNps)", (double) score / 100.0, nodes, duration, knodes / seconds);
 }
 
 bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
@@ -240,7 +218,7 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
     result->searchStatus = SEARCH_STATUS_NONE;
     createMoveBuffer(&buffer);
 
-    logSearchStart(searchArgs);
+    writeLog(searchArgs->log, "Search starting with depth=%i", searchArgs->depth);
 
     const long start = getCurrentTimeMillis();
     const int moveCount = generateLegalMoves(state, &buffer);
@@ -263,6 +241,7 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 
             // If we found a checkmate, just play that immediately. No need to deepen further!
             if (isEarlyCheckmate(scores[0].score)) {
+                writeLog(searchArgs->log, "Early checkmate found at depth %i", depth);
                 break;
             }
         }

@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <stdarg.h>
 
 #include "log.h"
 
@@ -35,6 +36,16 @@ static void printDt(char* buff, const char* format) {
     time(&timer);
     tm_info = localtime(&timer);
     strftime(buff, 32, format, tm_info);
+}
+
+static void writeEntry(GameLog* log, const char* message) {
+    if (log != NULL) {
+        char dateBuff[32];
+        printDt(dateBuff, "%F %H:%M:%S%z");
+
+        fprintf(log->fh, "%s\t%s\n", dateBuff, message);
+        fflush(log->fh);
+    }
 }
 
 bool openLog(GameLog* log) {
@@ -67,14 +78,24 @@ open_log_fail:
     return result;
 }
 
-void writeEntry(GameLog* log, const char* message) {
-    if (log != NULL) {
-        char dateBuff[32];
-        printDt(dateBuff, "%F %H:%M:%S%z");
+void writeLog(GameLog* log, const char* format, ...) {
+    const int buffSize = 2048;
+    char* outputMessage;
 
-        fprintf(log->fh, "%s\t%s\n", dateBuff, message);
-        fflush(log->fh);
+    outputMessage = malloc(buffSize * sizeof(char));
+    if (!outputMessage) {
+        printf("Error: Unable to allocate log message buffer.\n");
+        exit(-1);
     }
+
+    va_list argptr;
+    va_start(argptr, format);
+    vsprintf(outputMessage, format, argptr);
+    va_end(argptr);
+
+    writeEntry(log, outputMessage);
+
+    free(outputMessage);
 }
 
 void closeLog(GameLog* log) {
