@@ -79,6 +79,10 @@ open_log_fail:
 }
 
 void writeLog(GameLog* log, const char* format, ...) {
+    if (log == NULL) {
+        return;
+    }
+
     const int buffSize = 2048;
     char* outputMessage;
 
