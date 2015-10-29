@@ -1,0 +1,20 @@
+>> No operation mode specified, entering XBoard mode.
+f3
+Illegal move: f3
+new
+f3
+move Nc6
+g4
+move Nf6
+a2
+Illegal move: a2
+a3
+move gxh6
+b3
+move e6
+a4
+move Bb4
+a5
+move axb6
+^C
+

@@ -42,7 +42,7 @@ static void xBoardWrite(XBoardState* xbs, const char* format, ...) {
 
     outputMessage = malloc(XBOARD_BUFF_LEN + 32);
     if (!outputMessage) {
-        printf("Error: Unable to allocate log message buffer.");
+        printf("Error: Unable to allocate log message buffer.\n");
         exit(-1);
     }
 
@@ -64,7 +64,7 @@ static void logInput(XBoardState* xbs, char* message) {
     outputMessage = malloc(XBOARD_BUFF_LEN + 32);
 
     if (!outputMessage) {
-        printf("Error: Unable to allocate log message buffer.");
+        printf("Error: Unable to allocate log message buffer.\n");
         exit(-1);
     }
 
@@ -77,7 +77,7 @@ static void logGameState(XBoardState* xbs) {
     char* outputMessage;
     outputMessage = malloc(1024);
     if (!outputMessage) {
-        printf("Error: Unable to allocate log message buffer.");
+        printf("Error: Unable to allocate log message buffer.\n");
         exit(-1);
     }
 
@@ -106,7 +106,7 @@ static void xBoardApplyMove(XBoardState* xbs, Move* move) {
 static void logSearchResult(XBoardState* xbs, SearchResult* result) {
     const int buffSize = 1024;
     char* buff = malloc(buffSize * sizeof(int));
-    if(!buff) {
+    if (!buff) {
         printf("Error: Unable to allocate search result log buffer.");
         exit(-1);
     }
@@ -132,14 +132,18 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
     Move move;
 
     // First check the book for this position.
-    createMoveBuffer(&mb);
-    const int bookMoveCount = getMovesFromBook(&xbs->gameState, &mb, &xbs->currentBook);
-    if (bookMoveCount > 0) {
-        foundMove = true;
-        move = mb.moves[rand() % bookMoveCount];
-        writeEntry(&xbs->log, "Found move from book.");
+    if (xbs->bookOpen) {
+        createMoveBuffer(&mb);
+        const int bookMoveCount = getMovesFromBook(&xbs->gameState, &mb, &xbs->currentBook);
+        if (bookMoveCount > 0) {
+            foundMove = true;
+            move = mb.moves[rand() % bookMoveCount];
+            writeEntry(&xbs->log, "Found move from book.");
+        }
+        destroyMoveBuffer(&mb);
+    } else {
+        writeEntry(&xbs->log, "Book not open, proceeding to search.");
     }
-    destroyMoveBuffer(&mb);
 
     // If nothing was found in the book, perform a search.
     if (!foundMove) {
@@ -284,10 +288,9 @@ bool startXBoard() {
 
     initializeGamestate(&xbState.gameState);
 
-    if (!openBook("tulip_openings.sqlite", &xbState.currentBook)) {
-        xBoardWrite(&xbState, "Error: Unable to open book.");
-        goto cleanup_gamestate;
-    }
+    const char* openingBook = "tulip_openings.sqlite";
+
+    xbState.bookOpen = openBook(openingBook, &xbState.currentBook);
 
     bool done = false;
 
@@ -342,7 +345,9 @@ bool startXBoard() {
 
     closeLog(&xbState.log);
 cleanup_book:
-    closeBook(&xbState.currentBook);
+    if (xbState.bookOpen) {
+        closeBook(&xbState.currentBook);
+    }
 cleanup_gamestate:
     destroyGamestate(&xbState.gameState);
     freeTokenBuffer(tb, maxTokens);

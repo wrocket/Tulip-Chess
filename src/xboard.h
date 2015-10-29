@@ -35,6 +35,7 @@ typedef struct {
     GameState gameState;
     bool forceMode;
     OpenBook currentBook;
+    bool bookOpen;
     GameLog log;
     char* outputBuffer;
 } XBoardState;

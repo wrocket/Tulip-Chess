@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
+#include <sys/stat.h>
 
 #include "sqlite/sqlite3.h"
 
@@ -85,15 +86,21 @@ static int readMoves(GameState* state, char*** strArray, OpenBook* book) {
 
 bool openBook(const char* fileName, OpenBook* book) {
     sqlite3* db;
-    int rc = sqlite3_open(fileName, &db);
+    int rc;
     bool result = true;
+    struct stat st;
 
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
+    if (stat(fileName, &st) != 0 ) {
         result = false;
     } else {
-        book->database = db;
+        rc = sqlite3_open(fileName, &db);
+        if (rc != SQLITE_OK) {
+            fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+            sqlite3_close(db);
+            result = false;
+        } else {
+            book->database = db;
+        }
     }
 
     return result;
