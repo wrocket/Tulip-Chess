@@ -90,7 +90,7 @@ void writeLog(GameLog* log, const char* format, ...) {
 
     va_list argptr;
     va_start(argptr, format);
-    vsprintf(outputMessage, format, argptr);
+    vsnprintf(outputMessage, buffSize, format, argptr);
     va_end(argptr);
 
     writeEntry(log, outputMessage);
