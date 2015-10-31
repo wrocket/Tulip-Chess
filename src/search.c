@@ -116,6 +116,7 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
             unmakeMove(state, &m);
 
             if (moveScore >= beta) {
+                result->betaCutoffs++;
                 return beta;
             }
 
@@ -217,14 +218,17 @@ static void logSearchResult(SearchArgs* args, SearchResult* result, GameState* s
     const double knodes = ((double) nodes) / 1000.0;
     const double seconds = ((double) duration) / 1000.0;
     const double score = friendlyScore(state, result->score);
+    const double betaPct = ((double) result->betaCutoffs) / (double) result->nodes;
 
     writeLog(args->log, "Search complete. Score %+.2f; %ld nodes in %ldms (%.2f KNps)", score, nodes, duration, knodes / seconds);
+    writeLog(args->log, "Beta cutoff in %i/%i of nodes (%.2f%%)", result->betaCutoffs, nodes, betaPct);
 }
 
 static void logIterativeResult(GameState* state, SearchArgs* searchArgs, MoveScore* scores, int depth) {
     char moveStr[16];
-    printShortAlg(&scores[0].move, state, moveStr);
-    double score = friendlyScore(state, scores[0].score);
+    MoveScore top = scores[0];
+    printShortAlg(&top.move, state, moveStr);
+    double score = friendlyScore(state, top.score);
     writeLog(searchArgs->log, "After depth=%i, best move is %s (%+0.2f)", depth, moveStr, score);
 }
 
@@ -244,6 +248,7 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
     result->moveScoreLength = moveCount;
     result->score = INT_MIN;
     result->nodes = 0;
+    result->betaCutoffs = 0;
     MoveScore* scores = result->moveScores;
 
     if (moveCount) {
@@ -277,8 +282,6 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
     destroyMoveBuffer(&buffer);
     return true;
 }
-
-
 
 void createSearchResult(SearchResult* result) {
     result->searchStatus = SEARCH_STATUS_NONE;

@@ -51,6 +51,7 @@ typedef struct {
     int searchStatus;       // SEARCH_STATUS_NO_LEGAL_MOVES if no moves could be considered.
     MoveScore* moveScores;  // A list of the moves considered and their scores.
     int moveScoreLength;    // The length of moveScores.
+    int betaCutoffs;
 } SearchResult;
 
 typedef struct {
