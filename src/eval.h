@@ -25,6 +25,9 @@
 
 #include "gamestate.h"
 
+// Returns the score of the position from the point of view of the side to move.
+// So, if white is to move, a positive number is good for white.
+// If black is to move, a positive number is good for black.
 int evaluate(GameState* state);
 
 // Take an internal represntation of a score (integer, according to the side to

@@ -234,7 +234,9 @@ int evaluate(GameState* state) {
         result = evaluateEndgame(state);
     }
 
-    return result;
+    const int mult = state->current->toMove == COLOR_WHITE ? 1 : -1;
+
+    return mult * result;
 }
 
 double friendlyScore(GameState* state, int rawScore) {

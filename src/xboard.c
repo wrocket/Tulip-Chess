@@ -107,7 +107,7 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
         SearchResult searchResult;
         SearchArgs args;
         initSearchArgs(&args);
-        args.depth = 3;
+        args.depth = 6;
         args.log = &xbs->log;
         createSearchResult(&searchResult);
 

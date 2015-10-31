@@ -73,17 +73,22 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
     result->nodes++;
 
     if (depth >= maxDepth) {
+        // const int mult = state->current->toMove == COLOR_WHITE ? -1 : 1;
+        // return mult * evaluate(state);
         return evaluate(state);
     }
 
-    // Apply the null move heuristic.
-    // Do not allow subsequent nodes in the move tree to apply the null move.
-    makeNullMove(state);
-    const int nullScore = alphaBeta(state, result, depth + 1 + NULL_MOVE_RADIUS, maxDepth, -beta, -beta + 1, false);
-    unmakeNullMove(state);
+    const bool check = isCheck(state);
+    if (!check) {
+        // Apply the null move heuristic.
+        // Do not allow subsequent nodes in the move tree to apply the null move.
+        makeNullMove(state);
+        const int nullScore = alphaBeta(state, result, depth + 1 + NULL_MOVE_RADIUS, maxDepth, -beta, -beta + 1, false);
+        unmakeNullMove(state);
 
-    if (nullScore > beta) {
-        return beta;
+        if (nullScore > beta) {
+            return beta;
+        }
     }
 
     MoveBuffer* buffer = &state->moveBuffers[depth];
@@ -119,7 +124,7 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
     }
 
     if (legalMoveCount == 0) {
-        if (isCheck(state)) {
+        if (check) {
             return -INFINITY + depth; // Add depth to encourage "faster" checkmates.
         } else {
             return 0; // Stalemate
@@ -129,7 +134,7 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
     return alpha;
 }
 
-void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScores, MoveBuffer* legalMoves, int maxDepth) {
+void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScores, MoveBuffer* legalMoves, int maxDepth, GameLog* log) {
     for (int i = 0; i < legalMoves->length; i++) {
         Move m = legalMoves->moves[i];
 
@@ -146,6 +151,8 @@ void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScor
 
     result->score = moveScores[0].score;
     result->move = moveScores[0].move;
+
+    writeLog(log, "Completed iterative deepening to depth=%i", maxDepth);
 }
 
 static void reorderMovesFromMoveScores(MoveScore* scores, int scoreLength, MoveBuffer* moveBuffer) {
@@ -237,7 +244,7 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 
     if (moveCount) {
         for (int depth = 1; depth <= searchArgs->depth; depth++) {
-            iterativeDeepen(state, result, scores, &buffer, depth);
+            iterativeDeepen(state, result, scores, &buffer, depth, searchArgs->log);
 
             // After each iteration, reorder the move search order "best moves first."
             // This speeds up successive searches by creating beta cutoffs faster.

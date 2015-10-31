@@ -225,8 +225,9 @@ static void evalPosition(int argc, char** argv) {
 
     char* fen = argv[1];
     GameState gs = parseFenOrQuit(fen);
+    int mult = gs.current->toMove == COLOR_WHITE ? 1 : -1;
 
-    int result = evaluate(&gs);
+    int result = mult * evaluate(&gs);
 
     printEvaluation(fen, result);
     destroyGamestate(&gs);
