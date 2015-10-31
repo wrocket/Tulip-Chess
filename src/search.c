@@ -79,6 +79,10 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
     }
 
     const bool check = isCheck(state);
+
+    // Doing null-move in check is *not* a good idea.
+    // Null move relies on letting the opponent move twice being the worst possible thing.
+    // Forcing them to move out of a checking position, however, is good.
     if (!check) {
         // Apply the null move heuristic.
         // Do not allow subsequent nodes in the move tree to apply the null move.
@@ -134,7 +138,7 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
     return alpha;
 }
 
-void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScores, MoveBuffer* legalMoves, int maxDepth, GameLog* log) {
+static void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScores, MoveBuffer* legalMoves, int maxDepth, GameLog* log) {
     for (int i = 0; i < legalMoves->length; i++) {
         Move m = legalMoves->moves[i];
 
