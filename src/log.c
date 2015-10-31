@@ -29,18 +29,21 @@
 
 #include "log.h"
 
+#define DATE_BUFF_SIZE 32
+#define FILE_NAME_SIZE 128
+
 static void printDt(char* buff, const char* format) {
     struct tm* tm_info;
     time_t timer;
 
     time(&timer);
     tm_info = localtime(&timer);
-    strftime(buff, 32, format, tm_info);
+    strftime(buff, DATE_BUFF_SIZE, format, tm_info);
 }
 
 static void writeEntry(GameLog* log, const char* message) {
     if (log != NULL) {
-        char dateBuff[32];
+        char dateBuff[DATE_BUFF_SIZE];
         printDt(dateBuff, "%F %H:%M:%S%z");
 
         fprintf(log->fh, "%s\t%s\n", dateBuff, message);
@@ -50,17 +53,16 @@ static void writeEntry(GameLog* log, const char* message) {
 
 bool openLog(GameLog* log) {
     char* fname;
-    char dateBuff[32];
-    const int buffSize = 128;
+    char dateBuff[DATE_BUFF_SIZE];
 
-    fname = malloc(buffSize * sizeof(char));
+    fname = malloc(FILE_NAME_SIZE * sizeof(char));
     if (!fname) {
         perror("Unable allocate memory for log file name.");
         exit(-1);
     }
 
     printDt(dateBuff, "%F-%H%M%S");
-    snprintf(fname, buffSize, "game-%s-p%i.log", dateBuff, getpid());
+    snprintf(fname, FILE_NAME_SIZE, "game-%s-p%i.log", dateBuff, getpid());
 
     bool result = false;
     log->fh = fopen(fname, "w");
@@ -79,29 +81,27 @@ open_log_fail:
 }
 
 void writeLog(GameLog* log, const char* format, ...) {
-    if (log == NULL) {
-        return;
+    if (log != NULL) {
+        char* outputMessage = malloc(LOG_BUFFER_SIZE * sizeof(char));
+
+        if (!outputMessage) {
+            printf("Error: Unable to allocate log message buffer.\n");
+            exit(-1);
+        }
+
+        va_list argptr;
+        va_start(argptr, format);
+        vsnprintf(outputMessage, LOG_BUFFER_SIZE, format, argptr);
+        va_end(argptr);
+
+        writeEntry(log, outputMessage);
+
+        free(outputMessage);
     }
-
-    const int buffSize = 2048;
-    char* outputMessage;
-
-    outputMessage = malloc(buffSize * sizeof(char));
-    if (!outputMessage) {
-        printf("Error: Unable to allocate log message buffer.\n");
-        exit(-1);
-    }
-
-    va_list argptr;
-    va_start(argptr, format);
-    vsnprintf(outputMessage, buffSize, format, argptr);
-    va_end(argptr);
-
-    writeEntry(log, outputMessage);
-
-    free(outputMessage);
 }
 
 void closeLog(GameLog* log) {
-    fclose(log->fh);
+    if (log != NULL) {
+        fclose(log->fh);
+    }
 }

@@ -30,8 +30,17 @@ typedef struct {
 	FILE* fh;
 } GameLog;
 
+// The maximum size of a log message.
+#define LOG_BUFFER_SIZE 2048
+
+// Open up a game log for writing.
+// Returns true on success, false on failure.
 bool openLog(GameLog* log);
+
+// Write a formatted message to the log.
 void writeLog(GameLog* log, const char* format, ...);
+
+// Close a log.
 void closeLog(GameLog* log);
 
 #endif
