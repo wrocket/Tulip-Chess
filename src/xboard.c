@@ -321,7 +321,6 @@ bool startXBoard() {
                 writeLog(&xbState.log, "Opponent time: %.2fs", (double) xbState.opponentTime / 100.0);
             } else if (isCommand("usermove", cmd)) {
             } else if (isCommand("?", cmd)) {
-            } else if (isCommand("ping", cmd)) {
             } else if (isCommand("draw", cmd)) {
             } else if (isCommand("result", cmd)) {
             } else if (isCommand("edit", cmd)) {
