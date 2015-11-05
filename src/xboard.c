@@ -226,6 +226,14 @@ static void chopNewline(char* buff, int length) {
     }
 }
 
+static int parseTime(char** buff, int len) {
+    int result = 0;
+    if (len >= 2) {
+        result = atoi(buff[1]);
+    }
+    return result;
+}
+
 bool startXBoard() {
     const int inputBufferSize = 1024;
     const int maxTokens = 32;
@@ -306,7 +314,11 @@ bool startXBoard() {
             } else if (isCommand("sd", cmd)) {
             } else if (isCommand("nps", cmd)) {
             } else if (isCommand("time", cmd)) {
+                xbState.myTime = parseTime(tb, tokenCount);
+                writeLog(&xbState.log, "My time: %.2fs", (double) xbState.myTime / 100.0);
             } else if (isCommand("otim", cmd)) {
+                xbState.opponentTime = parseTime(tb, tokenCount);
+                writeLog(&xbState.log, "Opponent time: %.2fs", (double) xbState.opponentTime / 100.0);
             } else if (isCommand("usermove", cmd)) {
             } else if (isCommand("?", cmd)) {
             } else if (isCommand("ping", cmd)) {

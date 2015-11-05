@@ -38,6 +38,8 @@ typedef struct {
     bool bookOpen;
     GameLog log;
     char* outputBuffer;
+    int myTime;
+    int opponentTime;
 } XBoardState;
 
 bool startXBoard(void);
