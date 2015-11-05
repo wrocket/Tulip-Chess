@@ -80,12 +80,12 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
 
     const bool check = isCheck(state);
 
+    // Apply the null-move heuristic if the situation warrants.
+    //
     // Doing null-move in check is *not* a good idea.
     // Null move relies on letting the opponent move twice being the worst possible thing.
     // Forcing them to move out of a checking position, however, is good.
-    if (!check) {
-        // Apply the null move heuristic.
-        // Do not allow subsequent nodes in the move tree to apply the null move.
+    if (allowNullMove && !check) {
         makeNullMove(state);
         const int nullScore = alphaBeta(state, result, depth + 1 + NULL_MOVE_RADIUS, maxDepth, -beta, -beta + 1, false);
         unmakeNullMove(state);
@@ -103,7 +103,7 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
         orderByMvvLva(buffer);
     }
 
-    int legalMoveCount = 0;
+    bool noLegalMoves = true;
 
     for (int i = 0; i < moveCount; i++) {
         Move m = buffer->moves[i];
@@ -111,7 +111,7 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
         makeMove(state, &m);
 
         if (isLegalPosition(state)) {
-            legalMoveCount++;
+            noLegalMoves = false;
             const int moveScore =  -1 * alphaBeta(state, result, depth + 1, maxDepth, -1 * beta, -1 * alpha, allowNullMove);
             unmakeMove(state, &m);
 
@@ -128,11 +128,14 @@ static int alphaBeta(GameState* state, SearchResult* result, const int depth, co
         }
     }
 
-    if (legalMoveCount == 0) {
-        if (check) {
-            return -INFINITY + depth; // Add depth to encourage "faster" checkmates.
+    if (noLegalMoves) {
+        if (check) { // No moves, and check? Checkmate.
+            // Add depth to encourage "faster" checkmates.
+            // Longer checkmates (more moves) still appear as great moves,
+            // but their score will be less than faster checkmates.
+            return -INFINITY + depth;
         } else {
-            return 0; // Stalemate
+            return 0; // No moves, and not check? Stalemate.
         }
     }
 
