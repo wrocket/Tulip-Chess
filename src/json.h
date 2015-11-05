@@ -37,6 +37,7 @@ void printMatchMoveResult(Move* move);
 void printGameStatus(char* position, int status);
 void printEvaluation(char* position, int score);
 void printSearchResult(SearchResult* result, GameState* state);
+void printEndgameClassification(int type);
 
 typedef struct {
     char move[8];

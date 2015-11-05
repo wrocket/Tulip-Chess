@@ -32,6 +32,7 @@
 #include "json.h"
 #include "result.h"
 #include "search.h"
+#include "eval.h"
 
 #define __STDC_FORMAT_MACROS
 
@@ -337,6 +338,21 @@ void printEvaluation(char* position, int score) {
     printf("\"fenString\": \"%s\", ", position);
     printf("\"score\": %i", score);
     printf("}\n");
+}
+
+void printEndgameClassification(int type) {
+    const char* typeStr;
+    if (type == ENDGAME_UNCLASSIFIED) {
+        typeStr = "unclassified";
+    } else if(type == ENDGAME_BROOKvKING) {
+        typeStr = "krvk_black";
+    } else if(type == ENDGAME_WROOKvKING) {
+        typeStr = "krvk_white";
+    } else {
+        typeStr = "unknown";
+    }
+
+    printf("{\"endgameType\":\"%s\"}\n", typeStr);
 }
 
 void printSearchResult(SearchResult* result, GameState* state) {

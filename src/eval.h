@@ -25,6 +25,10 @@
 
 #include "gamestate.h"
 
+#define ENDGAME_UNCLASSIFIED    0
+#define ENDGAME_BROOKvKING      1
+#define ENDGAME_WROOKvKING      2
+
 // Returns the score of the position from the point of view of the side to move.
 // So, if white is to move, a positive number is good for white.
 // If black is to move, a positive number is good for black.
@@ -35,4 +39,6 @@ int evaluate(GameState* state);
 // black advantage < 0).
 double friendlyScore(GameState* state, int rawScore);
 
+// Classify an endgame.
+int classifyEndgame(GameState* state);
 #endif

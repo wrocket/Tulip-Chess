@@ -20,12 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <stdio.h>
+
 #include "tulip.h"
 #include "board.h"
 #include "gamestate.h"
 #include "evalconsts.h"
 #include "bitboard.h"
 #include "piece.h"
+#include "eval.h"
 
 #define EVAL_SHARE_RANK_RQ_WHITE() onSameFileWithPowerPiece(state, sq, ORD_WROOK, ORD_WQUEEN)
 #define EVAL_SHARE_RANK_RQ_BLACK() onSameFileWithPowerPiece(state, sq, ORD_BROOK, ORD_BQUEEN)
@@ -39,6 +42,20 @@ static inline int countBits(uint64_t n) {
     return c;
 }
 
+static inline int kingMovesBetweenSquares(int sq1, int sq2) {
+    const int r1 = RANK_IDX(sq1);
+    const int f1 = FILE_IDX(sq1);
+    const int r2 = RANK_IDX(sq2);
+    const int f2 = FILE_IDX(sq2);
+
+    const int dr = abs(r1 - r2);
+    const int df = abs(f1 - f2);
+
+    const int min = dr < df ? dr : df;
+
+    return min + abs(dr - df);
+}
+
 // Determine if the given square shares a rank with the given rook or queen.
 static inline int onSameFileWithPowerPiece(GameState* gs, int sq, int ordinalRook, int ordinalQueen) {
     uint64_t* bb = gs->bitboards;
@@ -48,7 +65,19 @@ static inline int onSameFileWithPowerPiece(GameState* gs, int sq, int ordinalRoo
     return onRank ? BONUS_RQ_SHARE_RANK : 0;
 }
 
-static int evaluateOpening(GameState* state) {
+int classifyEndgame(GameState* g) {
+    StateData* sd = g->current;
+    int* counts = g->pieceCounts;
+
+    if (sd->whitePieceCount + sd->blackPieceCount == 3) {
+        if (counts[ORD_BROOK] || counts[ORD_BQUEEN]) return ENDGAME_BROOKvKING;
+        if (counts[ORD_WROOK] || counts[ORD_WQUEEN]) return ENDGAME_WROOKvKING;
+    }
+
+    return ENDGAME_UNCLASSIFIED;
+}
+
+int evaluateOpening(GameState* state) {
     const Piece** board = state->board;
     int score = 0;
     uint64_t* bb = state->bitboards;
@@ -172,9 +201,24 @@ static int evaluateMidgame(GameState* state) {
     return score;
 }
 
+#define KING_DISTANCE_PENALTY() (kingMovesBetweenSquares(sd->whiteKingSquare, sd->blackKingSquare)) * KING_ENDGAME_DISTANCE_PENALTY
+
 static int evaluateEndgame(GameState* state) {
     const Piece** board = state->board;
     int score = 0;
+    StateData* sd = state->current;
+
+    const int endgame = classifyEndgame(state);
+
+    // If in a rook endgame, penalize having the kings far apart.
+    // This is to encourage the player with the advantage to push the king up
+    // into a normal checkmate position.
+    if (endgame == ENDGAME_WROOKvKING) {
+        score += KING_DISTANCE_PENALTY();
+    } else if (endgame == ENDGAME_BROOKvKING) {
+        score -= KING_DISTANCE_PENALTY();
+    }
+
     for (int sq = SQ_A1; sq <= SQ_H8; sq++) {
         const Piece* p = board[sq];
 
@@ -211,6 +255,12 @@ static int evaluateEndgame(GameState* state) {
         case ORD_BQUEEN:
             score -= SCORE_QUEEN;
             break;
+        case ORD_WKING:
+            score += SQ_SCORE_ENDGAME_KING[sq];
+            break;
+        case ORD_BKING:
+            score -= SQ_SCORE_ENDGAME_KING[sq];
+            break;
         default:
             break;
         }
@@ -218,6 +268,8 @@ static int evaluateEndgame(GameState* state) {
 
     return score;
 }
+
+#undef KING_DISTANCE_PENALTY
 
 int evaluate(GameState* state) {
     StateData* current = state->current;

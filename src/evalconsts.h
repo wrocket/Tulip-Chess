@@ -35,9 +35,14 @@
 
 #define BONUS_RQ_SHARE_RANK 25
 
+#define KING_ENDGAME_DISTANCE_PENALTY -20
+
 extern const int SQ_SCORE_PAWN_OPENING_WHITE[144];
 extern const int SQ_SCORE_PAWN_OPENING_BLACK[144];
 extern const int SQ_SCORE_KNIGHT_OPENING_BLACK[144];
 extern const int SQ_SCORE_KNIGHT_OPENING_WHITE[144];
 
+// A board square array to encourage driving enemy kings to the edge of the
+// board in the endgame.
+extern const int SQ_SCORE_ENDGAME_KING[144];
 #endif

@@ -93,7 +93,7 @@ result.o: result.c result.h
 book.o: book.c book.h
 	$(CC) $(CFLAGS) -c book.c
 
-eval.o: eval.c eval.h
+eval.o: eval.c eval.h evalconsts.h evalconsts.c
 	$(CC) $(CFLAGS) -c eval.c
 
 evalconsts.o: evalconsts.c evalconsts.h

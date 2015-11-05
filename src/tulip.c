@@ -326,6 +326,21 @@ static void hashSequence(int argc, char** argv) {
     free(seqItems);
 }
 
+
+static void printEndgame(int argc, char** argv) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: -classifyendgame \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    char* fen = argv[argc - 1];
+    GameState gs = parseFenOrQuit(fen);
+    int result = classifyEndgame(&gs);
+    destroyGamestate(&gs);
+
+    printEndgameClassification(result);
+}
+
 static void simpleSearch(int argc, char** argv) {
     if (argc < 2) {
         fprintf(stderr, "Usage: -simplesearch \"[FEN string]\"\n");
@@ -417,6 +432,8 @@ int main(int argc, char** argv) {
             simpleSearch(argc, argv);
         } else if (0 == strcmp("-ordermoves", argv[0])) {
             printMoveOrder(argc, argv);
+        } else if (0 == strcmp("-classifyendgame", argv[0])) {
+            printEndgame(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);

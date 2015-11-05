@@ -38,7 +38,11 @@ class TestBasicMoveApplication(unittest.TestCase):
         result = call_tulip(['-evalposition', fen])
         parsed_output = json.loads(result)
         return int(parsed_output['score'])
-        return state
+
+    def classify_endgame(self, fen):
+        result = call_tulip(['-classifyendgame', fen])
+        parsed_output = json.loads(result)
+        return parsed_output['endgameType']
 
     def assert_score_approx(self, expected, actual, tolerance=5):
         self.assertTrue(abs(expected - actual) < abs(tolerance), "Expected score %i, got %i" % (expected, actual))
@@ -121,10 +125,22 @@ class TestBasicMoveApplication(unittest.TestCase):
         worse = self.zero_depth_eval('rnbqkbnr/p2ppppp/2p5/2p5/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1')
         self.assert_score_better_than_b(better, worse, by_at_least = 10, by_no_more_than=50)
 
-    def knight_mobility_white(self):
+    def test_knight_mobility_white(self):
         better = self.zero_depth_eval('r4k1r/pppppppp/2P1P3/1P3P2/4N3/1P3P2/2P1P3/5K2 w - - 0 1')
         worse = self.zero_depth_eval('r4k1r/pppppppp/2P1P3/1P3P2/3N4/1P3P2/2P1P3/5K2 w - - 0 1')
         self.assert_score_better_than_b(better, worse, by_at_least = 50, by_no_more_than=100)
+
+    def test_classify_eg_brook(self):
+        result = self.classify_endgame('8/8/8/8/8/4k2r/8/3K4 b - - 0 1')
+        self.assertEqual('krvk_black', result)
+
+    def test_classify_eg_wrook(self):
+        result = self.classify_endgame('8/8/8/8/8/4k2r/8/3K4 b - - 0 1')
+        self.assertEqual('krvk_black', result)
+
+    def test_classify_eg_wrook(self):
+        result = self.classify_endgame('3k4/8/8/7R/8/8/3K4/8 b - - 0 1')
+        self.assertEqual('krvk_white', result)
 
 if __name__ == '__main__':
     unittest.main()
