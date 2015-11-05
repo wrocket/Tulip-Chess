@@ -39,6 +39,6 @@ int evaluate(GameState* state);
 // black advantage < 0).
 double friendlyScore(GameState* state, int rawScore);
 
-// Classify an endgame.
+// Classify an endgame into one of several general types.
 int classifyEndgame(GameState* state);
 #endif

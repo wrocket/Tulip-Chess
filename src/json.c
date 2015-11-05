@@ -344,9 +344,9 @@ void printEndgameClassification(int type) {
     const char* typeStr;
     if (type == ENDGAME_UNCLASSIFIED) {
         typeStr = "unclassified";
-    } else if(type == ENDGAME_BROOKvKING) {
+    } else if (type == ENDGAME_BROOKvKING) {
         typeStr = "krvk_black";
-    } else if(type == ENDGAME_WROOKvKING) {
+    } else if (type == ENDGAME_WROOKvKING) {
         typeStr = "krvk_white";
     } else {
         typeStr = "unknown";
@@ -387,8 +387,8 @@ void printSearchResult(SearchResult* result, GameState* state) {
     printf("\"elapsedMs\": %ld,", result->durationMs);
     printf("\"nodesPerSecond\": %0.2f,", nps);
     printf("\"rootNodeScores\": [");
-    for(int i=0; i<result->moveScoreLength; i++) {
-        if(i != 0) {
+    for (int i = 0; i < result->moveScoreLength; i++) {
+        if (i != 0) {
             printf(", ");
         }
 

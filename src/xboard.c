@@ -296,6 +296,48 @@ bool startXBoard() {
                 xBoardSetboard(&xbState, tb, tokenCount);
             } else if (isCommand("ping", cmd)) {
                 xBoardPing(&xbState, tb, tokenCount);
+            } else if (isCommand("variant", cmd)) {
+            } else if (isCommand("random", cmd)) {
+            } else if (isCommand("playother", cmd)) {
+            } else if (isCommand("white", cmd)) {
+            } else if (isCommand("black", cmd)) {
+            } else if (isCommand("level", cmd)) {
+            } else if (isCommand("st", cmd)) {
+            } else if (isCommand("sd", cmd)) {
+            } else if (isCommand("nps", cmd)) {
+            } else if (isCommand("time", cmd)) {
+            } else if (isCommand("otim", cmd)) {
+            } else if (isCommand("usermove", cmd)) {
+            } else if (isCommand("?", cmd)) {
+            } else if (isCommand("ping", cmd)) {
+            } else if (isCommand("draw", cmd)) {
+            } else if (isCommand("result", cmd)) {
+            } else if (isCommand("edit", cmd)) {
+            } else if (isCommand("hint", cmd)) {
+            } else if (isCommand("bk", cmd)) {
+            } else if (isCommand("undo", cmd)) {
+            } else if (isCommand("remove", cmd)) {
+            } else if (isCommand("hard", cmd)) {
+            } else if (isCommand("easy", cmd)) {
+            } else if (isCommand("post", cmd)) {
+            } else if (isCommand("nopost", cmd)) {
+            } else if (isCommand("analyze", cmd)) {
+            } else if (isCommand("name", cmd)) {
+            } else if (isCommand("rating", cmd)) {
+            } else if (isCommand("ics", cmd)) {
+            } else if (isCommand("computer", cmd)) {
+            } else if (isCommand("pause", cmd)) {
+            } else if (isCommand("resume", cmd)) {
+            } else if (isCommand("memory", cmd)) {
+            } else if (isCommand("cores", cmd)) {
+            } else if (isCommand("egtpath", cmd)) {
+            } else if (isCommand("option", cmd)) {
+            } else if (isCommand("exclude", cmd)) {
+            } else if (isCommand("include", cmd)) {
+            } else if (isCommand("setscore", cmd)) {
+            } else if (isCommand("lift", cmd)) {
+            } else if (isCommand("put", cmd)) {
+            } else if (isCommand("hover", cmd)) {
             } else {
                 xBoardMove(&xbState, cmd);
             }
