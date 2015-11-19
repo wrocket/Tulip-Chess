@@ -109,6 +109,7 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
         initSearchArgs(&args);
         args.depth = 6;
         args.log = &xbs->log;
+        args.chessInterfaceState = (void*) xbs;
         createSearchResult(&searchResult);
 
         search(&xbs->gameState, &args, &searchResult);
@@ -234,6 +235,54 @@ static int parseTime(char** buff, int len) {
     return result;
 }
 
+#define POST_BUFF_SIZE 1024
+#define MAX_MOVE_SIZE 8
+void postXBOutput(void* chessInterfaceState, int ply, int score, long timeCentiseconds, long nodes, MoveBuffer* pv) {
+    XBoardState* xbs = (XBoardState*) chessInterfaceState;
+    if (!xbs->postThinking) {
+        return;
+    }
+
+    char* pvBuffer;
+    bool freeBuffer;
+    char moveBuff[MAX_MOVE_SIZE];
+    if (pv == NULL || pv->length <= 0) {
+        pvBuffer = "";
+        freeBuffer = false;
+    } else {
+        pvBuffer = malloc(POST_BUFF_SIZE * sizeof(char));
+        if (!pvBuffer) {
+            xBoardWrite(xbs, "Error: Unable to allocate mamory for principal variation display.");
+            return;
+        }
+
+        freeBuffer = true;
+        int buffPos = 0;
+
+        // Play the PV sequence forward, building up a list of move strings.
+        for (int i = 0; i < pv->length && buffPos < POST_BUFF_SIZE - MAX_MOVE_SIZE; i++) {
+            Move move = pv->moves[i];
+            const int moveLen = printShortAlg(&move, &xbs->gameState, moveBuff);
+            makeMove(&xbs->gameState, &move);
+            sprintf(pvBuffer + buffPos, " %s", moveBuff);
+            buffPos += moveLen;
+        }
+
+        // Unmake the moves to return to the original game state.
+        for (int i = pv->length - 1; i >= 0; i--) {
+            unmakeMove(&xbs->gameState, &pv->moves[i]);
+        }
+    }
+
+    xBoardWrite(xbs, "%i %i %i %i%s", ply, score, timeCentiseconds, nodes, pvBuffer);
+
+    if (freeBuffer) {
+        free(pvBuffer);
+    }
+}
+#undef POST_BUFF_SIZE
+#undef MAX_MOVE_SIZE
+
 bool startXBoard() {
     const int inputBufferSize = 1024;
     const int maxTokens = 32;
@@ -267,6 +316,8 @@ bool startXBoard() {
     const char* openingBook = "tulip_openings.sqlite";
 
     xbState.bookOpen = openBook(openingBook, &xbState.currentBook);
+
+    xbState.postThinking = false;
 
     bool done = false;
 
@@ -331,7 +382,9 @@ bool startXBoard() {
             } else if (isCommand("hard", cmd)) {
             } else if (isCommand("easy", cmd)) {
             } else if (isCommand("post", cmd)) {
+                xbState.postThinking = true;
             } else if (isCommand("nopost", cmd)) {
+                xbState.postThinking = false;
             } else if (isCommand("analyze", cmd)) {
             } else if (isCommand("name", cmd)) {
             } else if (isCommand("rating", cmd)) {

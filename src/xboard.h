@@ -40,8 +40,9 @@ typedef struct {
     char* outputBuffer;
     int myTime;
     int opponentTime;
+    bool postThinking;
 } XBoardState;
 
 bool startXBoard(void);
-
+void postXBOutput(void* xBoardState, int ply, int score, long timeCentiseconds, long nodes, MoveBuffer* pv);
 #endif

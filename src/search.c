@@ -35,6 +35,7 @@
 #include "result.h"
 #include "util.h"
 #include "log.h"
+#include "xboard.h"
 
 static int compareMoveScore(const void* a, const void* b) {
     return ((MoveScore*) b)->score - ((MoveScore*) a)->score; // Underflow issues? Hopefully our scores are on the order of 1e5...
@@ -235,6 +236,18 @@ static void logIterativeResult(GameState* state, SearchArgs* searchArgs, MoveSco
     writeLog(searchArgs->log, "After depth=%i, best move is %s (%+0.2f)", depth, moveStr, score);
 }
 
+static void postSearchThinking(void* interState, GameState* state, int depth, int score, long nodes, long startTime, Move bestMove) {
+    const long now = getCurrentTimeMillis();
+
+    MoveBuffer mb;
+    createMoveBuffer(&mb);
+    mb.moves[0] = bestMove;
+    mb.length = 1;
+    int postScore = score * (state->current->toMove == COLOR_WHITE ? 1 : -1);
+    postXBOutput(interState, depth, postScore, (now - startTime) / 10l, nodes, &mb);
+    destroyMoveBuffer(&mb);
+}
+
 bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
     MoveBuffer buffer;
     result->searchStatus = SEARCH_STATUS_NONE;
@@ -264,6 +277,8 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 
             logIterativeResult(state, searchArgs, scores, depth);
 
+            postSearchThinking(searchArgs->chessInterfaceState, state, depth, scores[0].score, result->nodes, start, scores[0].move);
+
             // If we found a checkmate, just play that immediately. No need to deepen further!
             if (isEarlyCheckmate(scores[0].score)) {
                 writeLog(searchArgs->log, "Early checkmate found at depth %i", depth);
@@ -281,6 +296,8 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
     if (searchArgs->log != NULL) {
         logSearchResult(searchArgs, result, state);
     }
+
+    postSearchThinking(searchArgs->chessInterfaceState, state, searchArgs->depth, result->score, result->nodes, start, result->move);
 
     destroyMoveBuffer(&buffer);
     return true;

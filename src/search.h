@@ -57,6 +57,7 @@ typedef struct {
 typedef struct {
     int depth;      // The maximum search depth.
     GameLog* log;    // The game log.
+    void* chessInterfaceState;    // A flag to indicate if the search should output XBoard thinking lines.
 } SearchArgs;
 
 void initSearchArgs(SearchArgs* args);
