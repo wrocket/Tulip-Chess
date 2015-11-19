@@ -225,9 +225,15 @@ static int evaluateEndgame(GameState* state) {
         switch (p->ordinal) {
         case ORD_WPAWN:
             score += SCORE_PAWN;
+            if ((BITS_PASSED_PAWN_W[sq] & state->bitboards[ORD_BPAWN]) == 0) {
+                score += SCORE_PASSED_PAWN;
+            }
             break;
         case ORD_BPAWN:
             score -= SCORE_PAWN;
+            if ((BITS_PASSED_PAWN_B[sq] & state->bitboards[ORD_WPAWN]) == 0) {
+                score -= SCORE_PASSED_PAWN;
+            }
             break;
         case ORD_WKNIGHT:
             score += SCORE_KNIGHT;

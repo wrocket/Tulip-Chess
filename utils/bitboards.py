@@ -152,6 +152,25 @@ def compute_king_mask(file, rank):
 	offsets = filter(lambda t: (t[0] | t[1]) != 0, pairs)
 	return compute_nonslider_mask(file, rank, offsets)
 
+def compute_passed_pawn_mask(file, rank, rank_range):
+	result = 0;
+	for new_rank in rank_range:
+		bit = 0
+		if file > 0:
+			bit |= get_sq_bit(square_index(file - 1, new_rank))
+		if file < 7:
+			bit |= get_sq_bit(square_index(file + 1, new_rank))
+		bit |= get_sq_bit(square_index(file, new_rank))
+		result |= bit
+	return result
+
+
+def compute_passed_pawn_mask_white(file, rank):
+	return compute_passed_pawn_mask(file, rank, range(rank + 1, 8))
+
+def compute_passed_pawn_mask_black(file, rank):
+	return compute_passed_pawn_mask(file, rank, range(rank - 1, -1, -1))
+
 def compute_light_squares():
 	result = 0
 	for file, rank in itertools.product(range(8), range(8)):
@@ -232,6 +251,18 @@ for file, rank in itertools.product(range(8), range(8)):
 	print('#define BIT_BPAWN_%s\t%s' % (print_sq(file, rank), print_hex(mask)))
 
 print()
+print("// Bitmasks for passed pawn detection for white pawns")
+for file, rank in itertools.product(range(8), range(8)):
+	mask = compute_passed_pawn_mask_white(file, rank)
+	print('#define BIT_PPAWN_W_%s\t%s' % (print_sq(file, rank), print_hex(mask)))
+
+print()
+print("// Bitmasks for passed pawn detection for black pawns")
+for file, rank in itertools.product(range(8), range(8)):
+	mask = compute_passed_pawn_mask_black(file, rank)
+	print('#define BIT_PPAWN_B_%s\t%s' % (print_sq(file, rank), print_hex(mask)))
+
+print()
 print("// Bitmasks for individual masks, addressable by square index.")
 print("extern const uint64_t BITS_SQ[144];")
 print("extern const uint64_t BITS_BISHOP[144];")
@@ -241,6 +272,8 @@ print("extern const uint64_t BITS_QUEEN[144];")
 print("extern const uint64_t BITS_KING[144];")
 print("extern const uint64_t BITS_WPAWN[144];")
 print("extern const uint64_t BITS_BPAWN[144];")
+print("extern const uint64_t BITS_PASSED_PAWN_W[144];")
+print("extern const uint64_t BITS_PASSED_PAWN_B[144];")
 
 
 print("//// ---------- Bitboard.c starts here ----------- ////")
@@ -270,5 +303,8 @@ print_square_array('const uint64_t BITS_WPAWN[144]', compute_piece_bit_array('BI
 print()
 print_square_array('const uint64_t BITS_BPAWN[144]', compute_piece_bit_array('BIT_BPAWN'))
 
+print()
+print_square_array('const uint64_t BITS_PASSED_PAWN_W[144]', compute_piece_bit_array('BIT_PPAWN_W'))
 
-
+print()
+print_square_array('const uint64_t BITS_PASSED_PAWN_B[144]', compute_piece_bit_array('BIT_PPAWN_B'))

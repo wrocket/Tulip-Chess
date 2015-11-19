@@ -49,6 +49,7 @@
 #include "util.h"
 #include "search.h"
 #include "xboard.h"
+#include "bitboard.h"
 
 static void printBanner() {
     printf("Tulip Chess Engine 0.001\n");
@@ -93,6 +94,38 @@ static void printState(int argc, char** argv) {
     GameState gs = parseFenOrQuit(argv[1]);
 
     printGameState(argv[1], &gs);
+    destroyGamestate(&gs);
+}
+
+static void checkPassedPawn(int argc, char** argv) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: -passedpawns \"[FEN string]\"\n");
+        exit(EXIT_FAILURE);
+    }
+
+    GameState gs = parseFenOrQuit(argv[1]);
+
+    int whitePassedPawns[8];
+    int whiteCount = 0;
+    int blackPassedPawns[8];
+    int blackCount = 0;
+
+    for (int sqIdx = 0; sqIdx < 64; sqIdx++) {
+        const int sq = BOARD_SQUARES[sqIdx];
+        const Piece* p = gs.board[sq];
+        if (p == &WPAWN) {
+            if ((BITS_PASSED_PAWN_W[sq] & gs.bitboards[ORD_BPAWN]) == 0) {
+                whitePassedPawns[whiteCount++] = sq;
+            }
+        } else if (p == &BPAWN) {
+            if ((BITS_PASSED_PAWN_B[sq] & gs.bitboards[ORD_WPAWN]) == 0) {
+                blackPassedPawns[blackCount++] = sq;
+            }
+        }
+    }
+
+    printPassedPawns(argv[1], whitePassedPawns, whiteCount, blackPassedPawns, blackCount);
+
     destroyGamestate(&gs);
 }
 
@@ -434,6 +467,8 @@ int main(int argc, char** argv) {
             printMoveOrder(argc, argv);
         } else if (0 == strcmp("-classifyendgame", argv[0])) {
             printEndgame(argc, argv);
+        } else if (0 == strcmp("-passedpawns", argv[0])) {
+            checkPassedPawn(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);

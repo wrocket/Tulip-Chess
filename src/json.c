@@ -333,6 +333,30 @@ void printHashSequence(HashSeqItem* items, int length, uint64_t initialHash) {
     printf("}\n");
 }
 
+static void printSquareArray(int* squares, int count) {
+    char sqStr[4];
+    printf("[");
+    for (int i = 0; i < count; i++) {
+        if (i > 0) {
+            printf(", ");
+        }
+
+        printSquareIndex(squares[i], sqStr);
+        printf("\"%s\"", sqStr);
+    }
+    printf("]");
+}
+
+void printPassedPawns(char* position, int* wPawns, int wCount, int* bPawns, int bCount) {
+    printf("{");
+    printf("\"fenString\": \"%s\", ", position);
+    printf("\"whitePassedPawns\": ");
+    printSquareArray(wPawns, wCount);
+    printf(", \"blackPassedPawns\": ");
+    printSquareArray(bPawns, bCount);
+    printf("}\n");
+}
+
 void printEvaluation(char* position, int score) {
     printf("{");
     printf("\"fenString\": \"%s\", ", position);

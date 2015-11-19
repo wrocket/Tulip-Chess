@@ -44,6 +44,14 @@ class TestBasicMoveApplication(unittest.TestCase):
         parsed_output = json.loads(result)
         return parsed_output['endgameType']
 
+    def find_passed_pawns(self, fen):
+        result = call_tulip(['-passedpawns', fen])
+        parsed_output = json.loads(result)
+        result = dict()
+        result['w'] = parsed_output['whitePassedPawns']
+        result['b'] = parsed_output['blackPassedPawns']
+        return result
+
     def assert_score_approx(self, expected, actual, tolerance=5):
         self.assertTrue(abs(expected - actual) < abs(tolerance), "Expected score %i, got %i" % (expected, actual))
 
@@ -141,6 +149,16 @@ class TestBasicMoveApplication(unittest.TestCase):
     def test_classify_eg_wrook(self):
         result = self.classify_endgame('3k4/8/8/7R/8/8/3K4/8 b - - 0 1')
         self.assertEqual('krvk_white', result)
+
+    def test_passed_pawns_01(self):
+        result = self.find_passed_pawns('4k3/8/6pp/8/3P1P2/1P6/8/4K3 b - - 0 1')
+        whitePawns = result['w']
+        blackPawns = result['b']
+        self.assertEqual(2, len(whitePawns))
+        self.assertTrue('b3' in whitePawns)
+        self.assertTrue('d4' in whitePawns)
+        self.assertEqual(1, len(blackPawns))
+        self.assertTrue('h6' in blackPawns)
 
 if __name__ == '__main__':
     unittest.main()
