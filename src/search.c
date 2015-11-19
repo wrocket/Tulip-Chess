@@ -68,6 +68,7 @@ void orderByMvvLva(MoveBuffer* buffer) {
 void initSearchArgs(SearchArgs* args) {
     args->log = NULL;
     args->depth = 5;
+    args->chessInterfaceState = NULL;
 }
 
 static int alphaBeta(GameState* state, SearchResult* result, const int depth, const int maxDepth, int alpha, int beta, bool allowNullMove) {
@@ -237,6 +238,10 @@ static void logIterativeResult(GameState* state, SearchArgs* searchArgs, MoveSco
 }
 
 static void postSearchThinking(void* interState, GameState* state, int depth, int score, long nodes, long startTime, Move bestMove) {
+    if (interState == NULL) {
+        return;
+    }
+
     const long now = getCurrentTimeMillis();
 
     MoveBuffer mb;
