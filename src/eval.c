@@ -206,7 +206,10 @@ static int evaluateMidgame(GameState* state) {
 static int evaluateEndgame(GameState* state) {
     const Piece** board = state->board;
     int score = 0;
+    uint64_t* bb = state->bitboards;
     StateData* sd = state->current;
+    uint64_t mobilityWhite = 0;
+    uint64_t mobilityBlack = 0;
 
     const int endgame = classifyEndgame(state);
 
@@ -237,9 +240,11 @@ static int evaluateEndgame(GameState* state) {
             break;
         case ORD_WKNIGHT:
             score += SCORE_KNIGHT;
+            mobilityWhite |= BITS_KNIGHT[sq];
             break;
         case ORD_BKNIGHT:
             score -= SCORE_KNIGHT;
+            mobilityBlack |= BITS_KNIGHT[sq];
             break;
         case ORD_WBISHOP:
             score += SCORE_BISHOP;
@@ -272,6 +277,11 @@ static int evaluateEndgame(GameState* state) {
         }
     }
 
+    mobilityWhite &= ~bb[ORD_WPAWN];
+    mobilityBlack &= ~bb[ORD_BPAWN];
+
+    score += MINOR_PIECE_MOBILITY_BONUS * (countBits(mobilityWhite) - countBits(mobilityBlack));
+
     return score;
 }
 
@@ -280,13 +290,16 @@ static int evaluateEndgame(GameState* state) {
 int evaluate(GameState* state) {
     StateData* current = state->current;
 
-    int totalPieces = current->whitePieceCount + current->blackPieceCount;
+    const int totalPieces = current->whitePieceCount
+        + current->blackPieceCount
+        - state->pieceCounts[ORD_WPAWN]
+        - state->pieceCounts[ORD_BPAWN];
+
     int result;
 
-    // TODO: Ponder discarding pawns from this count.
-    if (totalPieces > 20) {
+    if (totalPieces >= 12) {
         result = evaluateOpening(state);
-    } else if (totalPieces > 10) {
+    } else if (totalPieces >= 6) {
         result = evaluateMidgame(state);
     } else {
         result = evaluateEndgame(state);
