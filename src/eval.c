@@ -65,6 +65,32 @@ static inline int onSameFileWithPowerPiece(GameState* gs, int sq, int ordinalRoo
     return onRank ? BONUS_RQ_SHARE_RANK : 0;
 }
 
+// The idea here is to penalize open long diagonals or files leading to the king.
+// We'll count the open squares of diagonals and files leading "towards" the enemy side of the board.
+#define COUNT_DIRECTION(offset) sp = sq + (offset); while(b[sp]->ordinal == ORD_EMPTY) {sp += (offset); count++;}
+static inline int exposureWhite(const Piece** b, int sq) {
+    int count = 0;
+    int sp;
+
+    COUNT_DIRECTION(OFFSET_N);
+    COUNT_DIRECTION(OFFSET_NE);
+    COUNT_DIRECTION(OFFSET_NW);
+
+    return count;
+}
+
+static inline int exposureBlack(const Piece** b, int sq) {
+    int count = 0;
+    int sp;
+
+    COUNT_DIRECTION(OFFSET_S);
+    COUNT_DIRECTION(OFFSET_SE);
+    COUNT_DIRECTION(OFFSET_SW);
+
+    return count;
+}
+#undef COUNT_DIRECTION
+
 int classifyEndgame(GameState* g) {
     StateData* sd = g->current;
     int* counts = g->pieceCounts;
@@ -130,6 +156,12 @@ int evaluateOpening(GameState* state) {
             break;
         case ORD_BQUEEN:
             score -= SCORE_QUEEN;
+            break;
+        case ORD_WKING:
+            score += KING_EXPOSURE * exposureWhite(board, sq);
+            break;
+        case ORD_BKING:
+            score -= KING_EXPOSURE * exposureBlack(board, sq);
             break;
         default:
             break;
