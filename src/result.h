@@ -23,6 +23,8 @@
 #ifndef RESULT_H
 #define RESULT_H
 
+#include <inttypes.h>
+
 #include "gamestate.h"
 
 // Game continues.
@@ -49,6 +51,6 @@
 // Retrieves the current result of the game.
 // If the game is *not* over, STATUS_NONE will be returned.
 // Otherwise, the appropriate status flag (see above) will be returned.
-int getResult(GameState* g);
+int32_t getResult(GameState* g);
 
 #endif

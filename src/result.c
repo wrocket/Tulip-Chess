@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <inttypes.h>
+
 #include "tulip.h"
 #include "draw.h"
 #include "attack.h"
@@ -27,28 +29,27 @@
 #include "movegen.h"
 #include "result.h"
 
-int getResult(GameState* g) {
-
-    if (isMaterialDraw(g)) {
-        return STATUS_MATERIAL_DRAW;
-    }
-
-    if (isThreefoldDraw(g)) {
-        return STATUS_THREEFOLD_DRAW;
-    }
-
-    const int moves = countLegalMoves(g);
-
-    if (moves == 0) {
-        const bool check = isCheck(g);
-
-        if (check) {
-            return g->current->toMove == COLOR_WHITE ?
-                   STATUS_WHITE_CHECKMATED : STATUS_BLACK_CHECKMATED;
-        } else {
-            return STATUS_STALEMATE;
+int32_t getResult(GameState* g) {
+        if (isMaterialDraw(g)) {
+                return STATUS_MATERIAL_DRAW;
         }
-    }
 
-    return STATUS_NONE;
+        if (isThreefoldDraw(g)) {
+                return STATUS_THREEFOLD_DRAW;
+        }
+
+        const int32_t moves = countLegalMoves(g);
+
+        if (moves == 0) {
+                const bool check = isCheck(g);
+
+                if (check) {
+                        return g->current->toMove == COLOR_WHITE ?
+                               STATUS_WHITE_CHECKMATED : STATUS_BLACK_CHECKMATED;
+                } else {
+                        return STATUS_STALEMATE;
+                }
+        }
+
+        return STATUS_NONE;
 }

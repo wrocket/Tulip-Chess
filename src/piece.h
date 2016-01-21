@@ -23,6 +23,8 @@
 #ifndef PIECE_H
 #define PIECE_H
 
+#include <inttypes.h>
+
 // This is the color white pieces have.
 #define COLOR_WHITE     0
 
@@ -56,10 +58,10 @@
 
 // Structure describing a piece on the board.
 typedef struct {
-    int ordinal;        // A unique positive integer for this piece.
-    int color;          // The color of this piece.
-    char name;          // The human-readable character for this piece.
-    int relativeValue;  // A positive integer describing the general value of this piece compare to others.
+        int32_t ordinal;    // A unique positive integer for this piece.
+        int32_t color;      // The color of this piece.
+        char name;      // The human-readable character for this piece.
+        int32_t relativeValue; // A positive integer describing the general value of this piece compare to others.
 } Piece;
 
 extern const Piece WPAWN;

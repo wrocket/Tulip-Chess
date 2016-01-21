@@ -23,6 +23,8 @@
 #ifndef NOTATION_H
 #define NOTATION_H
 
+#include <inttypes.h>
+
 #include "tulip.h"
 #include "piece.h"
 #include "gamestate.h"
@@ -30,7 +32,7 @@
 
 // Prints the given move in the given game state to the given char buffer.
 // Returns the number of characters printed, not including the null char.
-int printShortAlg(Move* move, GameState* gameState, char* buffer);
+int32_t printShortAlg(Move* move, GameState* gameState, char* buffer);
 
 // Matches a human-input string against legal moves.
 // This method isn't terribly fast, but it uses "fuzzy" matching logic.
@@ -45,7 +47,7 @@ bool matchMove(char* str, GameState* gs, Move* move);
 // The char buffer must be at least 7 characters in size.
 // Returns the number of characters printed to the buffer.
 // The result will be null-terminated.
-int printMoveCoordinate(Move*, char*);
+int32_t printMoveCoordinate(Move*, char*);
 
 // Matches a *pseudo*move in coordinate algebraic form to a Move object for
 // the given game state. Returns false if no such move exists.
