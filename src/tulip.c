@@ -110,8 +110,8 @@ static void checkPassedPawn(int argc, char** argv) {
     int blackPassedPawns[8];
     int blackCount = 0;
 
-    for (int sqIdx = 0; sqIdx < 64; sqIdx++) {
-        const int sq = BOARD_SQUARES[sqIdx];
+    for (int32_t sqIdx = 0; sqIdx < 64; sqIdx++) {
+        const int32_t sq = BOARD_SQUARES[sqIdx];
         const Piece* p = gs.board[sq];
         if (p == &WPAWN) {
             if ((BITS_PASSED_PAWN_W[sq] & gs.bitboards[ORD_BPAWN]) == 0) {

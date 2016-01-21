@@ -26,30 +26,30 @@
 
 #include "board.h"
 
-const int BOARD_SQUARES[64] = {SQ_A1, SQ_B1, SQ_C1, SQ_D1, SQ_E1, SQ_F1, SQ_G1, SQ_H1,
-                        SQ_A2, SQ_B2, SQ_C2, SQ_D2, SQ_E2, SQ_F2, SQ_G2, SQ_H2,
-                        SQ_A3, SQ_B3, SQ_C3, SQ_D3, SQ_E3, SQ_F3, SQ_G3, SQ_H3,
-                        SQ_A4, SQ_B4, SQ_C4, SQ_D4, SQ_E4, SQ_F4, SQ_G4, SQ_H4,
-                        SQ_A5, SQ_B5, SQ_C5, SQ_D5, SQ_E5, SQ_F5, SQ_G5, SQ_H5,
-                        SQ_A6, SQ_B6, SQ_C6, SQ_D6, SQ_E6, SQ_F6, SQ_G6, SQ_H6,
-                        SQ_A7, SQ_B7, SQ_C7, SQ_D7, SQ_E7, SQ_F7, SQ_G7, SQ_H7,
-                        SQ_A8, SQ_B8, SQ_C8, SQ_D8, SQ_E8, SQ_F8, SQ_G8, SQ_H8};
+const int32_t BOARD_SQUARES[64] = {SQ_A1, SQ_B1, SQ_C1, SQ_D1, SQ_E1, SQ_F1, SQ_G1, SQ_H1,
+                                   SQ_A2, SQ_B2, SQ_C2, SQ_D2, SQ_E2, SQ_F2, SQ_G2, SQ_H2,
+                                   SQ_A3, SQ_B3, SQ_C3, SQ_D3, SQ_E3, SQ_F3, SQ_G3, SQ_H3,
+                                   SQ_A4, SQ_B4, SQ_C4, SQ_D4, SQ_E4, SQ_F4, SQ_G4, SQ_H4,
+                                   SQ_A5, SQ_B5, SQ_C5, SQ_D5, SQ_E5, SQ_F5, SQ_G5, SQ_H5,
+                                   SQ_A6, SQ_B6, SQ_C6, SQ_D6, SQ_E6, SQ_F6, SQ_G6, SQ_H6,
+                                   SQ_A7, SQ_B7, SQ_C7, SQ_D7, SQ_E7, SQ_F7, SQ_G7, SQ_H7,
+                                   SQ_A8, SQ_B8, SQ_C8, SQ_D8, SQ_E8, SQ_F8, SQ_G8, SQ_H8};
 
-const int BOARD_SQ_COLORS[144] = {COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD,
-                                  COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD,
-                                  COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_OFFBOARD, COLOR_OFFBOARD,
-                                  COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_OFFBOARD, COLOR_OFFBOARD,
-                                  COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_OFFBOARD, COLOR_OFFBOARD,
-                                  COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_OFFBOARD, COLOR_OFFBOARD,
-                                  COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_OFFBOARD, COLOR_OFFBOARD,
-                                  COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_OFFBOARD, COLOR_OFFBOARD,
-                                  COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_OFFBOARD, COLOR_OFFBOARD,
-                                  COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_OFFBOARD, COLOR_OFFBOARD,
-                                  COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD,
-                                  COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD};
+const int32_t BOARD_SQ_COLORS[144] = {COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD,
+                                      COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD,
+                                      COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_OFFBOARD, COLOR_OFFBOARD,
+                                      COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_OFFBOARD, COLOR_OFFBOARD,
+                                      COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_OFFBOARD, COLOR_OFFBOARD,
+                                      COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_OFFBOARD, COLOR_OFFBOARD,
+                                      COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_OFFBOARD, COLOR_OFFBOARD,
+                                      COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_OFFBOARD, COLOR_OFFBOARD,
+                                      COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_OFFBOARD, COLOR_OFFBOARD,
+                                      COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_WHITE, COLOR_BLACK, COLOR_OFFBOARD, COLOR_OFFBOARD,
+                                      COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD,
+                                      COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD, COLOR_OFFBOARD};
 
 int parseFileChar(const char c) {
-    switch(tolower(c)) {
+        switch(tolower(c)) {
         case 'a': return FILE_A;
         case 'b': return FILE_B;
         case 'c': return FILE_C;
@@ -59,11 +59,11 @@ int parseFileChar(const char c) {
         case 'g': return FILE_G;
         case 'h': return FILE_H;
         default: return INVALID_FILE;
-    }
+        }
 }
 
-char fileToChar(const int fileIndex) {
-    switch(fileIndex) {
+char fileToChar(const int32_t fileIndex) {
+        switch(fileIndex) {
         case FILE_A: return 'a';
         case FILE_B: return 'b';
         case FILE_C: return 'c';
@@ -73,11 +73,11 @@ char fileToChar(const int fileIndex) {
         case FILE_G: return 'g';
         case FILE_H: return 'h';
         default: return '?';
-    }
+        }
 }
 
-char rankToChar(const int rankIndex) {
-    switch(rankIndex) {
+char rankToChar(const int32_t rankIndex) {
+        switch(rankIndex) {
         case RANK_1: return '1';
         case RANK_2: return '2';
         case RANK_3: return '3';
@@ -87,22 +87,22 @@ char rankToChar(const int rankIndex) {
         case RANK_7: return '7';
         case RANK_8: return '8';
         default: return '?';
-    }
+        }
 }
 
-char indexToRankChar(const int index) {
-    return rankToChar(RANK_IDX(index));
+char indexToRankChar(const int32_t index) {
+        return rankToChar(RANK_IDX(index));
 }
 
-char indexToFileChar(const int index) {
-    return fileToChar(FILE_IDX(index));
+char indexToFileChar(const int32_t index) {
+        return fileToChar(FILE_IDX(index));
 }
 
-int printSquareIndex(const int index, char* buffer) {
-    int strIndex = 0;
+int printSquareIndex(const int32_t index, char* buffer) {
+        int strIndex = 0;
 
-    buffer[strIndex++] = indexToFileChar(index);
-    buffer[strIndex++] = indexToRankChar(index);
+        buffer[strIndex++] = indexToFileChar(index);
+        buffer[strIndex++] = indexToRankChar(index);
 
-    return strIndex;
+        return strIndex;
 }

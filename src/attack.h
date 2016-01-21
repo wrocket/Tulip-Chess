@@ -23,11 +23,13 @@
 #ifndef ATTACK_H
 #define ATTACK_H
 
+#include "inttypes.h"
+
 #include "gamestate.h"
 
 // Determines if a given color can attack (ignoring check) a given square.
 // This determination ignores rules around moving into check.
-bool canAttack(const int color, const int sq, GameState* state);
+bool canAttack(const int32_t color, const int32_t sq, GameState* state);
 
 // Determine if the current gamestate represents a checking position.
 bool isCheck(GameState* state);

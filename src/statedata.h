@@ -24,6 +24,7 @@
 #define STATE_DATA_H
 
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "tulip.h"
 #include "board.h"
@@ -45,16 +46,16 @@
 // peek back in history (e.g. threefold detection) or undo a move.
 // There should be no heap-allocated members in this structure.
 typedef struct {
-    int toMove;                 // The side to move, either COLOR_WHITE or COLOR_BLACK
-    int castleFlags;            // The castle flags as a bitmap; see CASTLE_WK and others.
-    int whiteKingSquare;        // The current square index of the white king.
-    int blackKingSquare;        // The current square index of the black king.
-    int epFile;                 // The current en passant file, if any.
-    int fiftyMoveCount;         // The fifty move count. This is the number of half-moves since a capture or pawn move.
-    int halfMoveCount;          // The half move count. This increments by one after every move.
-    uint64_t hash;              // The current state hash.
-    int whitePieceCount;        // The current white piece count.
-    int blackPieceCount;        // The current black piece count.
+        int32_t toMove;             // The side to move, either COLOR_WHITE or COLOR_BLACK
+        int32_t castleFlags;        // The castle flags as a bitmap; see CASTLE_WK and others.
+        int32_t whiteKingSquare;    // The current square index of the white king.
+        int32_t blackKingSquare;    // The current square index of the black king.
+        int32_t epFile;             // The current en passant file, if any.
+        int32_t fiftyMoveCount;     // The fifty move count. This is the number of half-moves since a capture or pawn move.
+        int32_t halfMoveCount;      // The half move count. This increments by one after every move.
+        uint64_t hash;          // The current state hash.
+        int32_t whitePieceCount;    // The current white piece count.
+        int32_t blackPieceCount;    // The current black piece count.
 } StateData;
 
 // Allocate memory for an new state data object.

@@ -30,19 +30,18 @@
 #include "board.h"
 
 void createStateData(StateData * data) {
-    data->toMove = COLOR_WHITE;
-    data->whiteKingSquare = 0;
-    data->blackKingSquare = 0;
-    data->castleFlags = 0;
-    data->hash = 0;
-    data->epFile = 0;
-    data->fiftyMoveCount = 0;
-    data->halfMoveCount = 0;
-    data->whitePieceCount = 0;
-    data->blackPieceCount = 0;
+        data->toMove = COLOR_WHITE;
+        data->whiteKingSquare = 0;
+        data->blackKingSquare = 0;
+        data->castleFlags = 0;
+        data->hash = 0;
+        data->epFile = 0;
+        data->fiftyMoveCount = 0;
+        data->halfMoveCount = 0;
+        data->whitePieceCount = 0;
+        data->blackPieceCount = 0;
 }
 
 void copyStateData(StateData* from, StateData* to) {
-    *to = *from;
+        *to = *from;
 }
-
