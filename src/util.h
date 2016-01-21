@@ -27,18 +27,18 @@
 // Given an input string, and a token buffer, and a maximum number of tokens,
 // this will split the string on whitespace. See createTokenBuffer() to create
 // the token buffer. This returns the number of tokens found.
-int tokenize(const char* str, char** tokenBuffer, const int maxTokens);
+int32_t tokenize(const char* str, char** tokenBuffer, const int32_t maxTokens);
 
 // Creates an array of arrays to store token data.
-char** createTokenBuffer(const int maxTokens, const int maxTokenLength);
+char** createTokenBuffer(const int32_t maxTokens, const int32_t maxTokenLength);
 
 // Free the array of arrays storing token data.
-void freeTokenBuffer(char** tokenBuffer, const int numberOfTokens);
+void freeTokenBuffer(char** tokenBuffer, const int32_t numberOfTokens);
 
 // Retrieve the current UNIX epoch time in milliseconds.
-long getCurrentTimeMillis();
+int64_t getCurrentTimeMillis();
 
 // Parse a given string as an integer, return success or failure.
 // On failure, this will print an error message to stderr.
-bool parseInteger(const char* str, int* result);
+bool parseInteger(const char* str, int32_t* result);
 #endif

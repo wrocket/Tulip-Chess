@@ -23,13 +23,14 @@
 #ifndef BOOK_H
 #define BOOK_H
 
+#include <inttypes.h>
 #include "gamestate.h"
 #include "move.h"
 #include "sqlite/sqlite3.h"
 
 // Structure defining a book. Essentially a "handle" to an open book.
 typedef struct {
-    sqlite3* database;
+        sqlite3* database;
 } OpenBook;
 
 // Opens a book given a file name. Returns true on success, else false.
@@ -41,6 +42,6 @@ bool closeBook(OpenBook* book);
 // Looks for moves in the book for the given position.
 // Places those moves in buffer, and returns the number of moves placed in the buffer.
 // Not suitable for tight loops.
-int getMovesFromBook(GameState* gameState, MoveBuffer* buffer, OpenBook* book);
+int32_t getMovesFromBook(GameState* gameState, MoveBuffer* buffer, OpenBook* book);
 
 #endif

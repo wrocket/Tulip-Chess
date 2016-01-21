@@ -38,98 +38,98 @@
 #define BOOK_MAX_STR_LEN 8
 
 static void initializeStrArray(char*** array) {
-    *array = ALLOC(BOOK_MAX_MOVES, sizeof(char*), *array, "Unable to allocate memory for book move string array.");
-    for (int i = 0; i < BOOK_MAX_MOVES; i++) {
-        (*array)[i] = ALLOC(BOOK_MAX_STR_LEN, sizeof(char), (*array)[i], "Unable to allocate memory for book move string.");
-    }
+        *array = ALLOC(BOOK_MAX_MOVES, sizeof(char*), *array, "Unable to allocate memory for book move string array.");
+        for (int32_t i = 0; i < BOOK_MAX_MOVES; i++) {
+                (*array)[i] = ALLOC(BOOK_MAX_STR_LEN, sizeof(char), (*array)[i], "Unable to allocate memory for book move string.");
+        }
 }
 
 static void destroyStrArray(char*** array) {
-    for (int i = 0; i < BOOK_MAX_STR_LEN; i++) {
-        free((*array)[i]);
-    }
-    free(*array);
+        for (int32_t i = 0; i < BOOK_MAX_STR_LEN; i++) {
+                free((*array)[i]);
+        }
+        free(*array);
 }
 
 static int readMoves(GameState* state, char*** strArray, OpenBook* book) {
-    int moveCount = 0;
-    sqlite3* db = book->database;
-    sqlite3_stmt *res;
-    char hashStr[17]; // 16 chars plus null terminator
+        int32_t moveCount = 0;
+        sqlite3* db = book->database;
+        sqlite3_stmt *res;
+        char hashStr[17]; // 16 chars plus null terminator
 
-    // Prepare the statement
-    char *sql = "select MOVE from OPENING_BOOK where POSITION_HASH = ? COLLATE NOCASE";
-    int rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+        // Prepare the statement
+        char *sql = "select MOVE from OPENING_BOOK where POSITION_HASH = ? COLLATE NOCASE";
+        int32_t rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
 
-    if (rc == SQLITE_OK) {
-        snprintf(hashStr, 17, "%016"PRIX64"", state->current->hash);
-        sqlite3_bind_text(res, 1, hashStr, (int) strlen(hashStr), SQLITE_STATIC);
-    } else {
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
-        return 0;
-    }
-
-    // Read results, copying the raw strings to the str buffer.
-    int step;
-    do {
-        step = sqlite3_step(res);
-        if (step == SQLITE_ROW) {
-            const char * moveStr =  (const char *) sqlite3_column_text(res, 0);
-            strncpy((*strArray)[moveCount++], moveStr, BOOK_MAX_STR_LEN);
+        if (rc == SQLITE_OK) {
+                snprintf(hashStr, 17, "%016" PRIX64 "", state->current->hash);
+                sqlite3_bind_text(res, 1, hashStr, (int) strlen(hashStr), SQLITE_STATIC);
+        } else {
+                fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+                return 0;
         }
-    } while (step == SQLITE_ROW);
 
-    sqlite3_finalize(res);
+        // Read results, copying the raw strings to the str buffer.
+        int32_t step;
+        do {
+                step = sqlite3_step(res);
+                if (step == SQLITE_ROW) {
+                        const char * moveStr =  (const char *) sqlite3_column_text(res, 0);
+                        strncpy((*strArray)[moveCount++], moveStr, BOOK_MAX_STR_LEN);
+                }
+        } while (step == SQLITE_ROW);
 
-    return moveCount;
+        sqlite3_finalize(res);
+
+        return moveCount;
 }
 
 bool openBook(const char* fileName, OpenBook* book) {
-    sqlite3* db;
-    int rc;
-    bool result = true;
-    struct stat st;
+        sqlite3* db;
+        int32_t rc;
+        bool result = true;
+        struct stat st;
 
-    if (stat(fileName, &st) != 0 ) {
-        result = false;
-    } else {
-        rc = sqlite3_open(fileName, &db);
-        if (rc != SQLITE_OK) {
-            fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-            sqlite3_close(db);
-            result = false;
+        if (stat(fileName, &st) != 0 ) {
+                result = false;
         } else {
-            book->database = db;
+                rc = sqlite3_open(fileName, &db);
+                if (rc != SQLITE_OK) {
+                        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+                        sqlite3_close(db);
+                        result = false;
+                } else {
+                        book->database = db;
+                }
         }
-    }
 
-    return result;
+        return result;
 }
 
 bool closeBook(OpenBook* book) {
-    return sqlite3_close(book->database) == SQLITE_OK;
+        return sqlite3_close(book->database) == SQLITE_OK;
 }
 
 int getMovesFromBook(GameState* gameState, MoveBuffer* buffer, OpenBook* book) {
-    int strCount;
-    int moveCount = 0;
-    char** strArray;
-    Move m;
-    initializeStrArray(&strArray);
+        int32_t strCount;
+        int32_t moveCount = 0;
+        char** strArray;
+        Move m;
+        initializeStrArray(&strArray);
 
-    // Get the move strings from the database
-    strCount = readMoves(gameState, &strArray, book);
+        // Get the move strings from the database
+        strCount = readMoves(gameState, &strArray, book);
 
-    // Parse the move strings and add the legal moves to the move buffer.
-    for (int i = 0; i < strCount; i++) {
-        if (matchMove(strArray[i], gameState, &m)) {
-            buffer->moves[moveCount++] = m;
+        // Parse the move strings and add the legal moves to the move buffer.
+        for (int32_t i = 0; i < strCount; i++) {
+                if (matchMove(strArray[i], gameState, &m)) {
+                        buffer->moves[moveCount++] = m;
+                }
         }
-    }
 
-    buffer->length = moveCount;
-    destroyStrArray(&strArray);
-    return moveCount;
+        buffer->length = moveCount;
+        destroyStrArray(&strArray);
+        return moveCount;
 }
 
 #undef BOOK_MAX_MOVES
