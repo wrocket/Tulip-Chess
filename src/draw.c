@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <inttypes.h>
+
 #include "bitboard.h"
 #include "draw.h"
 #include "gamestate.h"
@@ -30,10 +32,10 @@
 // Deal with king and arbitrary bishops vs king and arbitrary bishops.
 // If all the bishops are on the same color, and each side has at least
 // one bishop, and there are no other pieces, this is a draw.
-static inline bool moreThanFourPieces(GameState* g, const int total) {
+static inline bool moreThanFourPieces(GameState* g, const int32_t total) {
     bool result = false;
-    const int countWb = g->pieceCounts[ORD_WBISHOP];
-    const int countBb = g->pieceCounts[ORD_BBISHOP];
+    const int32_t countWb = g->pieceCounts[ORD_WBISHOP];
+    const int32_t countBb = g->pieceCounts[ORD_BBISHOP];
 
     if (countWb && countBb && (countWb + countBb + 2) == total) {
         const uint64_t wbishop = g->bitboards[ORD_WBISHOP];
@@ -55,7 +57,7 @@ static inline bool moreThanFourPieces(GameState* g, const int total) {
 }
 
 // Deal with KB vs KB with bishops on same square color.
-static inline bool fourPieces(GameState* g, const int total) {
+static inline bool fourPieces(GameState* g, const int32_t total) {
     bool result = false;
 
     if (g->pieceCounts[ORD_WBISHOP] == 1 && g->pieceCounts[ORD_BBISHOP] == 1) {
@@ -68,7 +70,7 @@ static inline bool fourPieces(GameState* g, const int total) {
     return result;
 }
 
-static inline bool threePieces(GameState* g, const int total) {
+static inline bool threePieces(GameState* g, const int32_t total) {
     // If there are three pieces, two must be kings.
     // That means there's one non-king piece.
     // If that one piece is a knight or bishop of any color, we're in a draw.
@@ -79,7 +81,7 @@ static inline bool threePieces(GameState* g, const int total) {
 }
 
 bool isMaterialDraw(GameState* g) {
-    const int total = g->current->whitePieceCount + g->current->blackPieceCount;
+    const int32_t total = g->current->whitePieceCount + g->current->blackPieceCount;
     bool result;
     switch (total) {
     case 4: // Exactly four pieces looks for KBvKB with same-color bishops.
@@ -103,10 +105,10 @@ bool isThreefoldDraw(GameState* g) {
     StateData* currentData = g->current;
     const uint64_t startingHash = currentData->hash;
     bool result = false;
-    int repeatCount = 0;
+    int32_t repeatCount = 0;
     const int limit = MIN(currentData->fiftyMoveCount, currentData->halfMoveCount);
 
-    for (int i = 0; i < limit; i++) {
+    for (int32_t i = 0; i < limit; i++) {
         currentData--;
         const uint64_t currentHash = currentData->hash;
         // Hash changes with toMove, so compare the hash with either white to move or black to move.
