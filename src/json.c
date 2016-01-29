@@ -37,12 +37,12 @@
 #define __STDC_FORMAT_MACROS
 
 // TODO: Use a real JSON library for this.
-static const char* maskBooleanToStrU(int value, int mask) {
+static const char* maskBooleanToStrU(int32_t value, int32_t mask) {
     return (value & mask) ? "true" : "false";
 }
 
-static void printSq(char* buff, int sq) {
-    int idx = printSquareIndex(sq, buff);
+static void printSq(char* buff, int32_t sq) {
+    int32_t idx = printSquareIndex(sq, buff);
     buff[idx] = '\0';
 }
 
@@ -84,7 +84,7 @@ static void printMoveDetail(Move* m) {
     printf("}");
 }
 
-static const char* printColor(int color) {
+static const char* printColor(int32_t color) {
     switch (color) {
     case COLOR_WHITE: return "white";
     case COLOR_BLACK: return "black";
@@ -102,7 +102,7 @@ void printMovelistJson(char* position, char* listType, GameState* gameState, Mov
     printf("\"moveListType\": \"%s\", ", listType);
 
     printf("\"moveList\": [");
-    for (int i = 0; i < buffer->length; i++) {
+    for (int32_t i = 0; i < buffer->length; i++) {
         if (i > 0) {
             printf(", ");
         }
@@ -113,7 +113,7 @@ void printMovelistJson(char* position, char* listType, GameState* gameState, Mov
     printf("], ");
 
     printf("\"shortAlgebraicMoves\":[");
-    for (int i = 0; i < buffer->length; i++) {
+    for (int32_t i = 0; i < buffer->length; i++) {
         if (i > 0) {
             printf(", ");
         }
@@ -125,7 +125,7 @@ void printMovelistJson(char* position, char* listType, GameState* gameState, Mov
     printf("], ");
 
     printf("\"moveDetails\": [");
-    for (int i = 0; i < buffer->length; i++) {
+    for (int32_t i = 0; i < buffer->length; i++) {
         if (i > 0) {
             printf(", ");
         }
@@ -144,8 +144,8 @@ void printAttackList(char* position, bool* attackGrid, GameState* state) {
     char strBuff[4];
 
     bool atLeastOne = false;
-    for (int i = 0; i < 64; i++) {
-        int idx = BOARD_SQUARES[i];
+    for (int32_t i = 0; i < 64; i++) {
+        int32_t idx = BOARD_SQUARES[i];
         if (attackGrid[idx]) {
             if (atLeastOne) {
                 printf(", ");
@@ -197,7 +197,7 @@ void printGameState(char* position, GameState* state) {
     printf("\"fiftyMoveCount\": %i, ", stateData->fiftyMoveCount);
     printf("\"halfMoveCount\": %i, ", stateData->halfMoveCount);
 
-    const int flags = stateData->castleFlags;
+    const int32_t flags = stateData->castleFlags;
     printf("\"castleWhiteKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_WK));
     printf("\"castleWhiteQueenside\": %s, ", maskBooleanToStrU(flags, CASTLE_WQ));
     printf("\"castleBlackKingside\": %s, ", maskBooleanToStrU(flags, CASTLE_BK));
@@ -216,8 +216,8 @@ void printGameState(char* position, GameState* state) {
 
     printf("\"board\": {");
     bool printedSq = false;
-    for (int i = 0; i < 64; i++) {
-        const int sq = BOARD_SQUARES[i];
+    for (int32_t i = 0; i < 64; i++) {
+        const int32_t sq = BOARD_SQUARES[i];
         const Piece* p = state->board[sq];
         if (p != &EMPTY) {
             if (printedSq) {
@@ -240,7 +240,7 @@ void printGameState(char* position, GameState* state) {
                              &WKING, &BKING, &EMPTY, &OFF_BOARD
                             };
 
-    for (int i = 0; i < 14; i++) {
+    for (int32_t i = 0; i < 14; i++) {
         if (i > 0) {
             printf(", ");
         }
@@ -250,7 +250,7 @@ void printGameState(char* position, GameState* state) {
     }
     printf("},");
     printf(" \"bitboards\" : {");
-    for (int i = 0; i < ALL_PIECES_LEN; i++) {
+    for (int32_t i = 0; i < ALL_PIECES_LEN; i++) {
         if (i > 0) {
             printf(", ");
         }
@@ -279,7 +279,7 @@ void printCheckStatus(char* position, bool isCheck) {
     printf("}\n");
 }
 
-static const char* gameStatusToStr(int status) {
+static const char* gameStatusToStr(int32_t status) {
     switch (status) {
     case STATUS_NONE:
         return "none";
@@ -308,7 +308,7 @@ static const char* gameStatusToStr(int status) {
     }
 }
 
-void printGameStatus(char* position, int status) {
+void printGameStatus(char* position, int32_t status) {
     const char* resultStr = gameStatusToStr(status);
 
     printf("{");
@@ -317,11 +317,11 @@ void printGameStatus(char* position, int status) {
     printf("}\n");
 }
 
-void printHashSequence(HashSeqItem* items, int length, uint64_t initialHash) {
+void printHashSequence(HashSeqItem* items, int32_t length, uint64_t initialHash) {
     printf("{");
     printf("\"initialHash\": \"%016"PRIX64"\", ", initialHash);
     printf("\"hashSequence\": [");
-    for (int i = 0; i < length; i++) {
+    for (int32_t i = 0; i < length; i++) {
         HashSeqItem item = items[i];
         if (i > 0) {
             printf(", ");
@@ -333,10 +333,10 @@ void printHashSequence(HashSeqItem* items, int length, uint64_t initialHash) {
     printf("}\n");
 }
 
-static void printSquareArray(int* squares, int count) {
+static void printSquareArray(int32_t*  squares, int32_t count) {
     char sqStr[4];
     printf("[");
-    for (int i = 0; i < count; i++) {
+    for (int32_t i = 0; i < count; i++) {
         if (i > 0) {
             printf(", ");
         }
@@ -347,7 +347,7 @@ static void printSquareArray(int* squares, int count) {
     printf("]");
 }
 
-void printPassedPawns(char* position, int* wPawns, int wCount, int* bPawns, int bCount) {
+void printPassedPawns(char* position, int32_t*  wPawns, int32_t wCount, int32_t*  bPawns, int32_t bCount) {
     printf("{");
     printf("\"fenString\": \"%s\", ", position);
     printf("\"whitePassedPawns\": ");
@@ -357,14 +357,14 @@ void printPassedPawns(char* position, int* wPawns, int wCount, int* bPawns, int 
     printf("}\n");
 }
 
-void printEvaluation(char* position, int score) {
+void printEvaluation(char* position, int32_t score) {
     printf("{");
     printf("\"fenString\": \"%s\", ", position);
     printf("\"score\": %i", score);
     printf("}\n");
 }
 
-void printEndgameClassification(int type) {
+void printEndgameClassification(int32_t type) {
     const char* typeStr;
     if (type == ENDGAME_UNCLASSIFIED) {
         typeStr = "unclassified";
@@ -411,7 +411,7 @@ void printSearchResult(SearchResult* result, GameState* state) {
     printf("\"elapsedMs\": %ld,", result->durationMs);
     printf("\"nodesPerSecond\": %0.2f,", nps);
     printf("\"rootNodeScores\": [");
-    for (int i = 0; i < result->moveScoreLength; i++) {
+    for (int32_t i = 0; i < result->moveScoreLength; i++) {
         if (i != 0) {
             printf(", ");
         }

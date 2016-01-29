@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <strings.h>
+#include <inttypes.h>
 
 #include "tulip.h"
 #include "board.h"
@@ -48,7 +49,7 @@ void destroyMoveBuffer(MoveBuffer* buff) {
 }
 
 
-const Piece* getPromotePiece(const int color, const int moveCode) {
+const Piece* getPromotePiece(const int32_t color, const int32_t moveCode) {
     if (color == COLOR_WHITE) {
         switch (moveCode) {
         case PROMOTE_Q: return &WQUEEN;

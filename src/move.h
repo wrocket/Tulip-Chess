@@ -24,6 +24,7 @@
 #define MOVE_H
 
 #include <stdbool.h>
+#include <inttypes.h>
 
 #include "piece.h"
 
@@ -43,9 +44,9 @@
 
 // Data structure describing a move.
 typedef struct {
-	int from;					// The "from" or "source" square index.
-	int to;						// The "to" or "destination" square index.
-	int moveCode;		// An integer that describes a special move condition
+	int32_t from;					// The "from" or "source" square index.
+	int32_t to;						// The "to" or "destination" square index.
+	int32_t moveCode;		// An integer that describes a special move condition
 	// (e.g. PROMOTE_Q for a promotion to queen)
 	const Piece* captures;		// A reference to any piece captured by this move.
 	// If no capture, this will be &EMPTY.
@@ -55,7 +56,7 @@ typedef struct {
 // A simple list structure that knows its current length.
 typedef struct {
     Move* moves;    // The list of moves in this buffer.
-    int length;     // The current length of this buffer.
+    int32_t length;     // The current length of this buffer.
     bool created;   // Indicating proper allocation/destruction.
 } MoveBuffer;
 
@@ -65,5 +66,5 @@ void createMoveBuffer(MoveBuffer*);
 // Deallocate a move buffer at a given address.
 void destroyMoveBuffer(MoveBuffer*);
 
-const Piece* getPromotePiece(const int color, const int moveCode);
+const Piece* getPromotePiece(const int32_t color, const int32_t moveCode);
 #endif

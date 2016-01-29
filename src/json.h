@@ -34,17 +34,17 @@ void printCheckStatus(char*, bool isCheck);
 void printMakeMoveResult(char* position, Move* m, GameState* state);
 void printAttackList(char* position, bool* attackGrid, GameState* state);
 void printMatchMoveResult(Move* move);
-void printGameStatus(char* position, int status);
-void printEvaluation(char* position, int score);
+void printGameStatus(char* position, int32_t status);
+void printEvaluation(char* position, int32_t score);
 void printSearchResult(SearchResult* result, GameState* state);
-void printEndgameClassification(int type);
-void printPassedPawns(char* position, int* wPawns, int wCount, int* bPawns, int bCount);
+void printEndgameClassification(int32_t type);
+void printPassedPawns(char* position, int32_t* wPawns, int32_t wCount, int32_t* bPawns, int32_t bCount);
 
 typedef struct {
     char move[8];
     StateData data;
 } HashSeqItem;
 
-void printHashSequence(HashSeqItem* items, int count, uint64_t initialHash);
+void printHashSequence(HashSeqItem* items, int32_t count, uint64_t initialHash);
 
 #endif
