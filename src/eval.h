@@ -32,13 +32,13 @@
 // Returns the score of the position from the point of view of the side to move.
 // So, if white is to move, a positive number is good for white.
 // If black is to move, a positive number is good for black.
-int evaluate(GameState* state);
+int32_t evaluate(GameState* state);
 
 // Take an internal represntation of a score (integer, according to the side to
 // move) and return a friendly version (double, with white advantage > 0 and
 // black advantage < 0).
-double friendlyScore(GameState* state, int rawScore);
+double friendlyScore(GameState* state, int32_t rawScore);
 
 // Classify an endgame into one of several general types.
-int classifyEndgame(GameState* state);
+int32_t classifyEndgame(GameState* state);
 #endif

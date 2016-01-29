@@ -26,6 +26,7 @@
 #include <stdbool.h>
 #include <limits.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #include "tulip.h"
 #include "string.h"
@@ -40,7 +41,7 @@
 #define _FEN_MAX_TOKENS     16
 #define _FEN_MAX_TOKEN_LEN  64
 
-static bool parseToMove(char * t, int* result, bool printErr) {
+static bool parseToMove(char * t, int32_t* result, bool printErr) {
     if (strlen(t) != 1) {
         if (printErr) fprintf(stderr, "Invalid to-move string: %s\n", t);
         return false;
@@ -55,10 +56,10 @@ static bool parseToMove(char * t, int* result, bool printErr) {
     return true;
 }
 
-static bool parseFiftyMove(char* t, int* result, bool printErr) {
+static bool parseFiftyMove(char* t, int32_t* result, bool printErr) {
     char* endToken;
     long parsed = strtol(t, &endToken, 10);
-    int intVal;
+    int32_t intVal;
     if (parsed >= 0 && parsed <= INT_MAX) {
         intVal = (int) parsed;
     }
@@ -86,14 +87,14 @@ static bool parseFiftyMove(char* t, int* result, bool printErr) {
     return true;
 }
 
-static bool parseEpFile(char* t, int* result) {
+static bool parseEpFile(char* t, int32_t* result) {
     unsigned long len = strlen(t);
     bool valid = true;
 
     if (len == 1 && strcmp("-", t) == 0) {
         *result = NO_EP_FILE;
     } else if (len == 2 && (t[1] == '3' || t[1] == '6')) {
-        const int file = parseFileChar(t[0]);
+        const int32_t file = parseFileChar(t[0]);
         if (file != INVALID_FILE) {
             *result = file;
         }
@@ -107,8 +108,8 @@ static bool parseEpFile(char* t, int* result) {
     return valid;
 }
 
-static bool parseCastleFlags(char* t, int* result) {
-    int flags = 0;
+static bool parseCastleFlags(char* t, int32_t* result) {
+    int32_t flags = 0;
 
     if (strstr(t, "K")) {
         flags |= CASTLE_WK;
@@ -132,13 +133,13 @@ static bool parseCastleFlags(char* t, int* result) {
 
 static bool parseBoard(char* t, GameState* gs, bool printErr) {
     const Piece** board = gs->board;
-    int* pCounts = gs->pieceCounts;
+    int32_t* pCounts = gs->pieceCounts;
     bool result = true;
-    int currentFile = FILE_A;
-    int currentRank = RANK_8;
-    int squares = 0;
-    int sqwk = -1;
-    int sqbk = -1;
+    int32_t currentFile = FILE_A;
+    int32_t currentRank = RANK_8;
+    int32_t squares = 0;
+    int32_t sqwk = -1;
+    int32_t sqbk = -1;
 
     char* c = t;
     while (*c && currentRank >= RANK_1) {
@@ -146,8 +147,8 @@ static bool parseBoard(char* t, GameState* gs, bool printErr) {
             currentRank--;
             currentFile = FILE_A;
         } else if (isdigit(*c)) {
-            int spaceDigits = *c - '0'; // Hack: Char to int. Might be funny in strange encodings...
-            for (int i = 0; i < spaceDigits; i++) {
+            int32_t spaceDigits = *c - '0'; // Hack: Char to int. Might be funny in strange encodings...
+            for (int32_t i = 0; i < spaceDigits; i++) {
                 board[B_IDX(currentFile++, currentRank)] = &EMPTY;
                 pCounts[(&EMPTY)->ordinal]++;
                 squares++;
@@ -160,7 +161,7 @@ static bool parseBoard(char* t, GameState* gs, bool printErr) {
                 goto parse_board_err;
             }
 
-            const int idx = B_IDX(currentFile++, currentRank);
+            const int32_t idx = B_IDX(currentFile++, currentRank);
 
             if (p == &WKING) {
                 if (sqwk >= 0) {
@@ -220,16 +221,16 @@ parse_board_err:
 bool parseFenWithPrint(GameState* state, char* fenStr, bool printErrors) {
     bool result = true;
     char** tokenBuffer;
-    int toMove = COLOR_WHITE;
-    int castleFlags = 0;
-    int epFile = NO_EP_FILE;
-    int fiftyMove = 0;
+    int32_t toMove = COLOR_WHITE;
+    int32_t castleFlags = 0;
+    int32_t epFile = NO_EP_FILE;
+    int32_t fiftyMove = 0;
 
     errno = 0;
 
     tokenBuffer = createTokenBuffer(_FEN_MAX_TOKENS, _FEN_MAX_TOKEN_LEN);
 
-    int tokenCount = tokenize(fenStr, tokenBuffer, _FEN_MAX_TOKENS);
+    int32_t tokenCount = tokenize(fenStr, tokenBuffer, _FEN_MAX_TOKENS);
 
     if (tokenCount != 6) {
         if (printErrors) {
@@ -309,13 +310,13 @@ bool parseFen(GameState* state, char* fenStr) {
     return parseFenWithPrint(state, fenStr, true);
 }
 
-static int printBoard(GameState* state, char* buffer, int buffLen, int charsWritten) {
-    int empties = 0;
-    int file, rank;
+static int32_t printBoard(GameState* state, char* buffer, int32_t buffLen, int32_t charsWritten) {
+    int32_t empties = 0;
+    int32_t file, rank;
 
     for (rank = RANK_8; rank >= RANK_1; rank--) {
         for (file = FILE_A; file <= FILE_H; file++) {
-            int bindex = B_IDX(file, rank);
+            int32_t bindex = B_IDX(file, rank);
             const Piece* p = state->board[bindex];
             if (p == &EMPTY) {
                 empties++;
@@ -341,14 +342,14 @@ static int printBoard(GameState* state, char* buffer, int buffLen, int charsWrit
     return charsWritten;
 }
 
-static int printToMove(GameState* state, char* buffer, int buffLen, int charsWritten) {
+static int32_t printToMove(GameState* state, char* buffer, int32_t buffLen, int32_t charsWritten) {
     const char c = state->current->toMove == COLOR_WHITE ? 'w' : 'b';
     buffer[charsWritten++] = c;
     return charsWritten;
 }
 
-static int printCastleFlags(GameState* state, char* buffer, int buffLen, int charsWritten) {
-    const int flags = state->current->castleFlags;
+static int32_t printCastleFlags(GameState* state, char* buffer, int32_t buffLen, int32_t charsWritten) {
+    const int32_t flags = state->current->castleFlags;
     const bool wk = (flags & CASTLE_WK) != 0;
     const bool wq = (flags & CASTLE_WQ) != 0;
     const bool bk = (flags & CASTLE_BK) != 0;
@@ -366,8 +367,8 @@ static int printCastleFlags(GameState* state, char* buffer, int buffLen, int cha
     return charsWritten;
 }
 
-static int printEpFile(GameState* state, char* buffer, int buffLen, int charsWritten) {
-    const int epFile = state->current->epFile;
+static int32_t printEpFile(GameState* state, char* buffer, int32_t buffLen, int32_t charsWritten) {
+    const int32_t epFile = state->current->epFile;
 
     if (epFile == NO_EP_FILE) {
         buffer[charsWritten++] = '-';
@@ -380,20 +381,20 @@ static int printEpFile(GameState* state, char* buffer, int buffLen, int charsWri
     return charsWritten;
 }
 
-static int printFiftyMove(GameState* state, char* buffer, int buffLen, int charsWritten) {
+static int32_t printFiftyMove(GameState* state, char* buffer, int32_t buffLen, int32_t charsWritten) {
     charsWritten += sprintf(buffer + charsWritten, "%i", state->current->fiftyMoveCount);
     return charsWritten;
 }
 
-static int printFullMove(GameState* state, char* buffer, int buffLen, int charsWritten) {
-    const int moves = 1 + state->current->halfMoveCount / 2;
+static int32_t printFullMove(GameState* state, char* buffer, int32_t buffLen, int32_t charsWritten) {
+    const int32_t moves = 1 + state->current->halfMoveCount / 2;
     charsWritten += sprintf(buffer + charsWritten, "%i", moves);
     return charsWritten;
 }
 
-int printFen(GameState* state, char* buffer, int buffLen) {
+int32_t printFen(GameState* state, char* buffer, int32_t buffLen) {
     // TODO: Actually use the buffLen to avoid buffer overruns
-    int charsWritten = 0;
+    int32_t charsWritten = 0;
 
     charsWritten = printBoard(state, buffer, buffLen, 0);
     buffer[charsWritten++] = ' ';
@@ -410,4 +411,3 @@ int printFen(GameState* state, char* buffer, int buffLen) {
     buffer[charsWritten] = '\0';
     return charsWritten - 1;
 }
-

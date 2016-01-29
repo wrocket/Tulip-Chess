@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "tulip.h"
 #include "board.h"
@@ -33,33 +34,33 @@
 #define EVAL_SHARE_RANK_RQ_WHITE() onSameFileWithPowerPiece(state, sq, ORD_WROOK, ORD_WQUEEN)
 #define EVAL_SHARE_RANK_RQ_BLACK() onSameFileWithPowerPiece(state, sq, ORD_BROOK, ORD_BQUEEN)
 
-static inline int countBits(uint64_t n) {
+static inline int32_t countBits(uint64_t n) {
     // Thank you, Brian Kernighan!
-    int c;
+    int32_t c;
     for (c = 0; n; c++) {
         n &= n - 1;
     }
     return c;
 }
 
-static inline int kingMovesBetweenSquares(int sq1, int sq2) {
-    const int r1 = RANK_IDX(sq1);
-    const int f1 = FILE_IDX(sq1);
-    const int r2 = RANK_IDX(sq2);
-    const int f2 = FILE_IDX(sq2);
+static inline int32_t kingMovesBetweenSquares(int32_t sq1, int32_t sq2) {
+    const int32_t r1 = RANK_IDX(sq1);
+    const int32_t f1 = FILE_IDX(sq1);
+    const int32_t r2 = RANK_IDX(sq2);
+    const int32_t f2 = FILE_IDX(sq2);
 
-    const int dr = abs(r1 - r2);
-    const int df = abs(f1 - f2);
+    const int32_t dr = abs(r1 - r2);
+    const int32_t df = abs(f1 - f2);
 
-    const int min = dr < df ? dr : df;
+    const int32_t min = dr < df ? dr : df;
 
     return min + abs(dr - df);
 }
 
 // Determine if the given square shares a rank with the given rook or queen.
-static inline int onSameFileWithPowerPiece(GameState* gs, int sq, int ordinalRook, int ordinalQueen) {
+static inline int32_t onSameFileWithPowerPiece(GameState* gs, int32_t sq, int32_t ordinalRook, int32_t ordinalQueen) {
     uint64_t* bb = gs->bitboards;
-    const int file = FILE_IDX(sq);
+    const int32_t file = FILE_IDX(sq);
     const uint64_t fileMask = BITS_FILES[file] & ~BITS_SQ[sq];
     const bool onRank = ((fileMask & bb[ordinalRook]) != 0) | ((fileMask & bb[ordinalQueen]) != 0);
     return onRank ? BONUS_RQ_SHARE_RANK : 0;
@@ -68,9 +69,9 @@ static inline int onSameFileWithPowerPiece(GameState* gs, int sq, int ordinalRoo
 // The idea here is to penalize open long diagonals or files leading to the king.
 // We'll count the open squares of diagonals and files leading "towards" the enemy side of the board.
 #define COUNT_DIRECTION(offset) sp = sq + (offset); while(b[sp]->ordinal == ORD_EMPTY) {sp += (offset); count++;}
-static inline int exposureWhite(const Piece** b, int sq) {
-    int count = 0;
-    int sp;
+static inline int exposureWhite(const Piece** b, int32_t sq) {
+    int32_t count = 0;
+    int32_t sp;
 
     COUNT_DIRECTION(OFFSET_N);
     COUNT_DIRECTION(OFFSET_NE);
@@ -79,9 +80,9 @@ static inline int exposureWhite(const Piece** b, int sq) {
     return count;
 }
 
-static inline int exposureBlack(const Piece** b, int sq) {
-    int count = 0;
-    int sp;
+static inline int32_t exposureBlack(const Piece** b, int sq) {
+    int32_t count = 0;
+    int32_t sp;
 
     COUNT_DIRECTION(OFFSET_S);
     COUNT_DIRECTION(OFFSET_SE);
@@ -91,9 +92,9 @@ static inline int exposureBlack(const Piece** b, int sq) {
 }
 #undef COUNT_DIRECTION
 
-int classifyEndgame(GameState* g) {
+int32_t classifyEndgame(GameState* g) {
     StateData* sd = g->current;
-    int* counts = g->pieceCounts;
+    int32_t* counts = g->pieceCounts;
 
     if (sd->whitePieceCount + sd->blackPieceCount == 3) {
         if (counts[ORD_BROOK] || counts[ORD_BQUEEN]) return ENDGAME_BROOKvKING;
@@ -103,15 +104,15 @@ int classifyEndgame(GameState* g) {
     return ENDGAME_UNCLASSIFIED;
 }
 
-int evaluateOpening(GameState* state) {
+int32_t evaluateOpening(GameState* state) {
     const Piece** board = state->board;
-    int score = 0;
+    int32_t score = 0;
     uint64_t* bb = state->bitboards;
 
     uint64_t mobilityWhite = 0;
     uint64_t mobilityBlack = 0;
 
-    for (int sq = SQ_A1; sq <= SQ_H8; sq++) {
+    for (int32_t sq = SQ_A1; sq <= SQ_H8; sq++) {
         const Piece* p = board[sq];
 
         switch (p->ordinal) {
@@ -177,13 +178,13 @@ int evaluateOpening(GameState* state) {
     return score;
 }
 
-static int evaluateMidgame(GameState* state) {
+static int32_t evaluateMidgame(GameState* state) {
     const Piece** board = state->board;
-    int score = 0;
+    int32_t score = 0;
     uint64_t* bb = state->bitboards;
     uint64_t mobilityWhite = 0;
     uint64_t mobilityBlack = 0;
-    for (int sq = SQ_A1; sq <= SQ_H8; sq++) {
+    for (int32_t sq = SQ_A1; sq <= SQ_H8; sq++) {
         const Piece* p = board[sq];
 
         switch (p->ordinal) {
@@ -235,9 +236,9 @@ static int evaluateMidgame(GameState* state) {
 
 #define KING_DISTANCE_PENALTY() (kingMovesBetweenSquares(sd->whiteKingSquare, sd->blackKingSquare)) * KING_ENDGAME_DISTANCE_PENALTY
 
-static int evaluateEndgame(GameState* state) {
+static int32_t evaluateEndgame(GameState* state) {
     const Piece** board = state->board;
-    int score = 0;
+    int32_t score = 0;
     uint64_t* bb = state->bitboards;
     StateData* sd = state->current;
     uint64_t mobilityWhite = 0;
@@ -254,7 +255,7 @@ static int evaluateEndgame(GameState* state) {
         score -= KING_DISTANCE_PENALTY();
     }
 
-    for (int sq = SQ_A1; sq <= SQ_H8; sq++) {
+    for (int32_t sq = SQ_A1; sq <= SQ_H8; sq++) {
         const Piece* p = board[sq];
 
         switch (p->ordinal) {
@@ -319,15 +320,15 @@ static int evaluateEndgame(GameState* state) {
 
 #undef KING_DISTANCE_PENALTY
 
-int evaluate(GameState* state) {
+int32_t evaluate(GameState* state) {
     StateData* current = state->current;
 
-    const int totalPieces = current->whitePieceCount
+    const int32_t totalPieces = current->whitePieceCount
         + current->blackPieceCount
         - state->pieceCounts[ORD_WPAWN]
         - state->pieceCounts[ORD_BPAWN];
 
-    int result;
+    int32_t result;
 
     if (totalPieces >= 12) {
         result = evaluateOpening(state);
@@ -337,13 +338,13 @@ int evaluate(GameState* state) {
         result = evaluateEndgame(state);
     }
 
-    const int mult = state->current->toMove == COLOR_WHITE ? 1 : -1;
+    const int32_t mult = state->current->toMove == COLOR_WHITE ? 1 : -1;
 
     return mult * result;
 }
 
-double friendlyScore(GameState* state, int rawScore) {
-    const int multiplier = state->current->toMove == COLOR_WHITE ? 1 : -1;
+double friendlyScore(GameState* state, int32_t rawScore) {
+    const int32_t multiplier = state->current->toMove == COLOR_WHITE ? 1 : -1;
     return (double) (rawScore * multiplier) / 100.0;
 }
 

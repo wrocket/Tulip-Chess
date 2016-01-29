@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <inttypes.h>
 
 #include "tulip.h"
 #include "gamestate.h"
@@ -40,7 +41,7 @@ void initializeGamestate(GameState* gs) {
     gs->pieceCounts = ALLOC_ZERO(ORD_MAX + 1, int, gs->pieceCounts, "Error allocating piece count array.");
 
     // Allocate memory for each element in the state data stack.
-    for (int i = 0; i < _GS_STACK_SIZE; i++) {
+    for (int32_t i = 0; i < _GS_STACK_SIZE; i++) {
         createStateData(&gs->dataStack[i]);
     }
 
@@ -48,31 +49,31 @@ void initializeGamestate(GameState* gs) {
     gs->created = true;
 
     // Set the board to be a 8x8 square of EMPTY with a 2-square border of OFF_BOARD.
-    for (int i = 0; i < 144; i++) {
+    for (int32_t i = 0; i < 144; i++) {
         gs->board[i] = &OFF_BOARD;
     }
 
-    for (int file = FILE_A; file <= FILE_H; file++) {
-        for (int rank = RANK_1; rank <= RANK_8; rank++) {
+    for (int32_t file = FILE_A; file <= FILE_H; file++) {
+        for (int32_t rank = RANK_1; rank <= RANK_8; rank++) {
             gs->board[B_IDX(file, rank)] = &EMPTY;
         }
     }
 
     gs->moveBuffers = ALLOC(MAX_MOVE_BUFFER, MoveBuffer, gs->moveBuffers, "Unable to allocate move buffers.");
-    for (int i = 0; i < MAX_MOVE_BUFFER; i++) {
+    for (int32_t i = 0; i < MAX_MOVE_BUFFER; i++) {
         createMoveBuffer(&gs->moveBuffers[i]);
     }
 }
 
 void reinitBitboards(GameState* gs) {
     // Zero out all current bitboards.
-    for (int i = 0; i <= ORD_MAX; i++) {
+    for (int32_t i = 0; i <= ORD_MAX; i++) {
         gs->bitboards[i] = 0;
     }
 
     // Iterate over all squares in the board, set appropriate bits in the appropriate bitboard.
     const Piece** board = gs->board;
-    for (int i = 0; i < 64; i++) {
+    for (int32_t i = 0; i < 64; i++) {
         int sq = BOARD_SQUARES[i];
         int ord = board[sq]->ordinal;
         (gs->bitboards[ord]) |= BITS_SQ[sq];
@@ -89,7 +90,7 @@ void destroyGamestate(GameState* gs) {
     free(gs->board);
     free(gs->pieceCounts);
 
-    for (int i = 0; i < MAX_MOVE_BUFFER; i++) {
+    for (int32_t i = 0; i < MAX_MOVE_BUFFER; i++) {
         destroyMoveBuffer(&gs->moveBuffers[i]);
     }
 

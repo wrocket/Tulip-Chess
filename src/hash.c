@@ -35,8 +35,8 @@ uint64_t computeHash(GameState* gameState) {
         h ^= HASH_WHITE_TO_MOVE;
     }
 
-    for (int i = 0; i < 64; i++) {
-        const int sq = BOARD_SQUARES[i];
+    for (int32_t i = 0; i < 64; i++) {
+        const int32_t sq = BOARD_SQUARES[i];
         const Piece* piece = gameState->board[sq];
 
         h ^= HASH_PIECE_SQ[sq][piece->ordinal];

@@ -23,6 +23,8 @@
 #ifndef EVAL_CONSTS_H
 #define EVAL_CONSTS_H
 
+#include <inttypes.h>
+
 #define SCORE_PAWN      100
 #define SCORE_KNIGHT    300
 #define SCORE_BISHOP    325
@@ -42,12 +44,12 @@
 // A per-square penalty for opening a king on files and diagonals.
 #define KING_EXPOSURE -3
 
-extern const int SQ_SCORE_PAWN_OPENING_WHITE[144];
-extern const int SQ_SCORE_PAWN_OPENING_BLACK[144];
-extern const int SQ_SCORE_KNIGHT_OPENING_BLACK[144];
-extern const int SQ_SCORE_KNIGHT_OPENING_WHITE[144];
+extern const int32_t SQ_SCORE_PAWN_OPENING_WHITE[144];
+extern const int32_t SQ_SCORE_PAWN_OPENING_BLACK[144];
+extern const int32_t SQ_SCORE_KNIGHT_OPENING_BLACK[144];
+extern const int32_t SQ_SCORE_KNIGHT_OPENING_WHITE[144];
 
 // A board square array to encourage driving enemy kings to the edge of the
 // board in the endgame.
-extern const int SQ_SCORE_ENDGAME_KING[144];
+extern const int32_t SQ_SCORE_ENDGAME_KING[144];
 #endif

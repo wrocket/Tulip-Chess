@@ -25,6 +25,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "tulip.h"
 #include "piece.h"
@@ -43,7 +44,7 @@
 // between threads, as most methods that operate on a GameState will
 // mutate it or rely on the non-mutation for correct functionality.
 typedef struct {
-    int* pieceCounts;       // The current piece counts, indexed by the piece ordinal.
+    int32_t* pieceCounts;       // The current piece counts, indexed by the piece ordinal.
     const Piece** board;    // A 144 element array that corresponds to a 12x12 board.
     StateData* dataStack;   // A stack structure storing "small" data that changes with each move.
     StateData* current;     // The current state data object.

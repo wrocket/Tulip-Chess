@@ -16,11 +16,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include <inttypes.h>
+
 #include "eval.h"
 
 // Generate these with the board_scores.py script in /utils.
 
-const int SQ_SCORE_PAWN_OPENING_WHITE[144] = {
+const int32_t SQ_SCORE_PAWN_OPENING_WHITE[144] = {
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -35,7 +37,7 @@ const int SQ_SCORE_PAWN_OPENING_WHITE[144] = {
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 };
 
-const int SQ_SCORE_PAWN_OPENING_BLACK[144] = {
+const int32_t SQ_SCORE_PAWN_OPENING_BLACK[144] = {
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -50,7 +52,7 @@ const int SQ_SCORE_PAWN_OPENING_BLACK[144] = {
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 };
 
-const int SQ_SCORE_KNIGHT_OPENING_WHITE[144] = {
+const int32_t SQ_SCORE_KNIGHT_OPENING_WHITE[144] = {
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,  -20,   -5,    0,    0,    0,    0,   -5,  -20,    0,    0,
@@ -65,7 +67,7 @@ const int SQ_SCORE_KNIGHT_OPENING_WHITE[144] = {
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 };
 
-const int SQ_SCORE_KNIGHT_OPENING_BLACK[144] = {
+const int32_t SQ_SCORE_KNIGHT_OPENING_BLACK[144] = {
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -80,7 +82,7 @@ const int SQ_SCORE_KNIGHT_OPENING_BLACK[144] = {
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
 };
 
-const int SQ_SCORE_ENDGAME_KING[144] = {
+const int32_t SQ_SCORE_ENDGAME_KING[144] = {
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         0,    0, -100,  -75,  -65,  -50,  -50,  -65,  -75, -100,    0,    0,

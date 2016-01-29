@@ -23,6 +23,8 @@
 #ifndef FEN_H
 #define FEN_H
 
+#include <inttypes.h>
+
 // Parses a FEN string representing a board state into a GameState object.
 // Returns false if the FEN is invalid.
 bool parseFen(GameState* state, char* fenStr);
@@ -33,5 +35,5 @@ bool parseFenWithPrint(GameState* state, char* fenStr, bool printErrors);
 // Prints a FEN to the given buffer, not exceeding the given length.
 // Returns the number of printed characters.
 // Output will be null-terminated.
-int printFen(GameState* state, char* buffer, int buffLen);
+int32_t printFen(GameState* state, char* buffer, int32_t buffLen);
 #endif
