@@ -50,6 +50,7 @@
 #include "search.h"
 #include "xboard.h"
 #include "bitboard.h"
+#include "interactive.h"
 
 static void printBanner() {
     printf("Tulip Chess Engine 0.001\n");
@@ -469,6 +470,8 @@ int main(int argc, char** argv) {
             printEndgame(argc, argv);
         } else if (0 == strcmp("-passedpawns", argv[0])) {
             checkPassedPawn(argc, argv);
+        } else if (0 == strcmp("-interactive", argv[0])) {
+          startInteractive();
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);
