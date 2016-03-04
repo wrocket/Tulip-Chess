@@ -366,6 +366,20 @@ class TestBasicMoveApplication(unittest.TestCase):
         self.assertEqual('none', result['epFile'])
         self.assertEqual(61, piece_counts['-'])
 
+    def test_enpassant_black(self):
+        result = self.make_move('4k3/8/8/8/3pP3/8/8/4K3 b - e3 0 1', 'd4e3')
+        board = result['board']
+        bitboards = result['bitboards']
+        piece_counts = result['pieceCounts']
+        self.assertEqual(3, len(board))
+        self.assertEqual(0, piece_counts['P'])
+        self.assertEqual(1, piece_counts['p'])
+        self.assertEqual('0000000000100000', bitboards['p'])
+        self.assertEqual('0000000000000000', bitboards['P'])
+        self.assertEqual('EFFFFFFFFFEFFFEF', bitboards['-'])
+        self.assertEqual('none', result['epFile'])
+        self.assertEqual(61, piece_counts['-'])
+
     def test_hash_simple_move(self):
         result = self.make_move('4k3/8/8/8/8/1Q6/8/4K3 w - - 0 1', 'b3c4')
         orig_hash = 0x41E9B629C07711F8

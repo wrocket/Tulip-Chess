@@ -24,6 +24,7 @@
 #include <inttypes.h>
 
 #include "tulip.h"
+#include "gamestate.h"
 #include "piece.h"
 #include "bitboard.h"
 #include "hashconsts.h"
@@ -321,6 +322,7 @@ void unmakeMove(GameState* gameState, Move* move) {
                 const uint64_t epSqBits = BITS_SQ[epSquare];
                 uint64_t* capturedBb = &gameState->bitboards[captured->ordinal];
                 board[epSquare] = move->captures;
+                board[move->to] = &EMPTY;
                 *capturedBb |= epSqBits;
                 *emptyBb &= ~epSqBits;
                 *emptyBb |= BITS_SQ[move->to];

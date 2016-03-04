@@ -239,6 +239,7 @@ class TestMakeUnmakeMove(unittest.TestCase):
 
         self.assertEqual('p', board['e5'])
         self.assertEqual('P', board['f5'])
+        self.assertTrue('e6' not in board.keys())
 
         self.assertEqual(1, piece_counts['p'])
         self.assertEqual(1, piece_counts['P'])
@@ -256,6 +257,7 @@ class TestMakeUnmakeMove(unittest.TestCase):
 
         self.assertEqual('p', board['e4'])
         self.assertEqual('P', board['f4'])
+        self.assertTrue('f3' not in board.keys())
 
         self.assertEqual(1, piece_counts['p'])
         self.assertEqual(1, piece_counts['P'])
@@ -265,6 +267,16 @@ class TestMakeUnmakeMove(unittest.TestCase):
         self.assertEqual('0000000020000000', bitboards['P'])
         self.assertEqual('EFFFFFFFCFFFFFEF', bitboards['-'])
 
+    def test_black_ep_capture_bug(self):
+        result = self.make_unmake_move('rnbqkbnr/1ppppp1p/6p1/8/pP2P3/5QP1/P1PP2PP/RNB1KBNR b KQkq b3 0 1', 'a4b3')
+        board = result['board']
+        piece_counts = result['pieceCounts']
+
+        self.assertEqual('p', board['a4'])
+        self.assertEqual('P', board['b4'])
+        self.assertTrue('b3' not in board.keys())
+        self.assertEqual(8, piece_counts['p'])
+        self.assertEqual(8, piece_counts['P'])
 
 if __name__ == '__main__':
     unittest.main()
