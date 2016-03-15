@@ -193,13 +193,13 @@ static void xBoardSetboard(XBoardState* xbs, char** tokens, int tokenCount) {
     }
 
     // Join the FEN tokens with single spaces.
-    int idx = 0;
+    size_t idx = 0;
     for (int i = 1; i < tokenCount; i++) {
         if (i > 1) {
             fenStr[idx++] = ' ';
         }
 
-        unsigned long len = strlen(tokens[i]);
+        size_t len = strlen(tokens[i]);
         memcpy(fenStr + idx, tokens[i], len);
         idx += len;
     }
@@ -293,7 +293,7 @@ bool startXBoard() {
     char** tb;
     XBoardState xbState;
 
-    inputBuffer = malloc(inputBufferSize * sizeof(char));
+    inputBuffer = malloc((size_t) inputBufferSize * sizeof(char));
     if (!inputBuffer) {
         perror("Error: Unable to allocate memory for XBoard input buffer.");
         result = false;
