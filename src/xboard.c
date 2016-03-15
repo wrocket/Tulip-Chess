@@ -31,7 +31,7 @@
 #include "gamestate.h"
 #include "fen.h"
 #include "notation.h"
-#include "makeMove.h"
+#include "makemove.h"
 #include "book.h"
 #include "move.h"
 #include "search.h"

@@ -23,6 +23,8 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <inttypes.h>
+
 // A "simple" tokenizer for strings.
 // Given an input string, and a token buffer, and a maximum number of tokens,
 // this will split the string on whitespace. See createTokenBuffer() to create
