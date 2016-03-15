@@ -343,6 +343,7 @@ bool startXBoard() {
 				xBoardProtover(&xbState);
 			} else if (isCommand("quit", cmd)) {
 				done = true;
+			} else if (isCommand("accepted", cmd)) {
 			} else if (isCommand("force", cmd)) {
 				xBoardForce(&xbState);
 			} else if (isCommand("go", cmd)) {
