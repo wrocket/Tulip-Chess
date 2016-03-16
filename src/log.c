@@ -33,75 +33,75 @@
 #define FILE_NAME_SIZE 128
 
 static void printDt(char* buff, const char* format) {
-    struct tm* tm_info;
-    time_t timer;
+	struct tm* tm_info;
+	time_t timer;
 
-    time(&timer);
-    tm_info = localtime(&timer);
-    strftime(buff, DATE_BUFF_SIZE, format, tm_info);
+	time(&timer);
+	tm_info = localtime(&timer);
+	strftime(buff, DATE_BUFF_SIZE, format, tm_info);
 }
 
 static void writeEntry(GameLog* log, const char* message) {
-    if (log != NULL) {
-        char dateBuff[DATE_BUFF_SIZE];
-        printDt(dateBuff, "%F %H:%M:%S%z");
+	if (log != NULL) {
+		char dateBuff[DATE_BUFF_SIZE];
+		printDt(dateBuff, "%F %H:%M:%S%z");
 
-        fprintf(log->fh, "%s\t%s\n", dateBuff, message);
-        fflush(log->fh);
-    }
+		fprintf(log->fh, "%s\t%s\n", dateBuff, message);
+		fflush(log->fh);
+	}
 }
 
 bool log_open(GameLog* log) {
-    char* fname;
-    char dateBuff[DATE_BUFF_SIZE];
+	char* fname;
+	char dateBuff[DATE_BUFF_SIZE];
 
-    fname = malloc(FILE_NAME_SIZE * sizeof(char));
-    if (!fname) {
-        perror("Unable allocate memory for log file name.");
-        exit(-1);
-    }
+	fname = malloc(FILE_NAME_SIZE * sizeof(char));
+	if (!fname) {
+		perror("Unable allocate memory for log file name.");
+		exit(-1);
+	}
 
-    printDt(dateBuff, "%F-%H%M%S");
-    snprintf(fname, FILE_NAME_SIZE, "game-%s-p%i.log", dateBuff, getpid());
+	printDt(dateBuff, "%F-%H%M%S");
+	snprintf(fname, FILE_NAME_SIZE, "game-%s-p%i.log", dateBuff, getpid());
 
-    bool result = false;
-    log->fh = fopen(fname, "w");
+	bool result = false;
+	log->fh = fopen(fname, "w");
 
-    if (log->fh) {
-        result = true;
-        writeEntry(log, "Opened log.");
-    } else {
-        perror("Unable to open log file.");
-        goto open_log_fail;
-    }
+	if (log->fh) {
+		result = true;
+		writeEntry(log, "Opened log.");
+	} else {
+		perror("Unable to open log file.");
+		goto open_log_fail;
+	}
 
 open_log_fail:
-    free(fname);
-    return result;
+	free(fname);
+	return result;
 }
 
 void log_write(GameLog* log, const char* format, ...) {
-    if (log != NULL) {
-        char* outputMessage = malloc(LOG_BUFFER_SIZE * sizeof(char));
+	if (log != NULL) {
+		char* outputMessage = malloc(LOG_BUFFER_SIZE * sizeof(char));
 
-        if (!outputMessage) {
-            printf("Error: Unable to allocate log message buffer.\n");
-            exit(-1);
-        }
+		if (!outputMessage) {
+			printf("Error: Unable to allocate log message buffer.\n");
+			exit(-1);
+		}
 
-        va_list argptr;
-        va_start(argptr, format);
-        vsnprintf(outputMessage, LOG_BUFFER_SIZE, format, argptr);
-        va_end(argptr);
+		va_list argptr;
+		va_start(argptr, format);
+		vsnprintf(outputMessage, LOG_BUFFER_SIZE, format, argptr);
+		va_end(argptr);
 
-        writeEntry(log, outputMessage);
+		writeEntry(log, outputMessage);
 
-        free(outputMessage);
-    }
+		free(outputMessage);
+	}
 }
 
 void log_close(GameLog* log) {
-    if (log != NULL) {
-        fclose(log->fh);
-    }
+	if (log != NULL) {
+		fclose(log->fh);
+	}
 }

@@ -37,27 +37,27 @@
 
 // Used for sorting moves by their score.
 typedef struct {
-    Move move;
-    int score;
-    int depth;
+	Move move;
+	int score;
+	int depth;
 } MoveScore;
 
 // Structure to define the output of the search method.
 typedef struct {
-    int score;              // The current game score, from the perspective of the side to move.
-    Move move;              // The best move.
-    long durationMs;        // The search duration.
-    long nodes;             // The number of positions processed.
-    int searchStatus;       // SEARCH_STATUS_NO_LEGAL_MOVES if no moves could be considered.
-    MoveScore* moveScores;  // A list of the moves considered and their scores.
-    int moveScoreLength;    // The length of moveScores.
-    int betaCutoffs;
+	int score;              // The current game score, from the perspective of the side to move.
+	Move move;              // The best move.
+	long durationMs;        // The search duration.
+	long nodes;             // The number of positions processed.
+	int searchStatus;       // SEARCH_STATUS_NO_LEGAL_MOVES if no moves could be considered.
+	MoveScore* moveScores;  // A list of the moves considered and their scores.
+	int moveScoreLength;    // The length of moveScores.
+	int betaCutoffs;
 } SearchResult;
 
 typedef struct {
-    int depth;      // The maximum search depth.
-    GameLog* log;    // The game log.
-    void* chessInterfaceState;    // A flag to indicate if the search should output XBoard thinking lines.
+	int depth;      // The maximum search depth.
+	GameLog* log;    // The game log.
+	void* chessInterfaceState;    // A flag to indicate if the search should output XBoard thinking lines.
 } SearchArgs;
 
 void initSearchArgs(SearchArgs* args);

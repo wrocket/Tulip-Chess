@@ -38,284 +38,284 @@
 #include "xboard.h"
 
 static int compareMoveScore(const void* a, const void* b) {
-    return ((MoveScore*) b)->score - ((MoveScore*) a)->score; // Underflow issues? Hopefully our scores are on the order of 1e5...
+	return ((MoveScore*) b)->score - ((MoveScore*) a)->score; // Underflow issues? Hopefully our scores are on the order of 1e5...
 }
 
 static int compareMvvLva(const void* a, const void* b) {
-    Move* aMove = (Move*) a;
-    Move* bMove = (Move*) b;
+	Move* aMove = (Move*) a;
+	Move* bMove = (Move*) b;
 
-    int result;
+	int result;
 
-    // First order by captured piece, most valuable first.
-    result = (bMove->captures->relativeValue) - (aMove->captures->relativeValue);
-    if (result == 0) {
-        // Next order by moving piece, least valuable first.
-        result = (aMove->movingPiece->relativeValue) - (bMove->movingPiece->relativeValue);
-    }
+	// First order by captured piece, most valuable first.
+	result = (bMove->captures->relativeValue) - (aMove->captures->relativeValue);
+	if (result == 0) {
+		// Next order by moving piece, least valuable first.
+		result = (aMove->movingPiece->relativeValue) - (bMove->movingPiece->relativeValue);
+	}
 
-    return result;
+	return result;
 }
 
 static void sortMoveScores(MoveScore* scores, const int length) {
-    qsort(scores, (size_t) length, sizeof(MoveScore), compareMoveScore);
+	qsort(scores, (size_t) length, sizeof(MoveScore), compareMoveScore);
 }
 
 void orderByMvvLva(MoveBuffer* buffer) {
-    qsort(buffer->moves, ((size_t) buffer->length), sizeof(Move), compareMvvLva);
+	qsort(buffer->moves, ((size_t) buffer->length), sizeof(Move), compareMvvLva);
 }
 
 void initSearchArgs(SearchArgs* args) {
-    args->log = NULL;
-    args->depth = 5;
-    args->chessInterfaceState = NULL;
+	args->log = NULL;
+	args->depth = 5;
+	args->chessInterfaceState = NULL;
 }
 
 static int alphaBeta(GameState* state, SearchResult* result, const int depth, const int maxDepth, int alpha, int beta, bool allowNullMove) {
-    result->nodes++;
+	result->nodes++;
 
-    if (depth >= maxDepth) {
-        // const int mult = state->current->toMove == COLOR_WHITE ? -1 : 1;
-        // return mult * evaluate(state);
-        return evaluate(state);
-    }
+	if (depth >= maxDepth) {
+		// const int mult = state->current->toMove == COLOR_WHITE ? -1 : 1;
+		// return mult * evaluate(state);
+		return evaluate(state);
+	}
 
-    const bool check = isCheck(state);
+	const bool check = isCheck(state);
 
-    // Apply the null-move heuristic if the situation warrants.
-    //
-    // Doing null-move in check is *not* a good idea.
-    // Null move relies on letting the opponent move twice being the worst possible thing.
-    // Forcing them to move out of a checking position, however, is good.
-    if (allowNullMove && !check) {
-        makeNullMove(state);
-        const int nullScore = alphaBeta(state, result, depth + 1 + NULL_MOVE_RADIUS, maxDepth, -beta, -beta + 1, false);
-        unmakeNullMove(state);
+	// Apply the null-move heuristic if the situation warrants.
+	//
+	// Doing null-move in check is *not* a good idea.
+	// Null move relies on letting the opponent move twice being the worst possible thing.
+	// Forcing them to move out of a checking position, however, is good.
+	if (allowNullMove && !check) {
+		makeNullMove(state);
+		const int nullScore = alphaBeta(state, result, depth + 1 + NULL_MOVE_RADIUS, maxDepth, -beta, -beta + 1, false);
+		unmakeNullMove(state);
 
-        if (nullScore > beta) {
-            return beta;
-        }
-    }
+		if (nullScore > beta) {
+			return beta;
+		}
+	}
 
-    MoveBuffer* buffer = &state->moveBuffers[depth];
-    const int moveCount = generatePseudoMoves(state, buffer);
+	MoveBuffer* buffer = &state->moveBuffers[depth];
+	const int moveCount = generatePseudoMoves(state, buffer);
 
-    // If we're early in the search, sort the moves a bit nicer.
-    if (depth < 3) {
-        orderByMvvLva(buffer);
-    }
+	// If we're early in the search, sort the moves a bit nicer.
+	if (depth < 3) {
+		orderByMvvLva(buffer);
+	}
 
-    bool noLegalMoves = true;
+	bool noLegalMoves = true;
 
-    for (int i = 0; i < moveCount; i++) {
-        Move m = buffer->moves[i];
+	for (int i = 0; i < moveCount; i++) {
+		Move m = buffer->moves[i];
 
-        makeMove(state, &m);
+		makeMove(state, &m);
 
-        if (isLegalPosition(state)) {
-            noLegalMoves = false;
-            const int moveScore =  -1 * alphaBeta(state, result, depth + 1, maxDepth, -1 * beta, -1 * alpha, allowNullMove);
-            unmakeMove(state, &m);
+		if (isLegalPosition(state)) {
+			noLegalMoves = false;
+			const int moveScore =  -1 * alphaBeta(state, result, depth + 1, maxDepth, -1 * beta, -1 * alpha, allowNullMove);
+			unmakeMove(state, &m);
 
-            if (moveScore >= beta) {
-                result->betaCutoffs++;
-                return beta;
-            }
+			if (moveScore >= beta) {
+				result->betaCutoffs++;
+				return beta;
+			}
 
-            if (moveScore > alpha) {
-                alpha = moveScore;
-            }
-        } else {
-            unmakeMove(state, &m);
-        }
-    }
+			if (moveScore > alpha) {
+				alpha = moveScore;
+			}
+		} else {
+			unmakeMove(state, &m);
+		}
+	}
 
-    if (noLegalMoves) {
-        if (check) { // No moves, and check? Checkmate.
-            // Add depth to encourage "faster" checkmates.
-            // Longer checkmates (more moves) still appear as great moves,
-            // but their score will be less than faster checkmates.
-            return -INFINITY + depth;
-        } else {
-            return 0; // No moves, and not check? Stalemate.
-        }
-    }
+	if (noLegalMoves) {
+		if (check) { // No moves, and check? Checkmate.
+			// Add depth to encourage "faster" checkmates.
+			// Longer checkmates (more moves) still appear as great moves,
+			// but their score will be less than faster checkmates.
+			return -INFINITY + depth;
+		} else {
+			return 0; // No moves, and not check? Stalemate.
+		}
+	}
 
-    return alpha;
+	return alpha;
 }
 
 static void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScores, MoveBuffer* legalMoves, int maxDepth, GameLog* log) {
-    for (int i = 0; i < legalMoves->length; i++) {
-        Move m = legalMoves->moves[i];
+	for (int i = 0; i < legalMoves->length; i++) {
+		Move m = legalMoves->moves[i];
 
-        makeMove(state, &m);
-        const int score = -1 * alphaBeta(state, result, 0, maxDepth, -1 * INFINITY, INFINITY, true);
-        unmakeMove(state, &m);
+		makeMove(state, &m);
+		const int score = -1 * alphaBeta(state, result, 0, maxDepth, -1 * INFINITY, INFINITY, true);
+		unmakeMove(state, &m);
 
-        moveScores[i].move = m;
-        moveScores[i].score = score;
-        moveScores[i].depth = maxDepth;
-    }
+		moveScores[i].move = m;
+		moveScores[i].score = score;
+		moveScores[i].depth = maxDepth;
+	}
 
-    sortMoveScores(moveScores, legalMoves->length);
+	sortMoveScores(moveScores, legalMoves->length);
 
-    result->score = moveScores[0].score;
-    result->move = moveScores[0].move;
+	result->score = moveScores[0].score;
+	result->move = moveScores[0].move;
 
-    log_write(log, "Completed iterative deepening to depth=%i", maxDepth);
+	log_write(log, "Completed iterative deepening to depth=%i", maxDepth);
 }
 
 static void reorderMovesFromMoveScores(MoveScore* scores, int scoreLength, MoveBuffer* moveBuffer) {
-    if (scoreLength != moveBuffer->length) {
-        fprintf(stderr, "Move score buffer length and move buffer length disagree.\n");
-    }
+	if (scoreLength != moveBuffer->length) {
+		fprintf(stderr, "Move score buffer length and move buffer length disagree.\n");
+	}
 
-    int limit = scoreLength > moveBuffer->length ? scoreLength : moveBuffer->length;
+	int limit = scoreLength > moveBuffer->length ? scoreLength : moveBuffer->length;
 
-    for (int i = 0; i < limit; i++) {
-        moveBuffer->moves[i] = scores[i].move;
-    }
+	for (int i = 0; i < limit; i++) {
+		moveBuffer->moves[i] = scores[i].move;
+	}
 }
 
 static bool isEarlyCheckmate(int score) {
-    return score >= (INFINITY - 1000);
+	return score >= (INFINITY - 1000);
 }
 
 // This is called once per search. It orders the moves at the root level thusly:
 // 1. Checks and captures first. A move that is both should be first.
 // 2. More valuable captured pieces before less valuable pieces.
 static void orderRootNode(GameState* state, MoveBuffer* buffer) {
-    const int moveCount = buffer->length;
-    MoveScore* scores = ALLOC((unsigned int) moveCount, MoveScore, scores, "Error allocating move scores in root node.");
+	const int moveCount = buffer->length;
+	MoveScore* scores = ALLOC((unsigned int) moveCount, MoveScore, scores, "Error allocating move scores in root node.");
 
-    for (int i = 0; i < moveCount; i++) {
-        Move* m = &buffer->moves[i];
-        int score = 0;
+	for (int i = 0; i < moveCount; i++) {
+		Move* m = &buffer->moves[i];
+		int score = 0;
 
-        // Loosely sort by captured piece value
-        if (m->captures != &EMPTY) {
-            score += m->captures->relativeValue;
-        }
+		// Loosely sort by captured piece value
+		if (m->captures != &EMPTY) {
+			score += m->captures->relativeValue;
+		}
 
-        // Add special bonus to checks.
-        makeMove(state, m);
-        if (isCheck(state)) {
-            score += 10; // Arbitrary value; high enough to put checks before captures.
-        }
-        unmakeMove(state, m);
+		// Add special bonus to checks.
+		makeMove(state, m);
+		if (isCheck(state)) {
+			score += 10; // Arbitrary value; high enough to put checks before captures.
+		}
+		unmakeMove(state, m);
 
-        scores[i].move = *m;
-        scores[i].score = score;
-    }
+		scores[i].move = *m;
+		scores[i].score = score;
+	}
 
-    sortMoveScores(scores, moveCount);
+	sortMoveScores(scores, moveCount);
 
-    for (int i = 0; i < moveCount; i++) {
-        buffer->moves[i] = scores[i].move;
-    }
+	for (int i = 0; i < moveCount; i++) {
+		buffer->moves[i] = scores[i].move;
+	}
 
-    free(scores);
+	free(scores);
 }
 
 static void logSearchResult(SearchArgs* args, SearchResult* result, GameState* state) {
-    const long nodes = result->nodes;
-    const long duration = result->durationMs;
-    const double knodes = ((double) nodes) / 1000.0;
-    const double seconds = ((double) duration) / 1000.0;
-    const double score = friendlyScore(state, result->score);
-    const double betaPct = ((double) result->betaCutoffs) / (double) result->nodes;
+	const long nodes = result->nodes;
+	const long duration = result->durationMs;
+	const double knodes = ((double) nodes) / 1000.0;
+	const double seconds = ((double) duration) / 1000.0;
+	const double score = friendlyScore(state, result->score);
+	const double betaPct = ((double) result->betaCutoffs) / (double) result->nodes;
 
-    log_write(args->log, "Search complete. Score %+.2f; %ld nodes in %ldms (%.2f KNps)", score, nodes, duration, knodes / seconds);
-    log_write(args->log, "Beta cutoff in %i/%i of nodes (%.2f%%)", result->betaCutoffs, nodes, betaPct);
+	log_write(args->log, "Search complete. Score %+.2f; %ld nodes in %ldms (%.2f KNps)", score, nodes, duration, knodes / seconds);
+	log_write(args->log, "Beta cutoff in %i/%i of nodes (%.2f%%)", result->betaCutoffs, nodes, betaPct);
 }
 
 static void logIterativeResult(GameState* state, SearchArgs* searchArgs, MoveScore* scores, int depth) {
-    char moveStr[16];
-    MoveScore top = scores[0];
-    printShortAlg(&top.move, state, moveStr);
-    double score = friendlyScore(state, top.score);
-    log_write(searchArgs->log, "After depth=%i, best move is %s (%+0.2f)", depth, moveStr, score);
+	char moveStr[16];
+	MoveScore top = scores[0];
+	printShortAlg(&top.move, state, moveStr);
+	double score = friendlyScore(state, top.score);
+	log_write(searchArgs->log, "After depth=%i, best move is %s (%+0.2f)", depth, moveStr, score);
 }
 
 static void postSearchThinking(void* interState, GameState* state, int depth, int score, long nodes, long startTime, Move bestMove) {
-    if (interState == NULL) {
-        return;
-    }
+	if (interState == NULL) {
+		return;
+	}
 
-    const long now = getCurrentTimeMillis();
+	const long now = getCurrentTimeMillis();
 
-    MoveBuffer mb;
-    createMoveBuffer(&mb);
-    mb.moves[0] = bestMove;
-    mb.length = 1;
-    int postScore = score * (state->current->toMove == COLOR_WHITE ? 1 : -1);
-    postXBOutput(interState, depth, postScore, (now - startTime) / 10l, nodes, &mb);
-    destroyMoveBuffer(&mb);
+	MoveBuffer mb;
+	createMoveBuffer(&mb);
+	mb.moves[0] = bestMove;
+	mb.length = 1;
+	int postScore = score * (state->current->toMove == COLOR_WHITE ? 1 : -1);
+	postXBOutput(interState, depth, postScore, (now - startTime) / 10l, nodes, &mb);
+	destroyMoveBuffer(&mb);
 }
 
 bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
-    MoveBuffer buffer;
-    result->searchStatus = SEARCH_STATUS_NONE;
-    createMoveBuffer(&buffer);
+	MoveBuffer buffer;
+	result->searchStatus = SEARCH_STATUS_NONE;
+	createMoveBuffer(&buffer);
 
-    log_write(searchArgs->log, "Search starting with depth=%i", searchArgs->depth);
+	log_write(searchArgs->log, "Search starting with depth=%i", searchArgs->depth);
 
-    const long start = getCurrentTimeMillis();
-    const int moveCount = generateLegalMoves(state, &buffer);
+	const long start = getCurrentTimeMillis();
+	const int moveCount = generateLegalMoves(state, &buffer);
 
-    // Put captures and checks at the top.
-    orderRootNode(state, &buffer);
+	// Put captures and checks at the top.
+	orderRootNode(state, &buffer);
 
-    result->moveScoreLength = moveCount;
-    result->score = INT_MIN;
-    result->nodes = 0;
-    result->betaCutoffs = 0;
-    MoveScore* scores = result->moveScores;
+	result->moveScoreLength = moveCount;
+	result->score = INT_MIN;
+	result->nodes = 0;
+	result->betaCutoffs = 0;
+	MoveScore* scores = result->moveScores;
 
-    if (moveCount) {
-        for (int depth = 1; depth <= searchArgs->depth; depth++) {
-            iterativeDeepen(state, result, scores, &buffer, depth, searchArgs->log);
+	if (moveCount) {
+		for (int depth = 1; depth <= searchArgs->depth; depth++) {
+			iterativeDeepen(state, result, scores, &buffer, depth, searchArgs->log);
 
-            // After each iteration, reorder the move search order "best moves first."
-            // This speeds up successive searches by creating beta cutoffs faster.
-            reorderMovesFromMoveScores(scores, result->moveScoreLength, &buffer);
+			// After each iteration, reorder the move search order "best moves first."
+			// This speeds up successive searches by creating beta cutoffs faster.
+			reorderMovesFromMoveScores(scores, result->moveScoreLength, &buffer);
 
-            logIterativeResult(state, searchArgs, scores, depth);
+			logIterativeResult(state, searchArgs, scores, depth);
 
-            postSearchThinking(searchArgs->chessInterfaceState, state, depth, scores[0].score, result->nodes, start, scores[0].move);
+			postSearchThinking(searchArgs->chessInterfaceState, state, depth, scores[0].score, result->nodes, start, scores[0].move);
 
-            // If we found a checkmate, just play that immediately. No need to deepen further!
-            if (isEarlyCheckmate(scores[0].score)) {
-                log_write(searchArgs->log, "Early checkmate found at depth %i", depth);
-                break;
-            }
-        }
-    } else {
-        result->searchStatus = SEARCH_STATUS_NO_LEGAL_MOVES;
-    }
+			// If we found a checkmate, just play that immediately. No need to deepen further!
+			if (isEarlyCheckmate(scores[0].score)) {
+				log_write(searchArgs->log, "Early checkmate found at depth %i", depth);
+				break;
+			}
+		}
+	} else {
+		result->searchStatus = SEARCH_STATUS_NO_LEGAL_MOVES;
+	}
 
-    const long end = getCurrentTimeMillis();
+	const long end = getCurrentTimeMillis();
 
-    result->durationMs = end - start;
+	result->durationMs = end - start;
 
-    if (searchArgs->log != NULL) {
-        logSearchResult(searchArgs, result, state);
-    }
+	if (searchArgs->log != NULL) {
+		logSearchResult(searchArgs, result, state);
+	}
 
-    postSearchThinking(searchArgs->chessInterfaceState, state, searchArgs->depth, result->score, result->nodes, start, result->move);
+	postSearchThinking(searchArgs->chessInterfaceState, state, searchArgs->depth, result->score, result->nodes, start, result->move);
 
-    destroyMoveBuffer(&buffer);
-    return true;
+	destroyMoveBuffer(&buffer);
+	return true;
 }
 
 void createSearchResult(SearchResult* result) {
-    result->searchStatus = SEARCH_STATUS_NONE;
-    result->score = INT_MIN;
-    result->nodes = 0;
-    result->moveScores = ALLOC(MOVE_BUFFER_LENGTH, MoveScore, result->moveScores, "Error allocating move score array.");
-    result->moveScoreLength = 0;
+	result->searchStatus = SEARCH_STATUS_NONE;
+	result->score = INT_MIN;
+	result->nodes = 0;
+	result->moveScores = ALLOC(MOVE_BUFFER_LENGTH, MoveScore, result->moveScores, "Error allocating move score array.");
+	result->moveScoreLength = 0;
 }
 
 void destroySearchResult(SearchResult* result) {
-    free(result->moveScores);
+	free(result->moveScores);
 }
