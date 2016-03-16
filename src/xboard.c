@@ -91,7 +91,7 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
 	// First check the book for this position.
 	if (xbs->bookOpen) {
 		createMoveBuffer(&mb);
-		const int bookMoveCount = getMovesFromBook(&xbs->gameState, &mb, &xbs->currentBook);
+		const int bookMoveCount = book_getMoves(&xbs->gameState, &mb, &xbs->currentBook);
 		if (bookMoveCount > 0) {
 			foundMove = true;
 			move = mb.moves[rand() % bookMoveCount];
@@ -309,9 +309,10 @@ bool startXBoard() {
 
 	initializeGamestate(&xbState.gameState);
 
+	// TODO: Define elsewhere
 	const char* openingBook = "tulip_openings.sqlite";
 
-	xbState.bookOpen = openBook(openingBook, &xbState.currentBook);
+	xbState.bookOpen = book_open(openingBook, &xbState.currentBook);
 
 	xbState.postThinking = false;
 
@@ -408,7 +409,7 @@ bool startXBoard() {
 	log_close(&xbState.log);
 cleanup_book:
 	if (xbState.bookOpen) {
-		closeBook(&xbState.currentBook);
+		book_close(&xbState.currentBook);
 	}
 cleanup_gamestate:
 	destroyGamestate(&xbState.gameState);

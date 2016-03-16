@@ -84,7 +84,7 @@ static int readMoves(GameState* state, char*** strArray, OpenBook* book) {
 	return moveCount;
 }
 
-bool openBook(const char* fileName, OpenBook* book) {
+bool book_open(const char* fileName, OpenBook* book) {
 	sqlite3* db;
 	int32_t rc;
 	bool result = true;
@@ -106,11 +106,11 @@ bool openBook(const char* fileName, OpenBook* book) {
 	return result;
 }
 
-bool closeBook(OpenBook* book) {
+bool book_close(OpenBook* book) {
 	return sqlite3_close(book->database) == SQLITE_OK;
 }
 
-int getMovesFromBook(GameState* gameState, MoveBuffer* buffer, OpenBook* book) {
+int book_getMoves(GameState* gameState, MoveBuffer* buffer, OpenBook* book) {
 	int32_t strCount;
 	int32_t moveCount = 0;
 	char** strArray;

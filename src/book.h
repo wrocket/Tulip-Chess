@@ -34,14 +34,14 @@ typedef struct {
 } OpenBook;
 
 // Opens a book given a file name. Returns true on success, else false.
-bool openBook(const char* fileName, OpenBook* book);
+bool book_open(const char* fileName, OpenBook* book);
 
 // Closes a book. Returns true on success, else false.
-bool closeBook(OpenBook* book);
+bool book_close(OpenBook* book);
 
 // Looks for moves in the book for the given position.
 // Places those moves in buffer, and returns the number of moves placed in the buffer.
 // Not suitable for tight loops.
-int32_t getMovesFromBook(GameState* gameState, MoveBuffer* buffer, OpenBook* book);
+int32_t book_getMoves(GameState* gameState, MoveBuffer* buffer, OpenBook* book);
 
 #endif
