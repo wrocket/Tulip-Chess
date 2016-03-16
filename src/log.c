@@ -85,7 +85,7 @@ void log_write(GameLog* log, const char* format, ...) {
 		char* outputMessage = malloc(LOG_BUFFER_SIZE * sizeof(char));
 
 		if (!outputMessage) {
-			printf("Error: Unable to allocate log message buffer.\n");
+			perror("Error: Unable to allocate log message buffer.\n");
 			exit(-1);
 		}
 
@@ -105,3 +105,6 @@ void log_close(GameLog* log) {
 		fclose(log->fh);
 	}
 }
+
+#undef DATE_BUFF_SIZE
+#undef FILE_NAME_SIZE

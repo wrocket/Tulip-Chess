@@ -23,6 +23,8 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
+#include <inttypes.h>
+
 #include "move.h"
 #include "gamestate.h"
 #include "notation.h"
