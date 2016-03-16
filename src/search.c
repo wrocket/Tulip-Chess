@@ -162,7 +162,7 @@ static void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* m
     result->score = moveScores[0].score;
     result->move = moveScores[0].move;
 
-    writeLog(log, "Completed iterative deepening to depth=%i", maxDepth);
+    log_write(log, "Completed iterative deepening to depth=%i", maxDepth);
 }
 
 static void reorderMovesFromMoveScores(MoveScore* scores, int scoreLength, MoveBuffer* moveBuffer) {
@@ -225,8 +225,8 @@ static void logSearchResult(SearchArgs* args, SearchResult* result, GameState* s
     const double score = friendlyScore(state, result->score);
     const double betaPct = ((double) result->betaCutoffs) / (double) result->nodes;
 
-    writeLog(args->log, "Search complete. Score %+.2f; %ld nodes in %ldms (%.2f KNps)", score, nodes, duration, knodes / seconds);
-    writeLog(args->log, "Beta cutoff in %i/%i of nodes (%.2f%%)", result->betaCutoffs, nodes, betaPct);
+    log_write(args->log, "Search complete. Score %+.2f; %ld nodes in %ldms (%.2f KNps)", score, nodes, duration, knodes / seconds);
+    log_write(args->log, "Beta cutoff in %i/%i of nodes (%.2f%%)", result->betaCutoffs, nodes, betaPct);
 }
 
 static void logIterativeResult(GameState* state, SearchArgs* searchArgs, MoveScore* scores, int depth) {
@@ -234,7 +234,7 @@ static void logIterativeResult(GameState* state, SearchArgs* searchArgs, MoveSco
     MoveScore top = scores[0];
     printShortAlg(&top.move, state, moveStr);
     double score = friendlyScore(state, top.score);
-    writeLog(searchArgs->log, "After depth=%i, best move is %s (%+0.2f)", depth, moveStr, score);
+    log_write(searchArgs->log, "After depth=%i, best move is %s (%+0.2f)", depth, moveStr, score);
 }
 
 static void postSearchThinking(void* interState, GameState* state, int depth, int score, long nodes, long startTime, Move bestMove) {
@@ -258,7 +258,7 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
     result->searchStatus = SEARCH_STATUS_NONE;
     createMoveBuffer(&buffer);
 
-    writeLog(searchArgs->log, "Search starting with depth=%i", searchArgs->depth);
+    log_write(searchArgs->log, "Search starting with depth=%i", searchArgs->depth);
 
     const long start = getCurrentTimeMillis();
     const int moveCount = generateLegalMoves(state, &buffer);
@@ -286,7 +286,7 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 
             // If we found a checkmate, just play that immediately. No need to deepen further!
             if (isEarlyCheckmate(scores[0].score)) {
-                writeLog(searchArgs->log, "Early checkmate found at depth %i", depth);
+                log_write(searchArgs->log, "Early checkmate found at depth %i", depth);
                 break;
             }
         }

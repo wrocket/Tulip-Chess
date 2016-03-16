@@ -43,13 +43,13 @@ static void xBoardWrite(XBoardState* xbs, const char* format, ...) {
 	vsprintf(xbs->outputBuffer, format, argptr);
 	va_end(argptr);
 
-	writeLog(&xbs->log, "<<\t%s", xbs->outputBuffer); // Write to the log.
+	log_write(&xbs->log, "<<\t%s", xbs->outputBuffer); // Write to the log.
 	printf("%s\n", xbs->outputBuffer); // Write to stdout.
 	fflush(stdout);
 }
 
 static void logInput(XBoardState* xbs, char* message) {
-	writeLog(&xbs->log, ">>\t%s", message);
+	log_write(&xbs->log, ">>\t%s", message);
 }
 
 static void logGameState(XBoardState* xbs) {
@@ -61,7 +61,7 @@ static void logGameState(XBoardState* xbs) {
 	}
 
 	printFen(&xbs->gameState, outputMessage, 1024);
-	writeLog(&xbs->log, "Current game state: %s", outputMessage);
+	log_write(&xbs->log, "Current game state: %s", outputMessage);
 
 	free(outputMessage);
 }
@@ -95,11 +95,11 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
 		if (bookMoveCount > 0) {
 			foundMove = true;
 			move = mb.moves[rand() % bookMoveCount];
-			writeLog(&xbs->log, "Found move from book.");
+			log_write(&xbs->log, "Found move from book.");
 		}
 		destroyMoveBuffer(&mb);
 	} else {
-		writeLog(&xbs->log, "Book not open, proceeding to search.");
+		log_write(&xbs->log, "Book not open, proceeding to search.");
 	}
 
 	// If nothing was found in the book, perform a search.
@@ -317,7 +317,7 @@ bool startXBoard() {
 
 	bool done = false;
 
-	if (!openLog(&xbState.log)) {
+	if (!log_open(&xbState.log)) {
 		xBoardWrite(&xbState, "Error: Unable to open game log.");
 		goto cleanup_book;
 	}
@@ -363,10 +363,10 @@ bool startXBoard() {
 			} else if (isCommand("nps", cmd)) {
 			} else if (isCommand("time", cmd)) {
 				xbState.myTime = parseTime(tb, tokenCount);
-				writeLog(&xbState.log, "My time: %.2fs", (double) xbState.myTime / 100.0);
+				log_write(&xbState.log, "My time: %.2fs", (double) xbState.myTime / 100.0);
 			} else if (isCommand("otim", cmd)) {
 				xbState.opponentTime = parseTime(tb, tokenCount);
-				writeLog(&xbState.log, "Opponent time: %.2fs", (double) xbState.opponentTime / 100.0);
+				log_write(&xbState.log, "Opponent time: %.2fs", (double) xbState.opponentTime / 100.0);
 			} else if (isCommand("usermove", cmd)) {
 			} else if (isCommand("?", cmd)) {
 			} else if (isCommand("draw", cmd)) {
@@ -405,7 +405,7 @@ bool startXBoard() {
 		}
 	}
 
-	closeLog(&xbState.log);
+	log_close(&xbState.log);
 cleanup_book:
 	if (xbState.bookOpen) {
 		closeBook(&xbState.currentBook);

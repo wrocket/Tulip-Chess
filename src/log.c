@@ -51,7 +51,7 @@ static void writeEntry(GameLog* log, const char* message) {
     }
 }
 
-bool openLog(GameLog* log) {
+bool log_open(GameLog* log) {
     char* fname;
     char dateBuff[DATE_BUFF_SIZE];
 
@@ -80,7 +80,7 @@ open_log_fail:
     return result;
 }
 
-void writeLog(GameLog* log, const char* format, ...) {
+void log_write(GameLog* log, const char* format, ...) {
     if (log != NULL) {
         char* outputMessage = malloc(LOG_BUFFER_SIZE * sizeof(char));
 
@@ -100,7 +100,7 @@ void writeLog(GameLog* log, const char* format, ...) {
     }
 }
 
-void closeLog(GameLog* log) {
+void log_close(GameLog* log) {
     if (log != NULL) {
         fclose(log->fh);
     }

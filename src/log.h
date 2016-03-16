@@ -35,12 +35,12 @@ typedef struct {
 
 // Open up a game log for writing.
 // Returns true on success, false on failure.
-bool openLog(GameLog* log);
+bool log_open(GameLog* log);
 
 // Write a formatted message to the log.
-void writeLog(GameLog* log, const char* format, ...);
+void log_write(GameLog* log, const char* format, ...);
 
 // Close a log.
-void closeLog(GameLog* log);
+void log_close(GameLog* log);
 
 #endif
