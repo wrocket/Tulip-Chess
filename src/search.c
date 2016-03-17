@@ -72,13 +72,20 @@ void initSearchArgs(SearchArgs* args) {
 	args->chessInterfaceState = NULL;
 }
 
+static void storeHash(GameState* state, int32_t score, int32_t depth) {
+	// Make sure we store the hash in an absolute score (>0 good for white)
+	const int32_t multiplier = state->current->toMove == COLOR_WHITE ? 1 : -1;
+	hash_put(state, score * multiplier, depth);
+}
+
 static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t depth, const int32_t maxDepth,
-	int32_t alpha, int32_t beta, bool allowNullMove) {
+                         int32_t alpha, int32_t beta, bool allowNullMove) {
 	result->nodes++;
 
 	if (depth >= maxDepth) {
 		const int32_t evalScore = evaluate(state);
-		hash_put(state, evalScore, depth);
+		// Experimental - Don't store the leaf node score here, since those aren't terribly valuable (very low depth).
+		// storeHash(state, evalScore, depth);
 		return evalScore;
 	}
 
@@ -145,8 +152,7 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 		return check ? -INFINITY + depth : 0;
 	}
 
-
-	hash_put(state, alpha, depth);
+	storeHash(state, alpha, depth);
 
 	return alpha;
 }
