@@ -31,6 +31,7 @@
 #include "piece.h"
 #include "move.h"
 #include "statedata.h"
+#include "ztable.h"
 
 // This is the maximum number of half-moves supportable in a game.
 #define _GS_STACK_SIZE  512
@@ -51,6 +52,7 @@ typedef struct {
     bool created;           // Indicates that this structure has been initialized.
     uint64_t* bitboards;    // An array of bitboards, indexable by piece ordinal.
     MoveBuffer* moveBuffers;     // A series of move buffers for efficient search storage
+    ZTable zTable;	// A Zobrist hash table for position hashing.
 } GameState;
 
 // Allocate memory and otherwise initialize a GameState to a default state.

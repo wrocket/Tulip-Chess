@@ -32,6 +32,7 @@
 #include "statedata.h"
 #include "move.h"
 #include "bitboard.h"
+#include "hash.h"
 
 void initializeGamestate(GameState* gs) {
     // Allocate memory space for arrays.
@@ -63,6 +64,8 @@ void initializeGamestate(GameState* gs) {
     for (int32_t i = 0; i < MAX_MOVE_BUFFER; i++) {
         createMoveBuffer(&gs->moveBuffers[i]);
     }
+
+    hash_createZTable(&gs->zTable);
 }
 
 void reinitBitboards(GameState* gs) {

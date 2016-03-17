@@ -30,7 +30,7 @@
 #include "notation.h"
 #include "log.h"
 
-#define INFINITY 10000
+#define INFINITY 10000 // Close enough.
 
 #define NULL_MOVE_RADIUS 2
 

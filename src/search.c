@@ -36,6 +36,7 @@
 #include "util.h"
 #include "log.h"
 #include "xboard.h"
+#include "hash.h"
 
 static int32_t compareMoveScore(const void* a, const void* b) {
 	return ((MoveScore*) b)->score - ((MoveScore*) a)->score; // Underflow issues? Hopefully our scores are on the order of 1e5...
@@ -76,7 +77,16 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 	result->nodes++;
 
 	if (depth >= maxDepth) {
-		return evaluate(state);
+		const int32_t evalScore = evaluate(state);
+		hash_put(state, evalScore, depth);
+		return evalScore;
+	}
+
+	const int32_t storedScore = hash_probe(state, depth);
+	if (storedScore != HASH_NOT_FOUND) {
+		// Hash scores are stored in absolute values (>0 good for white)
+		const int32_t multiplier = state->current->toMove == COLOR_WHITE ? 1 : -1;
+		return multiplier * storedScore;
 	}
 
 	const bool check = isCheck(state);
@@ -134,6 +144,9 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 		// Add the search depth to encourage "faster" checkmates; so longer checkmates are worth slightly less.
 		return check ? -INFINITY + depth : 0;
 	}
+
+
+	hash_put(state, alpha, depth);
 
 	return alpha;
 }

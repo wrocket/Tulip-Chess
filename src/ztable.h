@@ -20,31 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef HASH_H
-#define HASH_H
+#ifndef ZTABLE_H
+#define ZTABLE_H
 
-#include <inttypes.h>
-#include <limits.h>
+#define ZTABLE_SIZE (1024 * 1024)
 
-#include "ztable.h"
-#include "gamestate.h"
+typedef struct {
+	int32_t score;
+	int32_t depth;
+	uint64_t hash;
+} ZTableEntry;
 
-#define HASH_NOT_FOUND INT_MAX
-
-// Probe the hash table for a given state. Returns the score (if found) or HASH_NOT_FOUND otherwise.
-int32_t hash_probe(GameState* state, int currentDepth);
-
-// Put a new value in the hash table.
-void hash_put(GameState* state, int32_t score, int32_t depth);
-
-// Creates a new ZTable of the given size.
-void hash_createZTable(ZTable* table);
-
-// Clean up a ZTable
-void hash_destroyZTable(ZTable* table);
-
-// Computes the hash of the given state.
-// SLOW. Do not use in tight loops.
-uint64_t computeHash(GameState* gameState);
+typedef struct {
+	ZTableEntry* data;
+} ZTable;
 
 #endif
