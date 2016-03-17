@@ -157,6 +157,31 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 	return alpha;
 }
 
+static void logMoveScoreList(GameLog* log, GameState* state, MoveScore* scores, int32_t size) {
+	const size_t buffSize = 2048;
+	char* buff = calloc(buffSize, sizeof(char));
+	uint32_t pos = 0;
+	char moveStr[8];
+	char scoreStr[16];
+	buff[pos++] = '[';
+	for (int32_t i = 0; i < size; i++) {
+		printShortAlg(&scores[i].move, state, moveStr);
+		snprintf(scoreStr, 16, "%s: %+.2f", moveStr, (double) scores[i].score / 100.0);
+		for (int32_t j = 0; scoreStr[j] && j < 16; j++) {
+			buff[pos++] = scoreStr[j];
+		}
+		if (i != size - 1) {
+			buff[pos++] = ',';
+			buff[pos++] = ' ';
+		}
+	}
+	buff[pos++] = ']';
+	buff[pos++] = '\0';
+
+	log_write(log, buff);
+	free(buff);
+}
+
 static void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScores, MoveBuffer* legalMoves, int32_t maxDepth, GameLog* log) {
 	for (int32_t i = 0; i < legalMoves->length; i++) {
 		Move m = legalMoves->moves[i];
@@ -176,6 +201,7 @@ static void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* m
 	result->move = moveScores[0].move;
 
 	log_write(log, "Completed iterative deepening to depth=%i", maxDepth);
+	logMoveScoreList(log, state, moveScores, legalMoves->length);
 }
 
 static void reorderMovesFromMoveScores(MoveScore* scores, int32_t scoreLength, MoveBuffer* moveBuffer) {

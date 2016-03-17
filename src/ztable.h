@@ -23,7 +23,7 @@
 #ifndef ZTABLE_H
 #define ZTABLE_H
 
-#define ZTABLE_SIZE (1024 * 1024)
+#define ZTABLE_SIZE (512 * 1024)
 
 typedef struct {
 	int32_t score;

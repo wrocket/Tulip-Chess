@@ -35,7 +35,7 @@ import sys
 import re
 from itertools import chain
 
-_max_moves = 20
+_max_moves = 12
 
 if len(sys.argv) <= 1:
     print('Usage: %s [pgn file 1] [pgn file 2] ...' % sys.argv[0])
