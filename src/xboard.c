@@ -279,16 +279,17 @@ void postXBOutput(void* chessInterfaceState, int ply, int score, long timeCentis
 #undef POST_BUFF_SIZE
 #undef MAX_MOVE_SIZE
 
+
+#define INPUT_BUFFER_SIZE 2048
+#define MAX_INPUT_TOKENS 32
+#define MAX_TOKEN_LEN 64
 bool startXBoard() {
-	const int inputBufferSize = 1024;
-	const int maxTokens = 32;
-	const int maxTokenLen = 32;
 	char* inputBuffer;
 	bool result = true;
 	char** tb;
 	XBoardState xbState;
 
-	inputBuffer = malloc((size_t) inputBufferSize * sizeof(char));
+	inputBuffer = malloc(INPUT_BUFFER_SIZE * sizeof(char));
 	if (!inputBuffer) {
 		perror("Error: Unable to allocate memory for XBoard input buffer.");
 		result = false;
@@ -302,7 +303,7 @@ bool startXBoard() {
 		goto cleanup_outputBuff;
 	}
 
-	tb = createTokenBuffer(maxTokens, maxTokenLen);
+	tb = createTokenBuffer(MAX_INPUT_TOKENS, MAX_TOKEN_LEN);
 	if (!tb) {
 		goto cleanup_inputBuff;
 	}
@@ -311,29 +312,26 @@ bool startXBoard() {
 
 	// TODO: Define elsewhere
 	const char* openingBook = "tulip_openings.sqlite";
-
 	xbState.bookOpen = book_open(openingBook, &xbState.currentBook);
-
 	xbState.postThinking = false;
-
-	bool done = false;
 
 	if (!log_open(&xbState.log)) {
 		xBoardWrite(&xbState, "Error: Unable to open game log.");
 		goto cleanup_book;
 	}
 
+	bool done = false;
 	while (!done) {
-		if (!fgets(inputBuffer, inputBufferSize, stdin)) {
+		if (!fgets(inputBuffer, INPUT_BUFFER_SIZE, stdin)) {
 			perror("Error: Unable to read from stdin.");
 			result = false;
 			goto cleanup_gamestate;
 		}
 
-		chopNewline(inputBuffer, inputBufferSize);
+		chopNewline(inputBuffer, INPUT_BUFFER_SIZE);
 		logInput(&xbState, inputBuffer);
 
-		int tokenCount = tokenize(inputBuffer, tb, maxTokens);
+		int tokenCount = tokenize(inputBuffer, tb, MAX_INPUT_TOKENS);
 		if (tokenCount > 0) {
 			char* cmd = tb[0];
 			if (isCommand("xboard", cmd)) {
@@ -413,9 +411,14 @@ cleanup_book:
 	}
 cleanup_gamestate:
 	destroyGamestate(&xbState.gameState);
-	freeTokenBuffer(tb, maxTokens);
+	freeTokenBuffer(tb, MAX_INPUT_TOKENS);
 cleanup_outputBuff:
 	free(inputBuffer);
 cleanup_inputBuff:
 	return result;
 }
+
+#undef INPUT_BUFFER_SIZE
+#undef MAX_INPUT_TOKENS
+#undef MAX_TOKEN_LEN
+
