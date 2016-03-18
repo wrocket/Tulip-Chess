@@ -98,6 +98,7 @@ void destroyGamestate(GameState* gs) {
     }
 
     free(gs->moveBuffers);
+    hash_destroyZTable(&gs->zTable);
 
     gs->created = false;
 }
