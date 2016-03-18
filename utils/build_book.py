@@ -46,12 +46,18 @@ class MoveLine:
 def build_line(line):
     cmd = ['../src/tulip', '-hashseq', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1']
     cmd.extend(line)
-    out = subprocess.check_output(cmd)
-    result = json.loads(out.decode('utf-8'))
-    return MoveLine(result['initialHash'], [(x['move'], x['resultingHash']) for x in result['hashSequence']])
+    try:
+        out = subprocess.check_output(cmd)
+        result = json.loads(out.decode('utf-8'))
+        return MoveLine(result['initialHash'], [(x['move'], x['resultingHash']) for x in result['hashSequence']])
+    except (BrokenPipeError, subprocess.CalledProcessError):
+        print('Unplayable line: %s' % ' '.join(line))
+        return None
 
 
 def digest_line(move_line):
+    if not move_line:
+        return None
     d = {}
     current_hash = move_line.initial_hash
     for item in move_line.move_hashes:
@@ -99,6 +105,6 @@ def read_input():
 
 all_lines = read_input()
 print("Read %i line(s) from stdin." % len(all_lines))
-digested_lines = [digest_line(build_line(x)) for x in all_lines]
+digested_lines = filter(lambda l : l != None, [digest_line(build_line(x)) for x in all_lines])
 file_lines = combine_lines(digested_lines)
 write_to_database(file_lines, 'tulip_openings.sqlite')
