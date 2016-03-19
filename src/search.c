@@ -80,7 +80,6 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 
 	if (depth >= maxDepth) {
 		const int32_t evalScore = evaluate(state);
-		// Experimental - Don't store the leaf node score here, since those aren't terribly valuable (very low depth).
 		if (allowNullMove) {
 			hash_put(state, evalScore, depth, HASHF_EXACT);
 		}
