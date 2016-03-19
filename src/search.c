@@ -88,9 +88,7 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 
 	const int32_t storedScore = hash_probe(state, depth, alpha, beta);
 	if (storedScore != HASH_NOT_FOUND) {
-		// Hash scores are stored in absolute values (>0 good for white)
-		const int32_t multiplier = state->current->toMove == COLOR_WHITE ? 1 : -1;
-		return multiplier * storedScore;
+		return storedScore;
 	}
 
 	const bool check = isCheck(state);
@@ -150,7 +148,9 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 	if (noLegalMoves) {
 		// No legal moves and check? Checkmate. Else, stalemate.
 		// Add the search depth to encourage "faster" checkmates; so longer checkmates are worth slightly less.
-		return check ? -INFINITY + depth : 0;
+		const int32_t score = check ? -INFINITY + depth : 0;
+		hash_put(state, score, 0, HASHF_EXACT); // We know exactly what the score is here, searching deeper doesn't change it.
+		return score;
 	}
 
 	hash_put(state, alpha, depth, hashf);

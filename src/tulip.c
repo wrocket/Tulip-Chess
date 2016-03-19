@@ -381,7 +381,7 @@ static void simpleSearch(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
-    int depth = 6; // Configure default?
+    int depth = 7; // Configure default?
     const char* depthStr = findArg(argc, argv, "-depth");
     if (depthStr != NULL && !parseInteger(depthStr, &depth)) {
         exit(EXIT_FAILURE);
