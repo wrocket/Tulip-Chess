@@ -31,11 +31,15 @@
 
 #define HASH_NOT_FOUND INT_MAX
 
+#define HASHF_EXACT 0
+#define HASHF_ALPHA 1
+#define HASHF_BETA 2
+
 // Probe the hash table for a given state. Returns the score (if found) or HASH_NOT_FOUND otherwise.
-int32_t hash_probe(GameState* state, int currentDepth);
+int32_t hash_probe(GameState* state, int32_t currentDepth, int32_t alpha, int32_t beta);
 
 // Put a new value in the hash table.
-void hash_put(GameState* state, int32_t score, int32_t depth);
+void hash_put(GameState* state, int32_t score, int32_t depth, int32_t flag);
 
 // Creates a new ZTable of the given size.
 void hash_createZTable(ZTable* table);

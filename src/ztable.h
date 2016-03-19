@@ -29,6 +29,7 @@ typedef struct {
 	int32_t score;
 	int32_t depth;
 	uint64_t hash;
+	int32_t flag;
 } ZTableEntry;
 
 typedef struct {

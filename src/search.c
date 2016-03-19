@@ -72,24 +72,26 @@ void initSearchArgs(SearchArgs* args) {
 	args->chessInterfaceState = NULL;
 }
 
-static void storeHash(GameState* state, int32_t score, int32_t depth) {
+static void storeHash(GameState* state, int32_t score, int32_t depth, int32_t hash) {
 	// Make sure we store the hash in an absolute score (>0 good for white)
 	const int32_t multiplier = state->current->toMove == COLOR_WHITE ? 1 : -1;
-	hash_put(state, score * multiplier, depth);
+	hash_put(state, score * multiplier, depth, hash);
 }
 
 static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t depth, const int32_t maxDepth,
                          int32_t alpha, int32_t beta, bool allowNullMove) {
 	result->nodes++;
 
+	int32_t hashf = HASHF_ALPHA;
+
 	if (depth >= maxDepth) {
 		const int32_t evalScore = evaluate(state);
 		// Experimental - Don't store the leaf node score here, since those aren't terribly valuable (very low depth).
-		// storeHash(state, evalScore, depth);
+		// storeHash(state, evalScore, depth, HASHF_EXACT);
 		return evalScore;
 	}
 
-	const int32_t storedScore = hash_probe(state, depth);
+	const int32_t storedScore = hash_probe(state, depth, alpha, beta);
 	if (storedScore != HASH_NOT_FOUND) {
 		// Hash scores are stored in absolute values (>0 good for white)
 		const int32_t multiplier = state->current->toMove == COLOR_WHITE ? 1 : -1;
@@ -135,10 +137,12 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 
 			if (moveScore >= beta) {
 				result->betaCutoffs++;
+				storeHash(state, beta, depth, HASHF_BETA);
 				return beta;
 			}
 
 			if (moveScore > alpha) {
+				hashf = HASHF_EXACT;
 				alpha = moveScore;
 			}
 		} else {
@@ -152,7 +156,7 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 		return check ? -INFINITY + depth : 0;
 	}
 
-	storeHash(state, alpha, depth);
+	storeHash(state, alpha, depth, hashf);
 
 	return alpha;
 }
@@ -164,9 +168,12 @@ static void logMoveScoreList(GameLog* log, GameState* state, MoveScore* scores, 
 	char moveStr[8];
 	char scoreStr[16];
 	buff[pos++] = '[';
+	// TODO: Better checking to ensure we don't exceed buff's size.
 	for (int32_t i = 0; i < size; i++) {
 		printShortAlg(&scores[i].move, state, moveStr);
 		snprintf(scoreStr, 16, "%s: %+.2f", moveStr, (double) scores[i].score / 100.0);
+
+		// TODO: memcopy() is probably better here.
 		for (int32_t j = 0; scoreStr[j] && j < 16; j++) {
 			buff[pos++] = scoreStr[j];
 		}
@@ -311,8 +318,9 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 	result->betaCutoffs = 0;
 	MoveScore* scores = result->moveScores;
 
+	const int32_t iterationDeepenDepth = searchArgs->depth > ITERATIVE_DEEPEN_DEPTH ? ITERATIVE_DEEPEN_DEPTH : searchArgs -> depth;
 	if (moveCount) {
-		for (int32_t depth = 1; depth <= searchArgs->depth; depth++) {
+		for (int32_t depth = 1; depth <= iterationDeepenDepth; depth++) {
 			iterativeDeepen(state, result, scores, &buffer, depth, searchArgs->log);
 
 			// After each iteration, reorder the move search order "best moves first."

@@ -34,6 +34,8 @@
 
 #define NULL_MOVE_RADIUS 2
 
+#define ITERATIVE_DEEPEN_DEPTH 6
+
 #define SEARCH_STATUS_NONE              0
 #define SEARCH_STATUS_NO_LEGAL_MOVES    1
 

@@ -30,7 +30,7 @@
 #include "gamestate.h"
 #include "ztable.h"
 
-int32_t hash_probe(GameState* state, int currentDepth) {
+int32_t hash_probe(GameState* state, int32_t currentDepth, int32_t alpha, int32_t beta) {
     const uint64_t hash = state->current->hash;
     ZTable* table = &state->zTable;
 
@@ -38,12 +38,24 @@ int32_t hash_probe(GameState* state, int currentDepth) {
 
     // Lower depths mean the hash was computer "higher" on the tree, so it's a more accurate score.
     // E.g. a depth of MAX_DEPTH would be a leaf node, which has pretty shallow evaluation.
-    const bool foundEntry = entry->hash == hash && currentDepth < entry->depth;
+    if (entry->hash == hash && currentDepth < entry->depth) {
+        if (entry->flag == HASHF_EXACT) {
+            return entry->score;
+        }
 
-    return foundEntry ? entry->score : HASH_NOT_FOUND;
+        if ((entry->flag == HASHF_ALPHA) && (entry->score <= alpha)) {
+            return alpha;
+        }
+
+        if ((entry->flag == HASHF_BETA) && (entry->score >= beta)) {
+            return beta;
+        }
+    }
+
+    return HASH_NOT_FOUND;
 }
 
-void hash_put(GameState* state, int32_t score, int32_t depth) {
+void hash_put(GameState* state, int32_t score, int32_t depth, int32_t flag) {
     const uint64_t hash = state->current->hash;
     ZTable* table = &state->zTable;
 
@@ -52,6 +64,7 @@ void hash_put(GameState* state, int32_t score, int32_t depth) {
     entry->score = score;
     entry->depth = depth;
     entry->hash = hash;
+    entry->flag = flag;
 }
 
 void hash_createZTable(ZTable* table) {
