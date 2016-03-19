@@ -163,7 +163,9 @@ static void normalizeMove(char* original, char* normalized) {
                                 cv = *c;
                         }
 
-                        *normalized = (char) tolower(cv);
+                        // Normalize casing. We have an exception for the letter 'B' since two moves like
+                        // Bxc3 and bxc3 can both be legal (and be very different moves, one a pawn, the other a bishop)
+                        *normalized = cv == 'B' ? cv : (char) tolower(cv);
                         normalized++;
                         cnt++;
                 }

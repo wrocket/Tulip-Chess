@@ -160,6 +160,22 @@ class TestNotation(unittest.TestCase):
         self.assertEqual('-', move['capturedPiece'])
         self.assertEqual('none', move['moveCode'])
 
+    def test_bishopC3bug_bishop(self): # here the bug is that bxc3 and Bxc3 are both legal moves with very different meanings!
+        move = self.match_move('Bxc3', 'r1b1kbnr/pp1ppppp/8/q7/4P3/2p5/PPPB1PPP/R2QKB1R w KQkq - 0 7');
+        self.assertIsNotNone(move);
+        self.assertEqual('d2c3', move['move'])
+        self.assertEqual('B', move['movingPiece'])
+        self.assertEqual('p', move['capturedPiece'])
+        self.assertEqual('none', move['moveCode'])
+
+    def test_bishopC3bug_pawn(self): # here the bug is that bxc3 and Bxc3 are both legal moves with very different meanings!
+        move = self.match_move('bxc3', 'r1b1kbnr/pp1ppppp/8/q7/4P3/2p5/PPPB1PPP/R2QKB1R w KQkq - 0 7');
+        self.assertIsNotNone(move);
+        self.assertEqual('b2c3', move['move'])
+        self.assertEqual('P', move['movingPiece'])
+        self.assertEqual('p', move['capturedPiece'])
+        self.assertEqual('none', move['moveCode'])
+
     def test_match_move_checkmate_with_capture_x(self):
         move = self.match_move('Rxe1#', '4rk2/8/8/8/8/8/5PPP/4Q1K1 b - - 0 1')
         self.assertIsNotNone(move);
