@@ -45,7 +45,7 @@ static bool doMoveCollide(Move* legalMove, Move* candidate) {
                && legalMove->to == candidate->to;
 }
 
-static int32_t printMoveDisambiguation(GameState* g, Move* move, char* buffer) {
+static int32_t notation_printMoveDisambiguation(GameState* g, Move* move, char* buffer) {
         int32_t c = 0;
         MoveBuffer legalMoves;
         int32_t* collidingMoves;
@@ -97,7 +97,7 @@ static int32_t printMoveDisambiguation(GameState* g, Move* move, char* buffer) {
         return c;
 }
 
-int32_t printShortAlg(Move* move, GameState* gameState, char* buffer) {
+int32_t notation_printShortAlg(Move* move, GameState* gameState, char* buffer) {
         int32_t count = 0;
         const Piece* movingPiece = move->movingPiece;
         bool isPawn = movingPiece == &WPAWN || movingPiece == &BPAWN;
@@ -115,7 +115,7 @@ int32_t printShortAlg(Move* move, GameState* gameState, char* buffer) {
 
         if (!isPawn) {
                 buffer[count++] = (char) toupper(movingPiece->name);
-                count += printMoveDisambiguation(gameState, move, &buffer[count]);
+                count += notation_printMoveDisambiguation(gameState, move, &buffer[count]);
         }
 
         if (move->captures != &EMPTY) {
@@ -191,7 +191,7 @@ static bool checkMoveMatch(char* normalizedGeneratedMove, char* normalizedInputM
         return result;
 }
 
-bool matchMove(char* str, GameState* gs, Move* m) {
+bool notation_matchMove(char* str, GameState* gs, Move* m) {
         MoveBuffer buffer;
         char moveStr[16];
         char normalizedMove[16];
@@ -207,7 +207,7 @@ bool matchMove(char* str, GameState* gs, Move* m) {
                 Move currentMove = buffer.moves[i];
 
                 // Fist match with algebraic notation
-                printShortAlg(&currentMove, gs, moveStr);
+                notation_printShortAlg(&currentMove, gs, moveStr);
                 normalizeMove(moveStr, normalizedMove);
                 result = checkMoveMatch(normalizedMove, normalizedInputMove, currentMove, m);
                 if (result) {
@@ -215,7 +215,7 @@ bool matchMove(char* str, GameState* gs, Move* m) {
                 }
 
                 // Next match with coordinate notation
-                printMoveCoordinate(&currentMove, moveStr);
+                notation_printMoveCoordinate(&currentMove, moveStr);
                 normalizeMove(moveStr, normalizedMove);
                 result = checkMoveMatch(normalizedMove, normalizedInputMove, currentMove, m);
                 if (result) {
@@ -228,7 +228,7 @@ bool matchMove(char* str, GameState* gs, Move* m) {
 }
 
 
-bool matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m) {
+bool notation_matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m) {
         MoveBuffer moveBuff;
         int32_t moveCount;
         bool result = false;
@@ -239,7 +239,7 @@ bool matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m) {
 
         for (int32_t i = 0; i < moveCount; i++) {
                 Move current = moveBuff.moves[i];
-                printMoveCoordinate(&current, moveStrBuff);
+                notation_printMoveCoordinate(&current, moveStrBuff);
 
                 if (strcasecmp(moveStrBuff, moveStr) == 0) {
                         result = true;
@@ -253,7 +253,7 @@ bool matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m) {
         return result;
 }
 
-int32_t printMoveCoordinate(Move* move, char* buffer) {
+int32_t notation_printMoveCoordinate(Move* move, char* buffer) {
         int32_t index = 0;
 
         index += printSquareIndex(move->from, buffer);

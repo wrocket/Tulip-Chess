@@ -123,7 +123,7 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
 	}
 
 	if (foundMove) {
-		printShortAlg(&move, &xbs->gameState, moveStr);
+		notation_printShortAlg(&move, &xbs->gameState, moveStr);
 		xBoardWrite(xbs, "move %s", moveStr);
 		xBoardApplyMove(xbs, &move);
 		logGameState(xbs);
@@ -140,7 +140,7 @@ static void xBoardGo(XBoardState* xbs) {
 static void xBoardMove(XBoardState* xbs, char* move) {
 	Move m;
 
-	if (matchMove(move, &xbs->gameState, &m)) {
+	if (notation_matchMove(move, &xbs->gameState, &m)) {
 		makeMove(&xbs->gameState, &m);
 		logGameState(xbs);
 
@@ -258,7 +258,7 @@ void postXBOutput(void* chessInterfaceState, int ply, int score, long timeCentis
 		// Remember the previous move must be played for the next move string to make any sense.
 		for (int i = 0; i < pv->length && buffPos < POST_BUFF_SIZE - MAX_MOVE_SIZE; i++) {
 			Move move = pv->moves[i];
-			const int moveLen = printShortAlg(&move, &xbs->gameState, moveBuff);
+			const int moveLen = notation_printShortAlg(&move, &xbs->gameState, moveBuff);
 			makeMove(&xbs->gameState, &move);
 			sprintf(pvBuffer + buffPos, " %s", moveBuff);
 			buffPos += moveLen;

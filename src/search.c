@@ -167,7 +167,7 @@ static void logMoveScoreList(GameLog* log, GameState* state, MoveScore* scores, 
 	buff[pos++] = '[';
 	// TODO: Better checking to ensure we don't exceed buff's size.
 	for (int32_t i = 0; i < size; i++) {
-		printShortAlg(&scores[i].move, state, moveStr);
+		notation_printShortAlg(&scores[i].move, state, moveStr);
 		snprintf(scoreStr, 16, "%s: %+.2f", moveStr, (double) scores[i].score / 100.0);
 
 		// TODO: memcopy() is probably better here.
@@ -275,7 +275,7 @@ static void logSearchResult(SearchArgs* args, SearchResult* result, GameState* s
 static void logIterativeResult(GameState* state, SearchArgs* searchArgs, MoveScore* scores, int32_t depth) {
 	char moveStr[16];
 	MoveScore top = scores[0];
-	printShortAlg(&top.move, state, moveStr);
+	notation_printShortAlg(&top.move, state, moveStr);
 	double score = friendlyScore(state, top.score);
 	log_write(searchArgs->log, "After depth=%i, best move is %s (%+0.2f)", depth, moveStr, score);
 }

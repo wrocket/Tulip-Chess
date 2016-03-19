@@ -48,7 +48,7 @@ static void printSq(char* buff, int32_t sq) {
 
 static void printMoveDetail(Move* m) {
     char strBuff[16];
-    printMoveCoordinate(m, strBuff);
+    notation_printMoveCoordinate(m, strBuff);
     printf("{");
     printf("\"move\": \"%s\", ", strBuff);
     printf("\"movingPiece\": \"%c\", ", m->movingPiece->name);
@@ -107,7 +107,7 @@ void printMovelistJson(char* position, char* listType, GameState* gameState, Mov
             printf(", ");
         }
 
-        printMoveCoordinate(&(buffer->moves[i]), strBuff);
+        notation_printMoveCoordinate(&(buffer->moves[i]), strBuff);
         printf("\"%s\"", strBuff);
     }
     printf("], ");
@@ -118,7 +118,7 @@ void printMovelistJson(char* position, char* listType, GameState* gameState, Mov
             printf(", ");
         }
 
-        printShortAlg(&(buffer->moves[i]), gameState, strBuff);
+        notation_printShortAlg(&(buffer->moves[i]), gameState, strBuff);
         printf("\"%s\"", strBuff);
     }
 
@@ -166,7 +166,7 @@ void printMakeMoveResult(char* position, Move* m, GameState* state) {
     if (!m) {
         sprintf(moveStr, "NullMv");
     } else {
-        printMoveCoordinate(m, moveStr);
+        notation_printMoveCoordinate(m, moveStr);
     }
 
     printf("{");
@@ -384,7 +384,7 @@ void printSearchResult(SearchResult* result, GameState* state) {
     const bool printMove = result->searchStatus == SEARCH_STATUS_NONE;
 
     if (printMove) {
-        printShortAlg(&result->move, state, moveStr);
+        notation_printShortAlg(&result->move, state, moveStr);
     }
 
     const char* statusStr = result->searchStatus == SEARCH_STATUS_NONE ? "none" : "noLegalMoves";
@@ -417,7 +417,7 @@ void printSearchResult(SearchResult* result, GameState* state) {
         }
 
         MoveScore score = result->moveScores[i];
-        printShortAlg(&score.move, state, moveStr);
+        notation_printShortAlg(&score.move, state, moveStr);
         printf("{\"move\":\"%s\", \"score\":%i, \"depth\":%i}", moveStr, score.score, score.depth);
     }
     printf("]}}");

@@ -122,7 +122,7 @@ int book_getMoves(GameState* gameState, MoveBuffer* buffer, OpenBook* book) {
 
 	// Parse the move strings and add the legal moves to the move buffer.
 	for (int32_t i = 0; i < strCount; i++) {
-		if (matchMove(strArray[i], gameState, &m)) {
+		if (notation_matchMove(strArray[i], gameState, &m)) {
 			buffer->moves[moveCount++] = m;
 		}
 	}

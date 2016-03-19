@@ -187,7 +187,7 @@ static void printMoveResult(int argc, char** argv) {
     GameState gs = parseFenOrQuit(argv[2]);
     Move m;
 
-    if (!matchMove(argv[1], &gs, &m)) {
+    if (!notation_matchMove(argv[1], &gs, &m)) {
         fprintf(stderr, "Unknown move \"%s\" for position %s\n", argv[1], argv[2]);
         exit(EXIT_FAILURE);
     }
@@ -276,7 +276,7 @@ static void printMakeUnmakeMoveResult(int argc, char** argv) {
     GameState gs = parseFenOrQuit(argv[2]);
     Move m;
 
-    if (!matchMove(argv[1], &gs, &m)) {
+    if (!notation_matchMove(argv[1], &gs, &m)) {
         fprintf(stderr, "Unknown move \"%s\" for position %s\n", argv[1], argv[2]);
         exit(EXIT_FAILURE);
     }
@@ -297,7 +297,7 @@ static void printMatchMove(int argc, char** argv) {
     GameState gs = parseFenOrQuit(argv[2]);
 
     Move m;
-    if (!matchMove(argv[1], &gs, &m)) {
+    if (!notation_matchMove(argv[1], &gs, &m)) {
         printMatchMoveResult(NULL);
     } else {
         printMatchMoveResult(&m);
@@ -317,7 +317,7 @@ static void makeMovesAndPrintGameResultStatus(int argc, char** argv) {
     GameState gs = parseFenOrQuit(argv[1]);
 
     for (int i = 2; i < argc; i++) {
-        if (!matchMove(argv[i], &gs, &m)) {
+        if (!notation_matchMove(argv[i], &gs, &m)) {
             fprintf(stderr, "Unplayable move: %s\n", argv[i]);
             exit(EXIT_FAILURE);
         }
@@ -345,12 +345,12 @@ static void hashSequence(int argc, char** argv) {
     const uint64_t initialHash = gs.current->hash;
 
     for (int i = 2; i < argc; i++) {
-        if (!matchMove(argv[i], &gs, &m)) {
+        if (!notation_matchMove(argv[i], &gs, &m)) {
             fprintf(stderr, "Unplayable move: %s\n", argv[i]);
             exit(EXIT_FAILURE);
         }
         makeMove(&gs, &m);
-        printMoveCoordinate(&m, seqItems[count].move);
+        notation_printMoveCoordinate(&m, seqItems[count].move);
         seqItems[count].data = *gs.current;
         count++;
     }
