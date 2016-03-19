@@ -7,7 +7,7 @@ This is a chess engine written for my own amusement. Not designed to be the abso
 
 Requirements
 ------------
-The application is intended to be built on any UNIX-ish system using a GCC-like C compiler.
+The application is intended to be built on any UNIX-ish system using a GCC-like C compiler. Currently the default makefile uses Clang 3.7.
 
 SQLite is used as a storage engine. A version of SQLite 3.10 or greater will need to be provided.
 
@@ -25,7 +25,7 @@ Principles
 
 Current Status
 --------------
-Currently, the foundations of the chess engine (board representation, move generation, transposition tables, etc) are being developed. The search engine will be implemented once these are complete.
+Currently, Tulip can play a realtively weak game of chess, taking advantage of obvious blunders, using the XBoard front-end.
 
 
 Technical Concepts
@@ -35,7 +35,7 @@ Technical Concepts
 Tulip uses a hybrid approach of both bitboard and array-based game state representation. This allows reasonably efficient attack detection and so on with the convenience of array-index board lookup. Tulip is designed to take full advantage of modern 64-bit processors in this regard.
 
 #### Search
-While not yet implemented, the plan is to employ a reasonably effective search based on the common Alpha/Beta search.
+Tulip uses a relatively conventional alpha/beta search tactic, employing iterative deepening, null-moves, and Zobrist hashing to increase search speed.
 
 ### Interop
 #### Testing and Development
@@ -46,4 +46,13 @@ src > ./tulip -gamestatus "7k/8/8/4r3/6b1/6n1/2PP1P2/4K3 w - - 0 1"
 </pre>
 
 #### Gameplay
-The end goal is to implements the XBoard protocol for interface with front-ends such as XBoard, and perhaps the UCI protocol for more modern front-ends.
+Currently the XBoard protocol is used due to its simplicity. The interface is a very primitive syncronous stdin/stdout-based system. Eventually, the search will happen in a separate thread, enabling interrupting via the UI and such possible.
+
+#### Opening Books
+Tulip uses a SQLite datbase for its opening books. Generating these books from a set of games in a PGN format is accomplished via the enclosed Python scripts in /utils:
+
+<pre>
+utils > ./digest_pgn.py some_pgn_file.pgn | ./build_book.py
+Read 1419 line(s) from stdin.
+Wrote 14378 moves(s) and 12639 unique position(s) to opening file "tulip_openings.sqlite"
+</pre>
