@@ -36,6 +36,7 @@
 #include "move.h"
 #include "search.h"
 #include "log.h"
+#include "result.h"
 
 static void xBoardWrite(XBoardState* xbs, const char* format, ...) {
 	va_list argptr;
@@ -132,9 +133,33 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
 	return foundMove;
 }
 
+static void printResult(XBoardState* xbs, int32_t result) {
+	switch (result) {
+	case STATUS_MATERIAL_DRAW:
+		xBoardWrite(xbs, "1/2-1/2 {Draw by material.}");
+		break;
+	case STATUS_STALEMATE:
+		xBoardWrite(xbs, "1/2-1/2 {Stalemate.}");
+		break;
+	case STATUS_THREEFOLD_DRAW:
+		xBoardWrite(xbs, "1/2-1/2 {Draw by threefold repitition.");
+		break;
+	case STATUS_WHITE_CHECKMATED:
+		xBoardWrite(xbs, "0-1 {White checkmated.}");
+		break;
+	case STATUS_BLACK_CHECKMATED:
+		xBoardWrite(xbs, "1-0 {Black checkmated.}");
+		break;
+	}
+}
+
 static void xBoardGo(XBoardState* xbs) {
 	xbs->forceMode = false;
 	xBoardThinkAndMove(xbs);
+	const int32_t result = getResult(&xbs->gameState);
+	if (result != STATUS_NONE) {
+		printResult(xbs, result);
+	}
 }
 
 static void xBoardMove(XBoardState* xbs, char* move) {
@@ -145,7 +170,12 @@ static void xBoardMove(XBoardState* xbs, char* move) {
 		logGameState(xbs);
 
 		if (!xbs->forceMode) {
-			xBoardThinkAndMove(xbs);
+			const int32_t result = getResult(&xbs->gameState);
+			if (result == STATUS_NONE) {
+				xBoardThinkAndMove(xbs);
+			} else {
+				printResult(xbs, result);
+			}
 		}
 	} else {
 		xBoardWrite(xbs, "Illegal move: %s", move);

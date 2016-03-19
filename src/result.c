@@ -38,6 +38,8 @@ int32_t getResult(GameState* g) {
                 return STATUS_THREEFOLD_DRAW;
         }
 
+        // TODO: Fifty move count!
+
         const int32_t moves = countLegalMoves(g);
 
         if (moves == 0) {
