@@ -103,6 +103,6 @@ int printSquareIndex(const int32_t index, char* buffer) {
 
         buffer[strIndex++] = indexToFileChar(index);
         buffer[strIndex++] = indexToRankChar(index);
-
+        buffer[strIndex] = '\0';
         return strIndex;
 }
