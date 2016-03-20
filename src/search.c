@@ -100,7 +100,7 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 	// Forcing them to move out of a checking position, however, is good.
 	if (allowNullMove && !check) {
 		makeNullMove(state);
-		const int32_t nullScore = alphaBeta(state, result, depth + 1 + NULL_MOVE_RADIUS, maxDepth, -beta, -beta + 1, false);
+		const int32_t nullScore = -1 * alphaBeta(state, result, depth + 1 + NULL_MOVE_RADIUS, maxDepth, -beta, -beta + 1, false);
 		unmakeNullMove(state);
 
 		if (nullScore > beta) {

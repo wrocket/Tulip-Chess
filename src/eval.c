@@ -90,6 +90,19 @@ static inline int32_t exposureBlack(const Piece** b, int sq) {
 
     return count;
 }
+
+static inline int32_t bishopMobility(const Piece** b, int sq) {
+    // TODO: Figure out some leet way to do this with bitboards.
+    int32_t count = 0;
+    int32_t sp;
+
+    COUNT_DIRECTION(OFFSET_NE);
+    COUNT_DIRECTION(OFFSET_SE);
+    COUNT_DIRECTION(OFFSET_NW);
+    COUNT_DIRECTION(OFFSET_SW);
+
+    return count;
+}
 #undef COUNT_DIRECTION
 
 int32_t classifyEndgame(GameState* g) {
@@ -142,9 +155,11 @@ int32_t evaluateOpening(GameState* state) {
             break;
         case ORD_WBISHOP:
             score += SCORE_BISHOP;
+            score += bishopMobility(board, sq) * MINOR_PIECE_MOBILITY_BONUS;
             break;
         case ORD_BBISHOP:
             score -= SCORE_BISHOP;
+            score -= bishopMobility(board, sq) * MINOR_PIECE_MOBILITY_BONUS;
             break;
         case ORD_WROOK:
             score += SCORE_ROOK;
