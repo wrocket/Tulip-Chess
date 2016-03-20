@@ -31,9 +31,6 @@
 #include "piece.h"
 #include "eval.h"
 
-#define EVAL_SHARE_RANK_RQ_WHITE() onSameFileWithPowerPiece(state, sq, ORD_WROOK, ORD_WQUEEN)
-#define EVAL_SHARE_RANK_RQ_BLACK() onSameFileWithPowerPiece(state, sq, ORD_BROOK, ORD_BQUEEN)
-
 static inline int32_t countBits(uint64_t n) {
     // Thank you, Brian Kernighan!
     int32_t c;
@@ -301,11 +298,11 @@ static int32_t evaluateEndgame(GameState* state) {
             score -= SCORE_BISHOP;
             break;
         case ORD_WROOK:
-            score += EVAL_SHARE_RANK_RQ_WHITE();
+            score += onSameFileWithPowerPiece(state, sq, ORD_WROOK, ORD_WQUEEN);
             score += SCORE_ROOK;
             break;
         case ORD_BROOK:
-            score -= EVAL_SHARE_RANK_RQ_BLACK();
+            score -= onSameFileWithPowerPiece(state, sq, ORD_BROOK, ORD_BQUEEN);
             score -= SCORE_ROOK;
             break;
         case ORD_WQUEEN:
@@ -362,6 +359,3 @@ double friendlyScore(GameState* state, int32_t rawScore) {
     const int32_t multiplier = state->current->toMove == COLOR_WHITE ? 1 : -1;
     return (double) (rawScore * multiplier) / 100.0;
 }
-
-#undef EVAL_SHARE_RANK_RQ_WHITE
-#undef EVAL_SHARE_RANK_RQ_BLACK
