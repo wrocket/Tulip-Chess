@@ -37,6 +37,7 @@
 #include "log.h"
 #include "xboard.h"
 #include "hash.h"
+#include "draw.h"
 
 static int32_t compareMoveScore(const void* a, const void* b) {
 	return ((MoveScore*) b)->score - ((MoveScore*) a)->score; // Underflow issues? Hopefully our scores are on the order of 1e5...
@@ -77,6 +78,10 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 	result->nodes++;
 
 	int32_t hashf = HASHF_ALPHA;
+
+	if (isThreefoldDraw(state)) {
+		return 0;
+	}
 
 	if (depth >= maxDepth) {
 		const int32_t evalScore = evaluate(state);
