@@ -41,7 +41,7 @@
 
 #define KING_ENDGAME_DISTANCE_PENALTY -20
 
-#define KING_ENDGAME_RECTANGLE_PENALTY -10
+#define KING_ENDGAME_RECTANGLE_PENALTY -20
 
 // A per-square penalty for opening a king on files and diagonals.
 #define KING_EXPOSURE -3

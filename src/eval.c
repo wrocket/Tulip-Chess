@@ -273,7 +273,7 @@ static int32_t evaluateEndgame(GameState* state) {
 	// If in a rook endgame, penalize having the kings far apart.
 	// This is to encourage the player with the advantage to push the king up
 	// into a normal checkmate position.
-	// Also penalize the player with the advantage for leaving the king near the center of the board.
+	// Also penalize the player with the advantage for leaving the opposing king near the center of the board.
 	if (endgame == ENDGAME_WROOKvKING) {
 		score += KING_DISTANCE_PENALTY();
 		score += KING_ENDGAME_RECTANGLE_PENALTY * countKingRectangleSize(sd->blackKingSquare);
