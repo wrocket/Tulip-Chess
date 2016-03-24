@@ -39,6 +39,8 @@
 #include "hash.h"
 #include "draw.h"
 
+#define USE_Q_SEARCH false
+
 static int32_t compareMoveScore(const void* a, const void* b) {
 	return ((MoveScore*) b)->score - ((MoveScore*) a)->score; // Underflow issues? Hopefully our scores are on the order of 1e5...
 }
@@ -73,6 +75,44 @@ void initSearchArgs(SearchArgs* args) {
 	args->chessInterfaceState = NULL;
 }
 
+static int32_t qsearch(GameState* state, SearchResult* result, const int32_t depth, int32_t alpha, int32_t beta) {
+	const int32_t evalScore = evaluate(state);
+	if (evalScore >= beta) {
+		return beta;
+	}
+
+	if (evalScore > alpha) {
+		alpha = evalScore;
+	}
+
+	MoveBuffer* buffer = &state->moveBuffers[depth];
+	const int32_t moveCount = generatePseudoMoves(state, buffer);
+
+	for (int32_t i = 0; i < moveCount; i++) {
+		Move m = buffer->moves[i];
+		if (m.captures != &EMPTY) {
+			makeMove(state, &m);
+			if (isLegalPosition(state)) {
+				const int32_t moveScore =  -1 * qsearch(state, result, depth + 1, -1 * beta, -1 * alpha);
+				unmakeMove(state, &m);
+
+				if (moveScore >= beta) {
+					result->betaCutoffs++;
+					return beta;
+				}
+
+				if (moveScore > alpha) {
+					alpha = moveScore;
+				}
+			} else {
+				unmakeMove(state, &m);
+			}
+		}
+	}
+
+	return alpha;
+}
+
 static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t depth, const int32_t maxDepth,
                          int32_t alpha, int32_t beta, bool allowNullMove) {
 	result->nodes++;
@@ -84,7 +124,7 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 	}
 
 	if (depth >= maxDepth) {
-		const int32_t evalScore = evaluate(state);
+		const int32_t evalScore = USE_Q_SEARCH ? qsearch(state, result, depth, alpha, beta) :  evaluate(state);
 		if (allowNullMove) {
 			hash_put(state, evalScore, depth, HASHF_EXACT);
 		}
