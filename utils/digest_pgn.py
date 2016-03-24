@@ -86,7 +86,10 @@ def parse_pgn_lines(line_source):
 
 def read_pgn_file(file_name):
     with open(file_name, 'r') as in_file:
-        results = parse_pgn_lines(in_file)
+        try:
+            results = parse_pgn_lines(in_file)
+        except ValueError:
+            return []
     return results
 
 
