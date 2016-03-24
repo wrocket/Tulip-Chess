@@ -297,6 +297,8 @@ bool parseFenWithPrint(GameState* state, char* fenStr, bool printErrors) {
     state->current->epFile = epFile;
     state->current->fiftyMoveCount = fiftyMove;
 
+    hash_clearZTable(&state->zTable);
+
     reinitBitboards(state);
     state->current->hash = computeHash(state);
 

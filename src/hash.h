@@ -47,6 +47,9 @@ void hash_createZTable(ZTable* table);
 // Clean up a ZTable
 void hash_destroyZTable(ZTable* table);
 
+// Reset a ZTable without reallocating memory
+void hash_clearZTable(ZTable* table);
+
 // Computes the hash of the given state.
 // SLOW. Do not use in tight loops.
 uint64_t computeHash(GameState* gameState);

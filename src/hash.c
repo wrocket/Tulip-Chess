@@ -29,6 +29,7 @@
 #include "tulip.h"
 #include "gamestate.h"
 #include "ztable.h"
+#include "string.h"
 
 int32_t hash_probe(GameState* state, int32_t currentDepth, int32_t alpha, int32_t beta) {
     const uint64_t hash = state->current->hash;
@@ -65,6 +66,10 @@ void hash_put(GameState* state, int32_t score, int32_t depth, int32_t flag) {
     entry->depth = depth;
     entry->hash = hash;
     entry->flag = flag;
+}
+
+void hash_clearZTable(ZTable* table) {
+    memset(table->data, 0, ZTABLE_SIZE * sizeof(ZTableEntry));
 }
 
 void hash_createZTable(ZTable* table) {
