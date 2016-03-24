@@ -31,8 +31,6 @@
 #define SCORE_ROOK      500
 #define SCORE_QUEEN     900
 
-#define BONUS_BISHOP_MOBILITY 9
-
 #define PENALTY_DOUBLED_PAWN -24
 
 #define MINOR_PIECE_MOBILITY_BONUS 8
@@ -50,6 +48,8 @@ extern const int32_t SQ_SCORE_PAWN_OPENING_WHITE[144];
 extern const int32_t SQ_SCORE_PAWN_OPENING_BLACK[144];
 extern const int32_t SQ_SCORE_KNIGHT_OPENING_BLACK[144];
 extern const int32_t SQ_SCORE_KNIGHT_OPENING_WHITE[144];
+extern const int32_t SQ_SCORE_QUEEN_OPENING_WHITE[144];
+extern const int32_t SQ_SCORE_QUEEN_OPENING_BLACK[144];
 
 // A board square array to encourage driving enemy kings to the edge of the
 // board in the endgame.

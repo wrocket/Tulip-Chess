@@ -171,9 +171,11 @@ int32_t evaluateOpening(GameState* state) {
 			break;
 		case ORD_WQUEEN:
 			score += SCORE_QUEEN;
+			score += SQ_SCORE_QUEEN_OPENING_WHITE[sq];
 			break;
 		case ORD_BQUEEN:
 			score -= SCORE_QUEEN;
+			score -= SQ_SCORE_QUEEN_OPENING_BLACK[sq];
 			break;
 		case ORD_WKING:
 			score += KING_EXPOSURE * exposureWhite(board, sq);

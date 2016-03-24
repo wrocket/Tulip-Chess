@@ -96,3 +96,15 @@ white_knight_opening_scores = {
 write_array('KNIGHT_OPENING', white_knight_opening_scores)
 
 
+white_queen_opening_scores = {
+	8: [-10, -10, -10, -10, -10, -10, -10, -10],
+	7: [-10, -10, -10, -10, -10, -10, -10, -10],
+	6: [-10, -10, -10, -10, -10, -10, -10, -10],
+	5: [-10, -10, -10, -10, -10, -10, -10, -10],
+	4: [-10, -10, -10, -10, -10, -10, -10, -10],
+	3: [-10, -10, -10, -10, -10, -10, -10, -10],
+	2: [0, 0, 0, 0, 0, 0, 0, 0],
+	1: [0, 0, 0, 0, 0, 0, 0, 0],
+}
+
+write_array('QUEEN_OPENING', white_queen_opening_scores)
