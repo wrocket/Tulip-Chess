@@ -430,6 +430,32 @@ static void printMoveOrder(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
+static void kingRect(int argc, char** argv) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: -kingrect [square]\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if(strlen(argv[1]) != 2) {
+        fprintf(stderr, "Invalid square: %s\n", argv[1]);
+        exit(EXIT_FAILURE);
+    }
+
+    const int32_t file = parseFileChar(argv[1][0]);
+    const int32_t rank = parseRankChar(argv[1][1]);
+
+    if(file == INVALID_FILE || rank == INVALID_RANK) {
+        fprintf(stderr, "Invalid square: %s\n", argv[1]);
+        exit(EXIT_FAILURE);
+    }
+
+    const int32_t sqIndex = B_IDX(file, rank);
+
+    const int32_t rectSize = countKingRectangleSize(sqIndex);
+
+    printKingRectSize(argv[1], rectSize);
+}
+
 int main(int argc, char** argv) {
     argc--;
     argv++;
@@ -472,6 +498,8 @@ int main(int argc, char** argv) {
             checkPassedPawn(argc, argv);
         } else if (0 == strcmp("-interactive", argv[0])) {
           startInteractive();
+        } else if (0 == strcmp("-kingrect", argv[0])) {
+            kingRect(argc, argv);
         } else {
             printBanner();
             printf("Unknown command \"%s\"\n", argv[0]);

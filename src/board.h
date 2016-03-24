@@ -100,6 +100,7 @@
 #define RANK_6  5
 #define RANK_7  6
 #define RANK_8  7
+#define INVALID_RANK 8
 
 // The 144-element board array can be thought of as a 8x8 chessboard with a
 // two-square border around it. These constants are the indexes in to that
@@ -209,6 +210,10 @@ extern const int32_t BOARD_SQ_COLORS[144];
 // Given a human-readable character for a file, return the zero-based file index.
 // E.g.: an input of 'c' returns FILE_C.
 int parseFileChar(const char c);
+
+// Given a human-readable character for a file, return the zero-based file index.
+// E.g.: an input of '3' returns RANK_3.
+int parseRankChar(const char c);
 
 // Given a zero-based file index, return a human-readable respresentation.
 // E.g.: an input of FILE_C returns 'c'.

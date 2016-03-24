@@ -39,6 +39,7 @@ void printEvaluation(char* position, int32_t score);
 void printSearchResult(SearchResult* result, GameState* state);
 void printEndgameClassification(int32_t type);
 void printPassedPawns(char* position, int32_t* wPawns, int32_t wCount, int32_t* bPawns, int32_t bCount);
+void printKingRectSize(char* squareStr, int32_t size);
 
 typedef struct {
     char move[8];

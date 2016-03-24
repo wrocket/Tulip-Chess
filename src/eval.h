@@ -41,4 +41,27 @@ double friendlyScore(GameState* state, int32_t rawScore);
 
 // Classify an endgame into one of several general types.
 int32_t classifyEndgame(GameState* state);
+
+// Count the size of the rectangle formed by placing a king on a given square.
+//   +-+-+-+-+-+-+-+-+
+// 8 | | | | | |x|x|x|
+//   +-+-+-+-+-+-+-+-+
+// 7 | | | | | |k|x|x|
+//   +-+-+-+-+-+-+-+-+
+// 6 | | | | | | | | |
+//   +-+-+-+-+-+-+-+-+
+// 5 | | | | | | | | |
+//   +-+-+-+-+-+-+-+-+
+// 4 | | | | | | | | |
+//   +-+-+-+-+-+-+-+-+
+// 3 |x|x|K| | | | | |
+//   +-+-+-+-+-+-+-+-+
+// 2 |x|x|x| | | | | |
+//   +-+-+-+-+-+-+-+-+
+// 1 |x|x|x| | | | | |
+//   +-+-+-+-+-+-+-+-+
+//    A B C D E F G H
+// For example, on the board above, the K on C3 has an area of 9 (denoted by x).
+// The k on F7 has an area of 6.
+int32_t countKingRectangleSize(int sq);
 #endif

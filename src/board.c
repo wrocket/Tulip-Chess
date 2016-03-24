@@ -62,6 +62,20 @@ int parseFileChar(const char c) {
         }
 }
 
+int parseRankChar(const char c) {
+        switch(tolower(c)) {
+        case '1': return RANK_1;
+        case '2': return RANK_2;
+        case '3': return RANK_3;
+        case '4': return RANK_4;
+        case '5': return RANK_5;
+        case '6': return RANK_6;
+        case '7': return RANK_7;
+        case '8': return RANK_8;
+        default: return INVALID_RANK;
+        }
+}
+
 char fileToChar(const int32_t fileIndex) {
         switch(fileIndex) {
         case FILE_A: return 'a';

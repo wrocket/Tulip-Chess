@@ -183,7 +183,7 @@ static void xBoardMove(XBoardState* xbs, char* move) {
 }
 
 static void xBoardProtover(XBoardState* xbs) {
-	xBoardWrite(xbs, "feature ping=1 san=1 time=1 sigint=0 sigterm=0 done=1");
+	xBoardWrite(xbs, "feature ping=1 san=1 time=1 sigint=0 sigterm=0 setboard=1 done=1");
 }
 
 static void xBoardPing(XBoardState* xbs, char** tokens, int tokenCount) {

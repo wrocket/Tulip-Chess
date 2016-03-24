@@ -44,6 +44,11 @@ class TestBasicMoveApplication(unittest.TestCase):
         parsed_output = json.loads(result)
         return parsed_output['endgameType']
 
+    def size_king_rect(self, square):
+        result = call_tulip(['-kingrect', square])
+        parsed_output = json.loads(result)
+        return int(parsed_output['rectangleSize'])
+
     def find_passed_pawns(self, fen):
         result = call_tulip(['-passedpawns', fen])
         parsed_output = json.loads(result)
@@ -149,6 +154,19 @@ class TestBasicMoveApplication(unittest.TestCase):
     def test_classify_eg_wrook(self):
         result = self.classify_endgame('3k4/8/8/7R/8/8/3K4/8 b - - 0 1')
         self.assertEqual('krvk_white', result)
+
+    def test_king_rect_size(self):
+        desired = {};
+        desired['a1'] = 1
+        desired['h8'] = 1
+        desired['a8'] = 1
+        desired['h1'] = 1
+        desired['a2'] = 2
+        desired['e4'] = 16
+        desired['f4'] = 12
+        for (square, size) in desired.items():
+            result = self.size_king_rect(square)
+            self.assertEqual(size, result)
 
     def test_passed_pawns_01(self):
         result = self.find_passed_pawns('4k3/8/6pp/8/3P1P2/1P6/8/4K3 b - - 0 1')

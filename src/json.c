@@ -364,6 +364,10 @@ void printEvaluation(char* position, int32_t score) {
     printf("}\n");
 }
 
+void printKingRectSize(char* sq, int32_t size) {
+    printf("{\"square\": \"%s\", \"rectangleSize\": %d}\n", sq, size);
+}
+
 void printEndgameClassification(int32_t type) {
     const char* typeStr;
     if (type == ENDGAME_UNCLASSIFIED) {

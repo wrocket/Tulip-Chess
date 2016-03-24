@@ -102,6 +102,11 @@ static inline int32_t bishopMobility(const Piece** b, int sq) {
 }
 #undef COUNT_DIRECTION
 
+int32_t countKingRectangleSize(int sq) {
+	// TODO: Consider if calculating is faster than lookup.
+	return KING_RECT_SIZES[sq];
+}
+
 int32_t classifyEndgame(GameState* g) {
 	StateData* sd = g->current;
 	int32_t* counts = g->pieceCounts;
@@ -268,10 +273,13 @@ static int32_t evaluateEndgame(GameState* state) {
 	// If in a rook endgame, penalize having the kings far apart.
 	// This is to encourage the player with the advantage to push the king up
 	// into a normal checkmate position.
+	// Also penalize the player with the advantage for leaving the king near the center of the board.
 	if (endgame == ENDGAME_WROOKvKING) {
 		score += KING_DISTANCE_PENALTY();
+		score += KING_ENDGAME_RECTANGLE_PENALTY * countKingRectangleSize(sd->blackKingSquare);
 	} else if (endgame == ENDGAME_BROOKvKING) {
 		score -= KING_DISTANCE_PENALTY();
+		score -= KING_ENDGAME_RECTANGLE_PENALTY * countKingRectangleSize(sd->whiteKingSquare);
 	}
 
 	for (int32_t sq = SQ_A1; sq <= SQ_H8; sq++) {
