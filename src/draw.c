@@ -80,7 +80,7 @@ static inline bool threePieces(GameState* g, const int32_t total) {
            || g->pieceCounts[ORD_WKNIGHT] > 0;
 }
 
-bool isMaterialDraw(GameState* g) {
+bool draw_isMaterial(GameState* g) {
     const int32_t total = g->current->whitePieceCount + g->current->blackPieceCount;
     bool result;
     switch (total) {
@@ -101,7 +101,7 @@ bool isMaterialDraw(GameState* g) {
     return result;
 }
 
-bool isThreefoldDraw(GameState* g) {
+bool draw_isThreefold(GameState* g) {
     StateData* currentData = g->current;
     const uint64_t startingHash = currentData->hash;
     bool result = false;

@@ -119,7 +119,7 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 
 	int32_t hashf = HASHF_ALPHA;
 
-	if (isThreefoldDraw(state)) {
+	if (draw_isThreefold(state) || draw_isMaterial(state)) {
 		return 0;
 	}
 

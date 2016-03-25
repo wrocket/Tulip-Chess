@@ -26,9 +26,9 @@
 #include "gamestate.h"
 
 // Determines if the given game state is in a material draw situation.
-bool isMaterialDraw(GameState* g);
+bool draw_isMaterial(GameState* g);
 
 // Determines if the given game state is in a threefold repetition draw situation.
-bool isThreefoldDraw(GameState* g);
+bool draw_isThreefold(GameState* g);
 
 #endif

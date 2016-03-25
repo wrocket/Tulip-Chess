@@ -30,11 +30,11 @@
 #include "result.h"
 
 int32_t getResult(GameState* g) {
-        if (isMaterialDraw(g)) {
+        if (draw_isMaterial(g)) {
                 return STATUS_MATERIAL_DRAW;
         }
 
-        if (isThreefoldDraw(g)) {
+        if (draw_isThreefold(g)) {
                 return STATUS_THREEFOLD_DRAW;
         }
 
