@@ -124,6 +124,37 @@ int32_t classifyEndgame(GameState* g) {
 	return ENDGAME_UNCLASSIFIED;
 }
 
+static inline int32_t basicWPawnBonus(const int32_t sq, const Piece** board, uint64_t* bb) {
+	int32_t score = SCORE_PAWN;
+	score += SQ_SCORE_PAWN_OPENING_WHITE[sq];
+	if (board[sq + OFFSET_N] == &WPAWN) {
+		score += PENALTY_DOUBLED_PAWN;
+	}
+
+	// If the squares to the SE or SW are also white pawns, add a bonus.
+	const uint64_t defendingPawns = bb[ORD_WPAWN] & BITS_WPAWN[sq];
+	if (defendingPawns) {
+		score += PAWN_CHAIN_BONUS;
+	}
+	return score;
+}
+
+static inline int32_t basicBPawnBonus(const int32_t sq, const Piece** board, uint64_t* bb) {
+	int32_t score = SCORE_PAWN;
+	score += SQ_SCORE_PAWN_OPENING_BLACK[sq];
+	if (board[sq + OFFSET_S] == &BPAWN) {
+		score += PENALTY_DOUBLED_PAWN;
+	}
+
+	// If the squares to the NE or NW are also black pawns, add a bonus.
+	const uint64_t defendingPawns = bb[ORD_BPAWN] & BITS_BPAWN[sq];
+	if (defendingPawns) {
+		score += PAWN_CHAIN_BONUS;
+	}
+
+	return score;
+}
+
 int32_t evaluateOpening(GameState* state) {
 	const Piece** board = state->board;
 	int32_t score = 0;
@@ -137,18 +168,10 @@ int32_t evaluateOpening(GameState* state) {
 
 		switch (p->ordinal) {
 		case ORD_WPAWN:
-			score += SCORE_PAWN;
-			score += SQ_SCORE_PAWN_OPENING_WHITE[sq];
-			if (board[sq + OFFSET_N] == &WPAWN) {
-				score += PENALTY_DOUBLED_PAWN;
-			}
+			score += basicWPawnBonus(sq, board, bb);
 			break;
 		case ORD_BPAWN:
-			score -= SCORE_PAWN;
-			score -= SQ_SCORE_PAWN_OPENING_BLACK[sq];
-			if (board[sq + OFFSET_S] == &BPAWN) {
-				score -= PENALTY_DOUBLED_PAWN;
-			}
+			score -= basicBPawnBonus(sq, board, bb);
 			break;
 		case ORD_WKNIGHT:
 			score += SCORE_KNIGHT;
@@ -213,10 +236,10 @@ static int32_t evaluateMidgame(GameState* state) {
 
 		switch (p->ordinal) {
 		case ORD_WPAWN:
-			score += SCORE_PAWN;
+			score += basicWPawnBonus(sq, board, bb);
 			break;
 		case ORD_BPAWN:
-			score -= SCORE_PAWN;
+			score -= basicBPawnBonus(sq, board, bb);
 			break;
 		case ORD_WKNIGHT:
 			score += SCORE_KNIGHT;
