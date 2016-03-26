@@ -35,7 +35,7 @@ import sys
 import re
 from itertools import chain
 
-_max_moves = 20
+_max_moves = 14
 
 if len(sys.argv) <= 1:
     print('Usage: %s [pgn file 1] [pgn file 2] ...' % sys.argv[0])
@@ -50,7 +50,7 @@ def remove_move_numbers(t):
 
 # Eliminate empty tokens and move number tokens.
 def is_move_token(str):
-    return len(str) and not re.match(r'^\d+\.*', str)
+    return len(str) and not re.match(r'^\d+\.*', str) and str != '*'
 
 
 def parse_moves(game_lines):

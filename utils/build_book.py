@@ -65,7 +65,6 @@ def digest_line(move_line):
         current_hash = item[1]
     return d
 
-
 def combine_lines(line_dicts):
     result = {}
     for d in line_dicts:
@@ -104,7 +103,20 @@ def read_input():
 
 
 all_lines = read_input()
-print("Read %i line(s) from stdin." % len(all_lines))
-digested_lines = filter(lambda l : l != None, [digest_line(build_line(x)) for x in all_lines])
+line_len = len(all_lines)
+print("Read %i line(s) from stdin." % line_len)
+digested_lines = []
+count = 0
+for x in all_lines:
+    count += 1
+    if count % 10 == 0 or count == line_len:
+        sys.stdout.write('\rCompleted %0.2f%%' % (count / line_len * 100.0))
+    digested = digest_line(build_line(x))
+    if digested != None:
+        digested_lines.append(digested)
+print()
+print('Combining positions...');
 file_lines = combine_lines(digested_lines)
+print('Writing to database file...')
 write_to_database(file_lines, 'tulip_openings.sqlite')
+print('Done.')
