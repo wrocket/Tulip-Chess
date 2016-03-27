@@ -51,11 +51,24 @@
 #include "xboard.h"
 #include "bitboard.h"
 #include "interactive.h"
+#include "env.h"
 
 static void printBanner() {
     printf("Tulip Chess Engine 0.001\n");
     printf("Size of uint64: %lu bits\n", CHAR_BIT * sizeof(uint64_t));
     printf("Using SQLite %s\n", sqlite3_libversion());
+
+    const int32_t size = 1024;
+    char* str = calloc(size, sizeof(char));
+    if (env_getCpuInfo(str, size)) {
+        printf("CPU: %s\n", str);
+    }
+
+    if (env_getOsInfo(str, size)) {
+        printf("OS: %s\n", str);
+    }
+
+    free(str);
 }
 
 // Simple alternative to getopt(). Consider using getopt anyway...

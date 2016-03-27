@@ -24,7 +24,7 @@ CC=clang-3.7
 CFLAGS=-Wall -Werror -Wconversion -pedantic -std=c99
 OBJ_FILES = tulip.o board.o piece.o statedata.o movegen.o move.o util.o gamestate.o json.o fen.o bitboard.o attack.o \
 makemove.o notation.o hash.o hashconsts.o draw.o result.o book.o eval.o evalconsts.o search.o xboard.o log.o \
-interactive.o
+interactive.o env.o
 FINAL_LINK_FLAGS=-lm -pthread -ldl
 
 all: tulip
@@ -112,6 +112,9 @@ xboard.o: xboard.c xboard.h
 
 log.o: log.c log.h
 	$(CC) $(CFLAGS) -c log.c
+
+env.o: env.c env.h
+	$(CC) $(CFLAGS) -c env.c
 
 clean:
 	rm *.o tulip
