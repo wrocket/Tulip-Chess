@@ -141,6 +141,9 @@ static bool parseBoard(char* t, GameState* gs, bool printErr) {
     int32_t sqwk = -1;
     int32_t sqbk = -1;
 
+    // Clear out all piece counts.
+    memset(pCounts, 0, sizeof(int32_t) * (ORD_MAX + 1));
+
     char* c = t;
     while (*c && currentRank >= RANK_1) {
         if (*c == '/') {
