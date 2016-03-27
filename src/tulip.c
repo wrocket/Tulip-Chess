@@ -254,16 +254,15 @@ static void findBookMoves(int argc, char** argv) {
 
     if (!book_open(bookFile, &book)) {
         fprintf(stderr, "Unable to open book [%s]\n", bookFile);
-        exit(EXIT_FAILURE);
+    } else {
+        book_getMoves(&gs, &buff, &book);
+        book_close(&book);
     }
-
-    book_getMoves(&gs, &buff, &book);
-    book_close(&book);
-
     printMovelistJson(fen, "legal", &gs, &buff);
 
     destroyMoveBuffer(&buff);
     destroyGamestate(&gs);
+
 }
 
 static void evalPosition(int argc, char** argv) {

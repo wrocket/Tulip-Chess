@@ -26,6 +26,7 @@
 #include <inttypes.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <unistd.h>
 
 #include "book.h"
 #include "tulip.h"
@@ -52,6 +53,11 @@ static void destroyStrArray(char*** array) {
 }
 
 static int readMoves(GameState* state, char*** strArray, OpenBook* book) {
+	// Check if book exists.
+	if (access(book->fileName, F_OK) != 0) {
+		return 0;
+	}
+
 	const size_t sqlLen = 1024;
 	char* sql = calloc(sqlLen, sizeof(char));
 	if (!sql) {
@@ -88,7 +94,7 @@ static int readMoves(GameState* state, char*** strArray, OpenBook* book) {
 
 bool book_open(const char* fileName, OpenBook* book) {
 	book->fileName = fileName;
-	return true;
+	return access(book->fileName, F_OK) == 0;
 }
 
 bool book_close(OpenBook* book) {
