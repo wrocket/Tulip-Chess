@@ -52,6 +52,7 @@
 #include "bitboard.h"
 #include "interactive.h"
 #include "env.h"
+#include "hash.h"
 
 static void printBanner() {
     printf("Tulip Chess Engine 0.001\n");
@@ -68,7 +69,11 @@ static void printBanner() {
         printf("OS: %s\n", str);
     }
 
+    hash_friendlySize(str, size);
+    printf("Hash table size: %s\n", str);
+
     free(str);
+
 }
 
 // Simple alternative to getopt(). Consider using getopt anyway...

@@ -50,6 +50,12 @@ void hash_destroyZTable(ZTable* table);
 // Reset a ZTable without reallocating memory
 void hash_clearZTable(ZTable* table);
 
+// Get the size of the ZTable in bytes.
+size_t hash_zTableSizeBytes();
+
+// Prints a "friendly" size of the hash table.
+void hash_friendlySize(char* str, size_t size);
+
 // Computes the hash of the given state.
 // SLOW. Do not use in tight loops.
 uint64_t computeHash(GameState* gameState);

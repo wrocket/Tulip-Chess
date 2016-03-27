@@ -105,3 +105,25 @@ uint64_t computeHash(GameState* gameState) {
 
     return h;
 }
+
+size_t hash_zTableSizeBytes() {
+    return ZTABLE_SIZE * sizeof(ZTableEntry);
+}
+
+void hash_friendlySize(char* str, size_t size) {
+    size_t zTableBytes = hash_zTableSizeBytes();
+    const char* suffix;
+    double qty;
+    if (zTableBytes > 1024 * 1024) {
+        suffix = "MiB";
+        qty = (double) zTableBytes / (1024.0 * 1024.0);
+    } else if (zTableBytes > 1024) {
+        suffix = "KiB";
+        qty = (double) zTableBytes / 1024.0;
+    } else {
+        suffix = "bytes";
+        qty = (double) zTableBytes;
+    }
+
+    snprintf(str, size, "%.2f %s", qty, suffix);
+}
