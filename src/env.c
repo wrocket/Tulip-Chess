@@ -30,29 +30,35 @@
 #include "env.h"
 
 static bool runCommand(const char* command, char* buff, int32_t len) {
-    FILE *fp;
-    bool result = false;
-    fp = popen(command, "r");
-    if (fp) {
-        if (fgets(buff, len, fp)) {
-            result = true;
-            char* idx = buff + strlen(buff) - 1;
-            while (idx > buff && iscntrl(*idx)) {
-                *idx-- = '\0';
-            }
-        }
+	if (len <= 0) {
+		return false;
+	}
 
-        pclose(fp);
-    }
+	FILE *fp;
+	bool result = false;
+	fp = popen(command, "r");
+	if (fp) {
+		if (fgets(buff, len, fp)) {
+			result = true;
+			char* idx = buff + strlen(buff) - 1;
+			while (idx > buff && iscntrl(*idx)) {
+				*idx-- = '\0';
+			}
+		}
 
-    return true;
+		pclose(fp);
+	} else {
+		buff[0] = '\0';
+	}
+
+	return result;
 }
 
 bool env_getCpuInfo(char* buff, int32_t len) {
-    const char * getCPU = "grep -m 1 \"model name\" /proc/cpuinfo | sed -e \"s/model name\\s\\+:\\s\\+//g\"";
-    return runCommand(getCPU, buff, len);
+	const char * getCPU = "grep -m 1 \"model name\" /proc/cpuinfo | sed -e \"s/model name\\s\\+:\\s\\+//g\"";
+	return runCommand(getCPU, buff, len);
 }
 
 bool env_getOsInfo(char* buff, int32_t len) {
-    return runCommand("uname -o -r", buff, len);
+	return runCommand("uname -o -r", buff, len);
 }
