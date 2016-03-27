@@ -28,11 +28,6 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-// Declaring these here as they aren't part of the C std library.
-// The linker will find these when compile.
-extern FILE *popen (const char *__command, const char *__modes) __wur;
-extern int pclose (FILE *__stream);
-
 bool env_getCpuInfo(char* buff, int32_t len);
 bool env_getOsInfo(char* buff, int32_t len);
 
