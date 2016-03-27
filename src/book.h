@@ -26,11 +26,10 @@
 #include <inttypes.h>
 #include "gamestate.h"
 #include "move.h"
-#include "sqlite/sqlite3.h"
 
 // Structure defining a book. Essentially a "handle" to an open book.
 typedef struct {
-        sqlite3* database;
+        const char* fileName;
 } OpenBook;
 
 // Opens a book given a file name. Returns true on success, else false.

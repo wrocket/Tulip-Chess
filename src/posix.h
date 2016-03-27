@@ -20,46 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
-#include <inttypes.h>
-#include <stdbool.h>
+#ifndef POSIX_H
+#define POSIX_H
 
-#include "env.h"
-#include "posix.h"
+// Declaring these here as they aren't part of the C std library.
+// The linker will find these when compile.
+extern FILE *popen (const char *__command, const char *__modes) __wur;
+extern int pclose (FILE *__stream);
 
-static bool runCommand(const char* command, char* buff, int32_t len) {
-	if (len <= 0) {
-		return false;
-	}
-
-	FILE *fp;
-	bool result = false;
-	fp = popen(command, "r");
-	if (fp) {
-		if (fgets(buff, len, fp)) {
-			result = true;
-			char* idx = buff + strlen(buff) - 1;
-			while (idx > buff && iscntrl(*idx)) {
-				*idx-- = '\0';
-			}
-		}
-
-		pclose(fp);
-	} else {
-		buff[0] = '\0';
-	}
-
-	return result;
-}
-
-bool env_getCpuInfo(char* buff, int32_t len) {
-	const char * getCPU = "grep -m 1 \"model name\" /proc/cpuinfo | sed -e \"s/model name\\s\\+:\\s\\+//g\"";
-	return runCommand(getCPU, buff, len);
-}
-
-bool env_getOsInfo(char* buff, int32_t len) {
-	return runCommand("uname -o -r", buff, len);
-}
+#endif

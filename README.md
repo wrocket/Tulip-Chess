@@ -3,15 +3,13 @@ Tulip-Chess
 
 Purpose
 -------
-This is a chess engine written for my own amusement. Not designed to be the absolute strongest, but rather a fun programming project. The current goal is play strength >= 2000 ELO. I've been writing chess engines since my undergraduate years using various technologies and techniques. Tulip represents what development I find "fun" at the moment.
+This is a chess engine written for my own amusement. Not designed to be the absolute strongest, but rather a fun programming project. The current goal is play strength >= 2000 ELO. I've been writing chess engines since my undergraduate years using various technologies and techniques. Tulip represents what development I find "fun" at the moment - it is my forever project.
 
 Requirements
 ------------
-The application is intended to be built on any UNIX-ish system using a GCC-like C compiler. Currently the default makefile uses Clang 3.7.
+The application is intended to be built on any UNIX-ish system using a GCC-like C compiler. Currently the default makefile uses Clang 3.7. At the time of this writing, 90% of development is done on a Linux machine, so build issues with OS/X and such might slowly creep in.
 
-SQLite is used as a storage engine. A version of SQLite 3.10 or greater will need to be provided.
-
-Place the compiled sqlite3.o and sqlite3.h files in src/sqlite before running the build.
+SQLite is used as a storage engine for opening books and similar. The application expects that the "sqlite3" command is available on the host system.
 
 The relevant source files can be obtained from http://sqlite.org.
 
@@ -25,7 +23,7 @@ Principles
 
 Current Status
 --------------
-Currently, Tulip can play a realtively weak game of chess, taking advantage of obvious blunders, using the XBoard front-end.
+Currently, Tulip can play a relatively weak game of chess, taking advantage of obvious blunders, using the XBoard front-end.
 
 
 Technical Concepts

@@ -25,14 +25,14 @@
 #include <string.h>
 #include <inttypes.h>
 #include <sys/stat.h>
-
-#include "sqlite/sqlite3.h"
+#include <ctype.h>
 
 #include "book.h"
 #include "tulip.h"
 #include "gamestate.h"
 #include "move.h"
 #include "notation.h"
+#include "posix.h"
 
 #define BOOK_MAX_MOVES 256
 #define BOOK_MAX_STR_LEN 8
@@ -52,62 +52,47 @@ static void destroyStrArray(char*** array) {
 }
 
 static int readMoves(GameState* state, char*** strArray, OpenBook* book) {
-	int32_t moveCount = 0;
-	sqlite3* db = book->database;
-	sqlite3_stmt *res;
-	char hashStr[17]; // 16 chars plus null terminator
+	const size_t sqlLen = 1024;
+	char* sql = calloc(sqlLen, sizeof(char));
+	if (!sql) {
+		perror("Error allocating memory for SQL statement.");
+		return 0;
+	}
+	snprintf(sql, sqlLen, "sqlite3 %s \"select MOVE from OPENING_BOOK where POSITION_HASH = '%016" PRIX64 "' COLLATE NOCASE\"", book->fileName, state->current->hash);
 
-	// Prepare the statement
-	char *sql = "select MOVE from OPENING_BOOK where POSITION_HASH = ? COLLATE NOCASE";
-	int32_t rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
-
-	if (rc == SQLITE_OK) {
-		snprintf(hashStr, 17, "%016" PRIX64 "", state->current->hash);
-		sqlite3_bind_text(res, 1, hashStr, (int) strlen(hashStr), SQLITE_STATIC);
-	} else {
-		fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+	const size_t lineLen = 16;
+	char* line = calloc(lineLen, sizeof(char));
+	if (!line) {
+		perror("Error allocating memory for line buffer.");
 		return 0;
 	}
 
-	// Read results, copying the raw strings to the str buffer.
-	int32_t step;
-	do {
-		step = sqlite3_step(res);
-		if (step == SQLITE_ROW) {
-			const char * moveStr =  (const char *) sqlite3_column_text(res, 0);
-			strncpy((*strArray)[moveCount++], moveStr, BOOK_MAX_STR_LEN);
+	int32_t count = 0;
+	FILE *fp;
+	fp = popen(sql, "r");
+	if (fp) {
+		while (fgets(line, lineLen, fp)) {
+			char* idx = line + strlen(line) - 1;
+			while (idx > line && iscntrl(*idx)) {
+				*idx-- = '\0';
+			}
+
+			strncpy((*strArray)[count++], line, lineLen);
 		}
-	} while (step == SQLITE_ROW);
 
-	sqlite3_finalize(res);
+		pclose(fp);
+	}
 
-	return moveCount;
+	return count;
 }
 
 bool book_open(const char* fileName, OpenBook* book) {
-	sqlite3* db;
-	int32_t rc;
-	bool result = true;
-	struct stat st;
-
-	if (stat(fileName, &st) != 0 ) {
-		result = false;
-	} else {
-		rc = sqlite3_open(fileName, &db);
-		if (rc != SQLITE_OK) {
-			fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
-			sqlite3_close(db);
-			result = false;
-		} else {
-			book->database = db;
-		}
-	}
-
-	return result;
+	book->fileName = fileName;
+	return true;
 }
 
 bool book_close(OpenBook* book) {
-	return sqlite3_close(book->database) == SQLITE_OK;
+	return true;
 }
 
 int book_getMoves(GameState* gameState, MoveBuffer* buffer, OpenBook* book) {
