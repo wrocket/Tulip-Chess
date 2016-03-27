@@ -25,24 +25,32 @@
 
 #include <inttypes.h>
 
+// Basic piece values
 #define SCORE_PAWN      100
 #define SCORE_KNIGHT    300
 #define SCORE_BISHOP    325
 #define SCORE_ROOK      500
 #define SCORE_QUEEN     900
 
+// Penalty assessed when two pawns are adjacent, on the same file but different ranks.
 #define PENALTY_DOUBLED_PAWN -24
 
+// A per-square bonus for mobility given to knights and bishops, mainly in the opening.
 #define MINOR_PIECE_MOBILITY_BONUS 8
 
+// Bonus in endgames for rook/queens sharing the same rank. This can set up rook cannons.
 #define BONUS_RQ_SHARE_RANK 25
 
+// Score for a pawn (in the endgame) beyond the rank of the last possible opposing pawn.
 #define SCORE_PASSED_PAWN 50
 
+// Bonus for having a pawn defending another pawn
 #define PAWN_CHAIN_BONUS 6
 
+// Penalty designed to promote moving kings inward in KRvK and KQvK endgames
 #define KING_ENDGAME_DISTANCE_PENALTY -20
 
+// Penalty designed to promote moving the opposing king to the corners of the board in KRvK and KQvK endgames
 #define KING_ENDGAME_RECTANGLE_PENALTY -20
 
 // A per-square penalty for opening a king on files and diagonals.
