@@ -232,12 +232,18 @@ static void logMoveScoreList(GameLog* log, GameState* state, MoveScore* scores, 
 }
 
 static void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScores, MoveBuffer* legalMoves, int32_t maxDepth, GameLog* log) {
+	int32_t alpha = -INFINITY;
+	int32_t beta = INFINITY;
 	for (int32_t i = 0; i < legalMoves->length; i++) {
 		Move m = legalMoves->moves[i];
 
 		makeMove(state, &m);
-		const int32_t score = -1 * alphaBeta(state, result, 0, maxDepth, -1 * INFINITY, INFINITY, true);
+		const int32_t score = -1 * alphaBeta(state, result, 0, maxDepth, -beta, -alpha, true);
 		unmakeMove(state, &m);
+
+		if (score > alpha) {
+			alpha = score;
+		}
 
 		moveScores[i].move = m;
 		moveScores[i].score = score;
