@@ -107,6 +107,20 @@ int32_t countKingRectangleSize(int sq) {
 	return KING_RECT_SIZES[sq];
 }
 
+// Compute the raw material score ignoring position.
+static inline int32_t materialScore(GameState* g) {
+	int* counts = g->pieceCounts;
+	int score = 0;
+
+	score += (counts[ORD_WPAWN] - counts[ORD_BPAWN]) * SCORE_PAWN;
+	score += (counts[ORD_WKNIGHT] - counts[ORD_BKNIGHT]) * SCORE_KNIGHT;
+	score += (counts[ORD_WBISHOP] - counts[ORD_BBISHOP]) * SCORE_BISHOP;
+	score += (counts[ORD_WROOK] - counts[ORD_BROOK]) * SCORE_ROOK;
+	score += (counts[ORD_WQUEEN] - counts[ORD_BQUEEN]) * SCORE_QUEEN;
+
+	return score;
+}
+
 int32_t classifyEndgame(GameState* g) {
 	StateData* sd = g->current;
 	int32_t* counts = g->pieceCounts;
@@ -125,7 +139,7 @@ int32_t classifyEndgame(GameState* g) {
 }
 
 static inline int32_t basicWPawnBonus(const int32_t sq, const Piece** board, uint64_t* bb) {
-	int32_t score = SCORE_PAWN;
+	int32_t score = 0;
 	score += SQ_SCORE_PAWN_OPENING_WHITE[sq];
 	if (board[sq + OFFSET_N] == &WPAWN) {
 		score += PENALTY_DOUBLED_PAWN;
@@ -140,7 +154,7 @@ static inline int32_t basicWPawnBonus(const int32_t sq, const Piece** board, uin
 }
 
 static inline int32_t basicBPawnBonus(const int32_t sq, const Piece** board, uint64_t* bb) {
-	int32_t score = SCORE_PAWN;
+	int32_t score = 0;
 	score += SQ_SCORE_PAWN_OPENING_BLACK[sq];
 	if (board[sq + OFFSET_S] == &BPAWN) {
 		score += PENALTY_DOUBLED_PAWN;
@@ -157,7 +171,7 @@ static inline int32_t basicBPawnBonus(const int32_t sq, const Piece** board, uin
 
 int32_t evaluateOpening(GameState* state) {
 	const Piece** board = state->board;
-	int32_t score = 0;
+	int32_t score = materialScore(state);
 	uint64_t* bb = state->bitboards;
 
 	uint64_t mobilityWhite = 0;
@@ -174,35 +188,23 @@ int32_t evaluateOpening(GameState* state) {
 			score -= basicBPawnBonus(sq, board, bb);
 			break;
 		case ORD_WKNIGHT:
-			score += SCORE_KNIGHT;
 			score += SQ_SCORE_KNIGHT_OPENING_WHITE[sq];
 			mobilityWhite |= BITS_KNIGHT[sq];
 			break;
 		case ORD_BKNIGHT:
-			score -= SCORE_KNIGHT;
 			score -= SQ_SCORE_KNIGHT_OPENING_BLACK[sq];
 			mobilityBlack |= BITS_KNIGHT[sq];
 			break;
 		case ORD_WBISHOP:
-			score += SCORE_BISHOP;
 			score += bishopMobility(board, sq) * MINOR_PIECE_MOBILITY_BONUS;
 			break;
 		case ORD_BBISHOP:
-			score -= SCORE_BISHOP;
 			score -= bishopMobility(board, sq) * MINOR_PIECE_MOBILITY_BONUS;
 			break;
-		case ORD_WROOK:
-			score += SCORE_ROOK;
-			break;
-		case ORD_BROOK:
-			score -= SCORE_ROOK;
-			break;
 		case ORD_WQUEEN:
-			score += SCORE_QUEEN;
 			score += SQ_SCORE_QUEEN_OPENING_WHITE[sq];
 			break;
 		case ORD_BQUEEN:
-			score -= SCORE_QUEEN;
 			score -= SQ_SCORE_QUEEN_OPENING_BLACK[sq];
 			break;
 		case ORD_WKING:
@@ -227,7 +229,7 @@ int32_t evaluateOpening(GameState* state) {
 
 static int32_t evaluateMidgame(GameState* state) {
 	const Piece** board = state->board;
-	int32_t score = 0;
+	int32_t score = materialScore(state);
 	uint64_t* bb = state->bitboards;
 	uint64_t mobilityWhite = 0;
 	uint64_t mobilityBlack = 0;
@@ -242,30 +244,10 @@ static int32_t evaluateMidgame(GameState* state) {
 			score -= basicBPawnBonus(sq, board, bb);
 			break;
 		case ORD_WKNIGHT:
-			score += SCORE_KNIGHT;
 			mobilityWhite |= BITS_KNIGHT[sq];
 			break;
 		case ORD_BKNIGHT:
-			score -= SCORE_KNIGHT;
 			mobilityBlack |= BITS_KNIGHT[sq];
-			break;
-		case ORD_WBISHOP:
-			score += SCORE_BISHOP;
-			break;
-		case ORD_BBISHOP:
-			score -= SCORE_BISHOP;
-			break;
-		case ORD_WROOK:
-			score += SCORE_ROOK;
-			break;
-		case ORD_BROOK:
-			score -= SCORE_ROOK;
-			break;
-		case ORD_WQUEEN:
-			score += SCORE_QUEEN;
-			break;
-		case ORD_BQUEEN:
-			score -= SCORE_QUEEN;
 			break;
 		default:
 			break;
@@ -285,7 +267,7 @@ static int32_t evaluateMidgame(GameState* state) {
 
 static int32_t evaluateEndgame(GameState* state) {
 	const Piece** board = state->board;
-	int32_t score = 0;
+	int32_t score = materialScore(state);
 	uint64_t* bb = state->bitboards;
 	StateData* sd = state->current;
 	uint64_t mobilityWhite = 0;
@@ -310,44 +292,26 @@ static int32_t evaluateEndgame(GameState* state) {
 
 		switch (p->ordinal) {
 		case ORD_WPAWN:
-			score += SCORE_PAWN;
 			if ((BITS_PASSED_PAWN_W[sq] & state->bitboards[ORD_BPAWN]) == 0) {
 				score += SCORE_PASSED_PAWN;
 			}
 			break;
 		case ORD_BPAWN:
-			score -= SCORE_PAWN;
 			if ((BITS_PASSED_PAWN_B[sq] & state->bitboards[ORD_WPAWN]) == 0) {
 				score -= SCORE_PASSED_PAWN;
 			}
 			break;
 		case ORD_WKNIGHT:
-			score += SCORE_KNIGHT;
 			mobilityWhite |= BITS_KNIGHT[sq];
 			break;
 		case ORD_BKNIGHT:
-			score -= SCORE_KNIGHT;
 			mobilityBlack |= BITS_KNIGHT[sq];
-			break;
-		case ORD_WBISHOP:
-			score += SCORE_BISHOP;
-			break;
-		case ORD_BBISHOP:
-			score -= SCORE_BISHOP;
 			break;
 		case ORD_WROOK:
 			score += onSameFileWithPowerPiece(state, sq, ORD_WROOK, ORD_WQUEEN);
-			score += SCORE_ROOK;
 			break;
 		case ORD_BROOK:
 			score -= onSameFileWithPowerPiece(state, sq, ORD_BROOK, ORD_BQUEEN);
-			score -= SCORE_ROOK;
-			break;
-		case ORD_WQUEEN:
-			score += SCORE_QUEEN;
-			break;
-		case ORD_BQUEEN:
-			score -= SCORE_QUEEN;
 			break;
 		case ORD_WKING:
 			score += SQ_SCORE_ENDGAME_KING[sq];
@@ -360,6 +324,8 @@ static int32_t evaluateEndgame(GameState* state) {
 		}
 	}
 
+	// Remove squares covered by pawns from the mobility mask.
+	// Having a friendly pawn structure that inhibits bishop and knight moves is a liability.
 	mobilityWhite &= ~bb[ORD_WPAWN];
 	mobilityBlack &= ~bb[ORD_BPAWN];
 
