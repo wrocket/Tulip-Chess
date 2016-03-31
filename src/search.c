@@ -75,6 +75,8 @@ void initSearchArgs(SearchArgs* args) {
 	args->chessInterfaceState = NULL;
 }
 
+// Perform a "quiet" search, which basically means keep playing captures and whatnot until a "quiet" position is reached.
+// This combats the horizon effect where nasty moves (captures, checks) lurk one ply beyond the max search depth.
 static int32_t qsearch(GameState* state, SearchResult* result, const int32_t depth, int32_t alpha, int32_t beta) {
 	const int32_t evalScore = evaluate(state);
 	if (evalScore >= beta) {
@@ -231,11 +233,39 @@ static void logMoveScoreList(GameLog* log, GameState* state, MoveScore* scores, 
 	free(buff);
 }
 
-static void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* moveScores, MoveBuffer* legalMoves, int32_t maxDepth, GameLog* log) {
+static void postSearchThinking(void* interState, GameState* state, int32_t depth, int32_t score, int64_t nodes, int64_t startTime, Move bestMove) {
+	if (interState == NULL) {
+		return;
+	}
+
+	const int64_t now = getCurrentTimeMillis();
+
+	MoveBuffer mb;
+	createMoveBuffer(&mb);
+	mb.moves[0] = bestMove;
+	mb.length = 1;
+	const int32_t postScore = score * (state->current->toMove == COLOR_WHITE ? 1 : -1);
+	postXBOutput(interState, depth, postScore, (now - startTime) / 10l, nodes, &mb);
+	destroyMoveBuffer(&mb);
+}
+
+static bool checkTime(SearchArgs* args, int64_t start) {
+	const int64_t span = getCurrentTimeMillis() - start;
+	const bool result = span > args->timeToThinkMillis;
+	log_write(args->log, "Out of time (%0.2fs > %0.2fs", (double) span / 1000.0, (double) args->timeToThinkMillis / 1000.0);
+	return result;
+}
+
+// Performs the "deep" search out to a given depth (plus any extensions).
+static void deepSearch(GameState* state, SearchArgs* searchArgs, SearchResult* result, MoveScore* moveScores, int32_t moveLen, int32_t maxDepth, GameLog* log, int64_t startTime) {
+	log_write(log, "Starting deep search with depth=%i", maxDepth);
 	int32_t alpha = -INFINITY;
 	int32_t beta = INFINITY;
-	for (int32_t i = 0; i < legalMoves->length; i++) {
-		Move m = legalMoves->moves[i];
+	MoveScore best;
+	best.score = INT_MIN;
+	char moveStr[16];
+	for (int32_t i = 0; i < moveLen; i++) {
+		Move m = moveScores[i].move;
 
 		makeMove(state, &m);
 		const int32_t score = -1 * alphaBeta(state, result, 0, maxDepth, -beta, -alpha, true);
@@ -245,9 +275,52 @@ static void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* m
 			alpha = score;
 		}
 
+		if (score > best.score) {
+			notation_printShortAlg(&m, state, moveStr);
+			log_write(log, "Improved score in deep search: %s, %+0.2f", moveStr, friendlyScore(state, score));
+			postSearchThinking(searchArgs->chessInterfaceState, state, maxDepth, score, result->nodes, startTime, m);
+			best.score = score;
+			best.move = m;
+		}
+
+		if (checkTime(searchArgs, startTime)) {
+			break;
+		}
+	}
+
+	result->score = best.score;
+	result->move = best.move;
+
+	log_write(log, "Completed deep search to depth=%i", maxDepth);
+}
+
+// Run a search to a given depth, assuming no previous knowledge.
+static void iterativeDeepen(
+	GameState* state,
+	SearchResult* result,
+	MoveScore* moveScores,
+	MoveBuffer* legalMoves,
+	int32_t maxDepth,
+	int64_t startTime,
+	SearchArgs* args) {
+	for (int32_t i = 0; i < legalMoves->length; i++) {
+		Move m = legalMoves->moves[i];
+
+		makeMove(state, &m);
+		const int32_t score = -1 * alphaBeta(state, result, 0, maxDepth, -INFINITY, INFINITY, true);
+		unmakeMove(state, &m);
+
+		// We don't update alpha/beta here because doing so can lead to misleading elements in the move score list.
+		// For example, if we find a checkmate, every score past that will end up as checkmate since technically
+		// they are part of the same position.
+
 		moveScores[i].move = m;
 		moveScores[i].score = score;
 		moveScores[i].depth = maxDepth;
+
+		if (checkTime(args, startTime)) {
+			break;
+		}
 	}
 
 	sortMoveScores(moveScores, legalMoves->length);
@@ -255,10 +328,11 @@ static void iterativeDeepen(GameState* state, SearchResult* result, MoveScore* m
 	result->score = moveScores[0].score;
 	result->move = moveScores[0].move;
 
-	log_write(log, "Completed iterative deepening to depth=%i", maxDepth);
-	logMoveScoreList(log, state, moveScores, legalMoves->length);
+	log_write(args->log, "Completed iterative deepening to depth=%i", maxDepth);
+	logMoveScoreList(args->log, state, moveScores, legalMoves->length);
 }
 
+// Reorders a move buffer according to a sorted list of move scores.
 static void reorderMovesFromMoveScores(MoveScore* scores, int32_t scoreLength, MoveBuffer* moveBuffer) {
 	if (scoreLength != moveBuffer->length) {
 		fprintf(stderr, "Move score buffer length and move buffer length disagree.\n");
@@ -331,22 +405,6 @@ static void logIterativeResult(GameState* state, SearchArgs* searchArgs, MoveSco
 	log_write(searchArgs->log, "After depth=%i, best move is %s (%+0.2f)", depth, moveStr, score);
 }
 
-static void postSearchThinking(void* interState, GameState* state, int32_t depth, int32_t score, int64_t nodes, int64_t startTime, Move bestMove) {
-	if (interState == NULL) {
-		return;
-	}
-
-	const int64_t now = getCurrentTimeMillis();
-
-	MoveBuffer mb;
-	createMoveBuffer(&mb);
-	mb.moves[0] = bestMove;
-	mb.length = 1;
-	const int32_t postScore = score * (state->current->toMove == COLOR_WHITE ? 1 : -1);
-	postXBOutput(interState, depth, postScore, (now - startTime) / 10l, nodes, &mb);
-	destroyMoveBuffer(&mb);
-}
-
 bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 	MoveBuffer buffer;
 	result->searchStatus = SEARCH_STATUS_NONE;
@@ -366,10 +424,15 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 	result->betaCutoffs = 0;
 	MoveScore* scores = result->moveScores;
 
+	// Do successively deeper searches out to a reasonably shallow depth, sorting the moves by score after each search.
+	// This accomplishes two things:
+	// 1. Orders the moves according to best first, which increases the speed of subsequent searches.
+	// 2. Ensures that we at least have a "decent" move in a given time frame, since the first few iterations should only take a few millis.
 	const int32_t iterationDeepenDepth = searchArgs->depth > ITERATIVE_DEEPEN_DEPTH ? ITERATIVE_DEEPEN_DEPTH : searchArgs -> depth;
 	if (moveCount) {
+		bool doDeepSearch = true;
 		for (int32_t depth = 1; depth <= iterationDeepenDepth; depth++) {
-			iterativeDeepen(state, result, scores, &buffer, depth, searchArgs->log);
+			iterativeDeepen(state, result, scores, &buffer, depth, start, searchArgs);
 
 			// After each iteration, reorder the move search order "best moves first."
 			// This speeds up successive searches by creating beta cutoffs faster.
@@ -381,9 +444,21 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 
 			// If we found a checkmate, just play that immediately. No need to deepen further!
 			if (isEarlyCheckmate(scores[0].score)) {
+				doDeepSearch = false;
 				log_write(searchArgs->log, "Early checkmate found at depth %i", depth);
 				break;
 			}
+
+			// If we're out of time, just go with whatever we have now.
+			if (checkTime(searchArgs, start)) {
+				doDeepSearch = false;
+				break;
+			}
+		}
+
+		// With the moves nicely ordered, start the deep search that might take a while.
+		if (doDeepSearch) {
+			deepSearch(state, searchArgs, result, scores, buffer.length, DEEP_SEARCH_DEPTH, searchArgs->log, start);
 		}
 	} else {
 		result->searchStatus = SEARCH_STATUS_NO_LEGAL_MOVES;
@@ -393,9 +468,7 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 
 	result->durationMs = end - start;
 
-	if (searchArgs->log != NULL) {
-		logSearchResult(searchArgs, result, state);
-	}
+	logSearchResult(searchArgs, result, state);
 
 	postSearchThinking(searchArgs->chessInterfaceState, state, searchArgs->depth, result->score, result->nodes, start, result->move);
 

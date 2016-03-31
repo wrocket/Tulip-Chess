@@ -34,7 +34,8 @@
 
 #define NULL_MOVE_RADIUS 2
 
-#define ITERATIVE_DEEPEN_DEPTH 8
+#define ITERATIVE_DEEPEN_DEPTH 6
+#define DEEP_SEARCH_DEPTH 8
 
 #define SEARCH_STATUS_NONE              0
 #define SEARCH_STATUS_NO_LEGAL_MOVES    1
@@ -62,6 +63,7 @@ typedef struct {
 	int32_t depth;      // The maximum search depth.
 	GameLog* log;    // The game log.
 	void* chessInterfaceState;    // A flag to indicate if the search should output XBoard thinking lines.
+	int64_t timeToThinkMillis; // An approximate number of milliseconds to use for thinking.
 } SearchArgs;
 
 void initSearchArgs(SearchArgs* args);

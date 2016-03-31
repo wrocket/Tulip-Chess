@@ -37,6 +37,7 @@
 #include "search.h"
 #include "log.h"
 #include "result.h"
+#include "time.h"
 
 static void xBoardWrite(XBoardState* xbs, const char* format, ...) {
 	va_list argptr;
@@ -110,8 +111,11 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
 		initSearchArgs(&args);
 		args.depth = 10;
 		args.log = &xbs->log;
+		args.timeToThinkMillis = time_thinkTimeMillis(&xbs->gameState, xbs->myTime, xbs->opponentTime);
 		args.chessInterfaceState = (void*) xbs;
 		createSearchResult(&searchResult);
+
+		log_write(&xbs->log, "Allocating %.2fs of think time.", (double) args.timeToThinkMillis / 1000.0);
 
 		search(&xbs->gameState, &args, &searchResult);
 
@@ -255,7 +259,7 @@ static void chopNewline(char* buff, int length) {
 static int parseTime(char** buff, int len) {
 	int result = 0;
 	if (len >= 2) {
-		result = atoi(buff[1]);
+		result = atoi(buff[1]) * 10; // Given unit is centiseconds, we'll use milliseconds always.
 	}
 	return result;
 }
@@ -392,10 +396,10 @@ bool startXBoard() {
 			} else if (isCommand("nps", cmd)) {
 			} else if (isCommand("time", cmd)) {
 				xbState.myTime = parseTime(tb, tokenCount);
-				log_write(&xbState.log, "My time: %.2fs", (double) xbState.myTime / 100.0);
+				log_write(&xbState.log, "My time: %.2fs", (double) xbState.myTime / 1000.0);
 			} else if (isCommand("otim", cmd)) {
 				xbState.opponentTime = parseTime(tb, tokenCount);
-				log_write(&xbState.log, "Opponent time: %.2fs", (double) xbState.opponentTime / 100.0);
+				log_write(&xbState.log, "Opponent time: %.2fs", (double) xbState.opponentTime / 1000.0);
 			} else if (isCommand("usermove", cmd)) {
 			} else if (isCommand("?", cmd)) {
 			} else if (isCommand("draw", cmd)) {
