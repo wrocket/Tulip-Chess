@@ -38,6 +38,7 @@
 #include "log.h"
 #include "result.h"
 #include "time.h"
+#include "env.h"
 
 static void xBoardWrite(XBoardState* xbs, const char* format, ...) {
 	va_list argptr;
@@ -190,6 +191,32 @@ static void xBoardProtover(XBoardState* xbs) {
 	xBoardWrite(xbs, "feature ping=1 san=1 time=1 sigint=0 sigterm=0 setboard=1 done=1");
 }
 
+static void xBoardIcs(XBoardState* xbs, char** tokens, int tokenCount) {
+	if (tokenCount >= 2) {
+		// An ICS of - means we're local
+		if (strcmp("-", tokens[1]) != 0) {
+			xbs->onIcs = true;
+
+			const int32_t buffSize = 256;
+			char* buff;
+			buff = calloc(buffSize, sizeof(char));
+			if (!buff) {
+				perror("Unable to allocate ICS buffer space.");
+				return;
+			}
+
+			env_getCpuInfo(buff, buffSize);
+			xBoardWrite(xbs, "tellicsnoalias set note 2 CPU: %s", buff);
+			env_getOsInfo(buff, buffSize);
+			xBoardWrite(xbs, "tellicsnoalias set note 3 OS: %s", buff);
+
+			free(buff);
+		} else {
+			xbs->onIcs = false;
+		}
+	}
+}
+
 static void xBoardPing(XBoardState* xbs, char** tokens, int tokenCount) {
 	if (tokenCount >= 2) {
 		xBoardWrite(xbs, "pong %s", tokens[1]);
@@ -323,6 +350,8 @@ bool startXBoard() {
 	char** tb;
 	XBoardState xbState;
 
+	xbState.onIcs = false;
+
 	inputBuffer = malloc(INPUT_BUFFER_SIZE * sizeof(char));
 	if (!inputBuffer) {
 		perror("Error: Unable to allocate memory for XBoard input buffer.");
@@ -419,6 +448,7 @@ bool startXBoard() {
 			} else if (isCommand("name", cmd)) {
 			} else if (isCommand("rating", cmd)) {
 			} else if (isCommand("ics", cmd)) {
+				xBoardIcs(&xbState, tb, tokenCount);
 			} else if (isCommand("computer", cmd)) {
 			} else if (isCommand("pause", cmd)) {
 			} else if (isCommand("resume", cmd)) {

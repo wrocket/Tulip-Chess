@@ -41,6 +41,7 @@ typedef struct {
     int myTime;
     int opponentTime;
     bool postThinking;
+    bool onIcs;
 } XBoardState;
 
 bool startXBoard(void);

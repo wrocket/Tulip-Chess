@@ -26,6 +26,7 @@
 #include <string.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <limits.h>
 
 #include "env.h"
 #include "posix.h"
@@ -56,10 +57,30 @@ static bool runCommand(const char* command, char* buff, int32_t len) {
 }
 
 bool env_getCpuInfo(char* buff, int32_t len) {
-	const char * getCPU = "grep -m 1 \"model name\" /proc/cpuinfo | sed -e \"s/model name\\s\\+:\\s\\+//g\"";
-	return runCommand(getCPU, buff, len);
+	char cpuInfo[64];
+	const char* getCPU = "grep -m 1 \"model name\" /proc/cpuinfo | sed -e \"s/model name\\s\\+:\\s\\+//g\"";
+
+	const bool result = runCommand(getCPU, cpuInfo, 64);
+	const int64_t cores = env_getCoreCount();
+
+	snprintf(buff, (size_t) len, "%s (%" PRId64 " core%s)", cpuInfo, cores, cores == 1 ? "" : "s");
+
+	return result;
 }
 
 bool env_getOsInfo(char* buff, int32_t len) {
 	return runCommand("uname -o -r", buff, len);
+}
+
+int64_t env_getCoreCount() {
+	char buff[16];
+	const char* command = "cat /proc/cpuinfo | grep vendor_id | wc -l";
+
+	runCommand(command, buff, 16);
+
+	int64_t count = strtol(buff, NULL, 10);
+
+	const bool validResult = count <= 0 || count == LONG_MIN || count == LONG_MAX;
+
+	return validResult ? -1 : count;
 }
