@@ -146,6 +146,10 @@ void makeNullMove(GameState* gameState) {
         nextData->toMove = INVERT_COLOR(nextData->toMove);
         APPLY_MASK(HASH_WHITE_TO_MOVE);
 
+        // Clear out the EP file to prevent really strange null positions.
+        // Basically, the "wrong" side is to move after a null move, so the EP file is quite wrong.
+        nextData->epFile = NO_EP_FILE;
+
         nextData->hash = hash;
 }
 
