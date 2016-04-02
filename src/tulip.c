@@ -344,19 +344,19 @@ static void makeMovesAndPrintGameResultStatus(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void hashSequence(int argc, char** argv) {
+static void bookLine(int argc, char** argv) {
     Move m;
     HashSeqItem* seqItems = ALLOC(512, HashSeqItem, seqItems, "Unable to allocate hash seq items array");
     int count = 0;
 
     if (argc < 2) {
-        fprintf(stderr, "Usage: -hashseq \"[FEN string]\" move1 move2 moveN\n");
+        fprintf(stderr, "Usage: -bookline \"[FEN string]\" move1 move2 moveN\n");
         exit(EXIT_FAILURE);
     }
 
     GameState gs = parseFenOrQuit(argv[1]);
 
-    const uint64_t initialHash = gs.current->hash;
+    const uint64_t initialHash = book_bookHash(&gs);
 
     for (int i = 2; i < argc; i++) {
         if (!notation_matchMove(argv[i], &gs, &m)) {
@@ -365,7 +365,7 @@ static void hashSequence(int argc, char** argv) {
         }
         makeMove(&gs, &m);
         notation_printMoveCoordinate(&m, seqItems[count].move);
-        seqItems[count].data = *gs.current;
+        seqItems[count].hash = book_bookHash(&gs);
         count++;
     }
 
@@ -373,7 +373,6 @@ static void hashSequence(int argc, char** argv) {
     destroyGamestate(&gs);
     free(seqItems);
 }
-
 
 static void printEndgame(int argc, char** argv) {
     if (argc != 2) {
@@ -496,8 +495,8 @@ int main(int argc, char** argv) {
             printMatchMove(argc, argv);
         } else if (0 == strcmp("-gamestatus", argv[0])) {
             makeMovesAndPrintGameResultStatus(argc, argv);
-        } else if (0 == strcmp("-hashseq", argv[0])) {
-            hashSequence(argc, argv);
+        } else if (0 == strcmp("-bookline", argv[0])) {
+            bookLine(argc, argv);
         } else if (0 == strcmp("-bookmoves", argv[0])) {
             findBookMoves(argc, argv);
         } else if (0 == strcmp("-evalposition", argv[0])) {

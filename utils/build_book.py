@@ -44,7 +44,7 @@ class MoveLine:
 
 
 def build_line(line):
-    cmd = ['../src/tulip', '-hashseq', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1']
+    cmd = ['../src/tulip', '-bookline', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1']
     cmd.extend(line)
     try:
         out = subprocess.check_output(cmd)

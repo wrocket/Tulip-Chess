@@ -327,7 +327,7 @@ void printHashSequence(HashSeqItem* items, int32_t length, uint64_t initialHash)
             printf(", ");
         }
 
-        printf("{\"move\":\"%s\", \"resultingHash\": \"%016"PRIX64"\"}", item.move, item.data.hash);
+        printf("{\"move\":\"%s\", \"resultingHash\": \"%016"PRIX64"\"}", item.move, item.hash);
     }
     printf("]");
     printf("}\n");

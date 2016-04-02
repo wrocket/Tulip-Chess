@@ -73,6 +73,7 @@ void initSearchArgs(SearchArgs* args) {
 	args->log = NULL;
 	args->depth = 5;
 	args->chessInterfaceState = NULL;
+	args->timeToThinkMillis = 5 * 1000;
 }
 
 // Perform a "quiet" search, which basically means keep playing captures and whatnot until a "quiet" position is reached.
@@ -324,7 +325,7 @@ static void iterativeDeepen(
 		// We want to make sure at least one full pass of this function is completed.
 		// Otherwise we'll have incompletely initiaized data in moveScores.
 		// Ignore the clock if we're at depth 0.
-		if (maxDepth > 0 && outOfTime(args, startTime)) {
+		if (maxDepth > 1 && outOfTime(args, startTime)) {
 			break;
 		}
 	}

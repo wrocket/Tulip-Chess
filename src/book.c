@@ -34,6 +34,7 @@
 #include "move.h"
 #include "notation.h"
 #include "posix.h"
+#include "hashconsts.h"
 
 #define BOOK_MAX_MOVES 256
 #define BOOK_MAX_STR_LEN 8
@@ -64,7 +65,10 @@ static int readMoves(GameState* state, char*** strArray, OpenBook* book) {
 		perror("Error allocating memory for SQL statement.");
 		return 0;
 	}
-	snprintf(sql, sqlLen, "sqlite3 %s \"select MOVE from OPENING_BOOK where POSITION_HASH = '%016" PRIX64 "' COLLATE NOCASE\"", book->fileName, state->current->hash);
+
+	const uint64_t positionHash = book_bookHash(state);
+
+	snprintf(sql, sqlLen, "sqlite3 %s \"select MOVE from OPENING_BOOK where POSITION_HASH = '%016" PRIX64 "' COLLATE NOCASE\"", book->fileName, positionHash);
 
 	const size_t lineLen = 16;
 	char* line = calloc(lineLen, sizeof(char));
@@ -121,6 +125,23 @@ int book_getMoves(GameState* gameState, MoveBuffer* buffer, OpenBook* book) {
 	buffer->length = moveCount;
 	destroyStrArray(&strArray);
 	return moveCount;
+}
+
+uint64_t book_bookHash(GameState* gameState) {
+   uint64_t h = 0;
+
+    if (gameState->current->toMove == COLOR_WHITE) {
+        h ^= HASH_WHITE_TO_MOVE;
+    }
+
+    for (int32_t i = 0; i < 64; i++) {
+        const int32_t sq = BOARD_SQUARES[i];
+        const Piece* piece = gameState->board[sq];
+
+        h ^= HASH_PIECE_SQ[sq][piece->ordinal];
+    }
+
+    return h;
 }
 
 #undef BOOK_MAX_MOVES
