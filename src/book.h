@@ -43,4 +43,8 @@ bool book_close(OpenBook* book);
 // Not suitable for tight loops.
 int32_t book_getMoves(GameState* gameState, MoveBuffer* buffer, OpenBook* book);
 
+// Calculates a 64-bit book-specific hash. Similar to the normal hash, this
+// removes things like the EP file for better transposition detection.
+uint64_t book_bookHash(GameState* gameState);
+
 #endif

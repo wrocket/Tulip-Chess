@@ -43,7 +43,7 @@ void printKingRectSize(char* squareStr, int32_t size);
 
 typedef struct {
     char move[8];
-    StateData data;
+    uint64_t hash;
 } HashSeqItem;
 
 void printHashSequence(HashSeqItem* items, int32_t count, uint64_t initialHash);
