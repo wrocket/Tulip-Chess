@@ -307,7 +307,6 @@ static void iterativeDeepen(
     int32_t maxDepth,
     int64_t startTime,
     SearchArgs* args) {
-
 	for (int32_t i = 0; i < legalMoves->length; i++) {
 		Move m = legalMoves->moves[i];
 
@@ -318,7 +317,6 @@ static void iterativeDeepen(
 		// We don't update alpha/beta here because doing so can lead to misleading elements in the move score list.
 		// For example, if we find a checkmate, every score past that will end up as checkmate since technically
 		// they are part of the same position.
-
 		moveScores[i].move = m;
 		moveScores[i].score = score;
 		moveScores[i].depth = maxDepth;
@@ -431,7 +429,6 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 	result->nodes = 0;
 	result->betaCutoffs = 0;
 	MoveScore* scores = result->moveScores;
-
 
 	// Do successively deeper searches out to a reasonably shallow depth, sorting the moves by score after each search.
 	// This accomplishes two things:

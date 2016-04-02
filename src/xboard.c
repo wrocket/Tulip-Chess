@@ -352,7 +352,7 @@ bool startXBoard() {
 
 	xbState.onIcs = false;
 
-	// Initilize time in case we don't know better!
+	// Initialize time in case we don't know better!
 	xbState.opponentTime = 60 * 1000;
 	xbState.myTime = 60 * 1000;
 
