@@ -249,10 +249,14 @@ static void postSearchThinking(void* interState, GameState* state, int32_t depth
 	destroyMoveBuffer(&mb);
 }
 
-static bool checkTime(SearchArgs* args, int64_t start) {
+static bool outOfTime(SearchArgs* args, int64_t start) {
 	const int64_t span = getCurrentTimeMillis() - start;
 	const bool result = span > args->timeToThinkMillis;
-	log_write(args->log, "Out of time (%0.2fs > %0.2fs", (double) span / 1000.0, (double) args->timeToThinkMillis / 1000.0);
+
+	if (result) {
+		log_write(args->log, "Out of time (%0.2fs > %0.2fs)", (double) span / 1000.0, (double) args->timeToThinkMillis / 1000.0);
+	}
+
 	return result;
 }
 
@@ -283,7 +287,7 @@ static void deepSearch(GameState* state, SearchArgs* searchArgs, SearchResult* r
 			best.move = m;
 		}
 
-		if (checkTime(searchArgs, startTime)) {
+		if (outOfTime(searchArgs, startTime)) {
 			break;
 		}
 	}
@@ -296,13 +300,13 @@ static void deepSearch(GameState* state, SearchArgs* searchArgs, SearchResult* r
 
 // Run a search to a given depth, assuming no previous knowledge.
 static void iterativeDeepen(
-	GameState* state,
-	SearchResult* result,
-	MoveScore* moveScores,
-	MoveBuffer* legalMoves,
-	int32_t maxDepth,
-	int64_t startTime,
-	SearchArgs* args) {
+    GameState* state,
+    SearchResult* result,
+    MoveScore* moveScores,
+    MoveBuffer* legalMoves,
+    int32_t maxDepth,
+    int64_t startTime,
+    SearchArgs* args) {
 	for (int32_t i = 0; i < legalMoves->length; i++) {
 		Move m = legalMoves->moves[i];
 
@@ -318,7 +322,7 @@ static void iterativeDeepen(
 		moveScores[i].score = score;
 		moveScores[i].depth = maxDepth;
 
-		if (checkTime(args, startTime)) {
+		if (outOfTime(args, startTime)) {
 			break;
 		}
 	}
@@ -450,7 +454,7 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 			}
 
 			// If we're out of time, just go with whatever we have now.
-			if (checkTime(searchArgs, start)) {
+			if (outOfTime(searchArgs, start)) {
 				doDeepSearch = false;
 				break;
 			}
