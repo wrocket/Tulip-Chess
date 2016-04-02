@@ -64,5 +64,9 @@ class TestSearch(unittest.TestCase):
         result = self.get_result('7k/8/2n5/8/2K3Q1/8/8/8 b - - 0 1')
         self.assertEqual('Ne5+', result.move)
 
+    def test_short_mate(self):
+        result = self.get_result('1rb2rk1/p1q1ppbp/n2p3B/3n1P2/1ppP4/3B1N2/PPPQN1PP/K2R3R w - - 0 1')
+        self.assertEqual('Qg5', result.move)
+
 if __name__ == '__main__':
     unittest.main()
