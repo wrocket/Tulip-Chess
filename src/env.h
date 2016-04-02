@@ -28,8 +28,8 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-bool env_getCpuInfo(char* buff, int32_t len);
-bool env_getOsInfo(char* buff, int32_t len);
+bool env_getCpuInfo(char* buff, size_t len);
+bool env_getOsInfo(char* buff, size_t len);
 int64_t env_getCoreCount();
 
 #endif

@@ -307,6 +307,7 @@ static void iterativeDeepen(
     int32_t maxDepth,
     int64_t startTime,
     SearchArgs* args) {
+
 	for (int32_t i = 0; i < legalMoves->length; i++) {
 		Move m = legalMoves->moves[i];
 
@@ -322,7 +323,10 @@ static void iterativeDeepen(
 		moveScores[i].score = score;
 		moveScores[i].depth = maxDepth;
 
-		if (outOfTime(args, startTime)) {
+		// We want to make sure at least one full pass of this function is completed.
+		// Otherwise we'll have incompletely initiaized data in moveScores.
+		// Ignore the clock if we're at depth 0.
+		if (maxDepth > 0 && outOfTime(args, startTime)) {
 			break;
 		}
 	}
@@ -427,6 +431,7 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 	result->nodes = 0;
 	result->betaCutoffs = 0;
 	MoveScore* scores = result->moveScores;
+
 
 	// Do successively deeper searches out to a reasonably shallow depth, sorting the moves by score after each search.
 	// This accomplishes two things:

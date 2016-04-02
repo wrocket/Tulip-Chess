@@ -197,7 +197,7 @@ static void xBoardIcs(XBoardState* xbs, char** tokens, int tokenCount) {
 		if (strcmp("-", tokens[1]) != 0) {
 			xbs->onIcs = true;
 
-			const int32_t buffSize = 256;
+			const size_t buffSize = 256;
 			char* buff;
 			buff = calloc(buffSize, sizeof(char));
 			if (!buff) {
@@ -351,6 +351,10 @@ bool startXBoard() {
 	XBoardState xbState;
 
 	xbState.onIcs = false;
+
+	// Initilize time in case we don't know better!
+	xbState.opponentTime = 60 * 1000;
+	xbState.myTime = 60 * 1000;
 
 	inputBuffer = malloc(INPUT_BUFFER_SIZE * sizeof(char));
 	if (!inputBuffer) {

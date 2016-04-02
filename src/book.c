@@ -77,7 +77,7 @@ static int readMoves(GameState* state, char*** strArray, OpenBook* book) {
 	FILE *fp;
 	fp = popen(sql, "r");
 	if (fp) {
-		while (fgets(line, lineLen, fp) && count < BOOK_MAX_MOVES) {
+		while (fgets(line, (int) lineLen, fp) && count < BOOK_MAX_MOVES) {
 			char* idx = line + strlen(line) - 1;
 			while (idx > line && iscntrl(*idx)) {
 				*idx-- = '\0';

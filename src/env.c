@@ -31,7 +31,7 @@
 #include "env.h"
 #include "posix.h"
 
-static bool runCommand(const char* command, char* buff, int32_t len) {
+static bool runCommand(const char* command, char* buff, size_t len) {
 	if (len <= 0) {
 		return false;
 	}
@@ -40,7 +40,7 @@ static bool runCommand(const char* command, char* buff, int32_t len) {
 	bool result = false;
 	fp = popen(command, "r");
 	if (fp) {
-		if (fgets(buff, len, fp)) {
+		if (fgets(buff, (int32_t) len, fp)) {
 			result = true;
 			char* idx = buff + strlen(buff) - 1;
 			while (idx > buff && iscntrl(*idx)) {
@@ -56,7 +56,7 @@ static bool runCommand(const char* command, char* buff, int32_t len) {
 	return result;
 }
 
-bool env_getCpuInfo(char* buff, int32_t len) {
+bool env_getCpuInfo(char* buff, size_t len) {
 	char cpuInfo[64];
 	const char* getCPU = "grep -m 1 \"model name\" /proc/cpuinfo | sed -e \"s/model name\\s\\+:\\s\\+//g\"";
 
@@ -68,7 +68,7 @@ bool env_getCpuInfo(char* buff, int32_t len) {
 	return result;
 }
 
-bool env_getOsInfo(char* buff, int32_t len) {
+bool env_getOsInfo(char* buff, size_t len) {
 	return runCommand("uname -o -r", buff, len);
 }
 

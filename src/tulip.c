@@ -56,7 +56,7 @@ static void printBanner() {
     printf("Tulip Chess Engine 0.001\n");
     printf("Size of uint64: %lu bits\n", CHAR_BIT * sizeof(uint64_t));
 
-    const int32_t size = 1024;
+    const size_t size = 1024;
     char* str = calloc(size, sizeof(char));
     if (env_getCpuInfo(str, size)) {
         printf("CPU: %s\n", str);

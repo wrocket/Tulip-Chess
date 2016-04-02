@@ -27,6 +27,11 @@
 int64_t time_thinkTimeMillis(GameState* state, int64_t myTimeLeftMillis, int64_t opponentsTimeLeftMillis) {
 	const int64_t defTime = 5000;
 
+	// On the off chance we get some nonsense input, make sure we don't return a negative time!
+	if (myTimeLeftMillis <= 0) {
+		myTimeLeftMillis = 60 * 1000;
+	}
+
 	// If we have at least four times the default time left, use the default time.
 	// Otherwise don't use more than a quarter of the remaining time.
 	return myTimeLeftMillis > (defTime * 4) ? defTime : myTimeLeftMillis / 4;
