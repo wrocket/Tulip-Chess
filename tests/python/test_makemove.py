@@ -39,14 +39,22 @@ class TestBasicMoveApplication(unittest.TestCase):
         zeros = '0' * (16 - len(h))
         return zeros + h.upper()
 
-    def make_move(self, fen, move):
-        result = call_tulip(['-makemove', move, fen])
-        parsed_output = json.loads(result)
-        state = parsed_output['resultingState']
+    def validate_state(self, json):
+        state = json['resultingState']
         adjusted_hash = state['hash']
         calculated_hash = state['recalculatedHash']
         self.assertEqual(adjusted_hash, calculated_hash, 'Hash value computed from the move and the value computed "from scratch" differ.')
         return state
+
+    def make_move(self, fen, move):
+        result = call_tulip(['-makemove', move, fen])
+        parsed_output = json.loads(result)
+        return self.validate_state(parsed_output)
+
+    def null_move(self, fen):
+        result = call_tulip(['-nullmove', fen])
+        parsed_output = json.loads(result)
+        return self.validate_state(parsed_output)
 
     def test_initial_position_nf3(self):
         result = self.make_move('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 'g1f3')
@@ -379,6 +387,11 @@ class TestBasicMoveApplication(unittest.TestCase):
         self.assertEqual('EFFFFFFFFFEFFFEF', bitboards['-'])
         self.assertEqual('none', result['epFile'])
         self.assertEqual(61, piece_counts['-'])
+
+    def null_move_epfile(self):
+        result = self.null_move('rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1')
+        self.assertEqual('none', result['epFile'])
+        self.assertEqual('white', result['toMove'])
 
     def test_hash_simple_move(self):
         result = self.make_move('4k3/8/8/8/8/1Q6/8/4K3 w - - 0 1', 'b3c4')
