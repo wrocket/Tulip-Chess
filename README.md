@@ -40,6 +40,10 @@ The automated tests and book generation are written in Python. Communication wit
 src > ./tulip -gamestatus "7k/8/8/4r3/6b1/6n1/2PP1P2/4K3 w - - 0 1"
 {"fenString": "7k/8/8/4r3/6b1/6n1/2PP1P2/4K3 w - - 0 1", "status": "whiteCheckmated"}
 </pre>
+The tests can now parse that output and make assertions against the results:
+<pre>
+self.assertEqual('whiteCheckmated', result['status'])
+</pre>
 
 #### Gameplay
 Currently the XBoard protocol is used due to its simplicity. The interface is a very primitive syncronous stdin/stdout-based system. Eventually, the search will happen in a separate thread, enabling interrupting via the UI and such possible.
