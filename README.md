@@ -11,8 +11,6 @@ The application is intended to be built on any UNIX-ish system using a GCC-like 
 
 SQLite is used as a storage engine for opening books and similar. The application expects that the "sqlite3" command is available on the host system.
 
-The relevant source files can be obtained from http://sqlite.org.
-
 Principles
 ----------
 * Tulip should be reasonably self-contained.
