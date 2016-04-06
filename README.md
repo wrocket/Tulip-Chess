@@ -31,7 +31,7 @@ Technical Concepts
 Tulip uses a hybrid approach of both bitboard and array-based game state representation. This allows reasonably efficient attack detection and so on with the convenience of array-index board lookup. Tulip is designed to take full advantage of modern 64-bit processors in this regard.
 
 #### Search
-Tulip uses a relatively conventional alpha/beta search tactic, employing iterative deepening, null-moves, and Zobrist hashing to increase search speed.
+Tulip uses a relatively conventional alpha/beta search tactic, employing iterative deepening, null-moves, and Zobrist hashing to increase search speed. Current development is around adding search extensions such as quiescence search.
 
 ### Interop
 #### Testing and Development
