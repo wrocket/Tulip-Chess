@@ -36,6 +36,7 @@
 
 #define ITERATIVE_DEEPEN_DEPTH 6
 #define DEEP_SEARCH_DEPTH 8
+#define Q_SEARCH_DEPTH 16
 
 #define SEARCH_STATUS_NONE              0
 #define SEARCH_STATUS_NO_LEGAL_MOVES    1

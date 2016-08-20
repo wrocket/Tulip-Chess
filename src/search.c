@@ -78,8 +78,18 @@ void initSearchArgs(SearchArgs* args) {
 
 // Perform a "quiet" search, which basically means keep playing captures and whatnot until a "quiet" position is reached.
 // This combats the horizon effect where nasty moves (captures, checks) lurk one ply beyond the max search depth.
-static int32_t qsearch(GameState* state, SearchResult* result, const int32_t depth, int32_t alpha, int32_t beta) {
+static int32_t qsearch(GameState* state, SearchResult* result, const int32_t depth, int32_t maxDepth, int32_t alpha, int32_t beta) {
+	if (draw_isThreefold(state) || draw_isMaterial(state)) {
+		return 0;
+	}
+
 	const int32_t evalScore = evaluate(state);
+
+	// Hmm...use hash table?
+	if (depth > maxDepth) {
+		return evalScore;
+	}
+
 	if (evalScore >= beta) {
 		return beta;
 	}
@@ -92,23 +102,26 @@ static int32_t qsearch(GameState* state, SearchResult* result, const int32_t dep
 	const int32_t moveCount = generatePseudoMoves(state, buffer);
 
 	for (int32_t i = 0; i < moveCount; i++) {
-		Move m = buffer->moves[i];
-		if (m.captures != &EMPTY) {
-			makeMove(state, &m);
-			if (isLegalPosition(state)) {
-				const int32_t moveScore =  -1 * qsearch(state, result, depth + 1, -1 * beta, -1 * alpha);
-				unmakeMove(state, &m);
+		Move* m = &buffer->moves[i];
 
-				if (moveScore >= beta) {
-					result->betaCutoffs++;
-					return beta;
-				}
+		makeMove(state, m);
 
-				if (moveScore > alpha) {
-					alpha = moveScore;
-				}
-			} else {
-				unmakeMove(state, &m);
+		// Only search moves that:
+		// 1. Are legal.
+		// 2. Result in a check state OR are captures.
+		if (!isLegalPosition(state) || !isCheck(state) || m->captures == &EMPTY) {
+			unmakeMove(state, m);
+		} else {
+			const int32_t moveScore =  -1 * qsearch(state, result, depth + 1, maxDepth, -1 * beta, -1 * alpha);
+			unmakeMove(state, m);
+
+			if (moveScore >= beta) {
+				result->betaCutoffs++;
+				return beta;
+			}
+
+			if (moveScore > alpha) {
+				alpha = moveScore;
 			}
 		}
 	}
@@ -127,7 +140,7 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 	}
 
 	if (depth >= maxDepth) {
-		const int32_t evalScore = USE_Q_SEARCH ? qsearch(state, result, depth, alpha, beta) :  evaluate(state);
+		const int32_t evalScore = USE_Q_SEARCH ? qsearch(state, result, depth, Q_SEARCH_DEPTH, alpha, beta) :  evaluate(state);
 		if (allowNullMove) {
 			hash_put(state, evalScore, depth, HASHF_EXACT);
 		}
@@ -167,14 +180,14 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 	bool noLegalMoves = true;
 
 	for (int32_t i = 0; i < moveCount; i++) {
-		Move m = buffer->moves[i];
+		Move* m = &buffer->moves[i];
 
-		makeMove(state, &m);
+		makeMove(state, m);
 
 		if (isLegalPosition(state)) {
 			noLegalMoves = false;
 			const int32_t moveScore =  -1 * alphaBeta(state, result, depth + 1, maxDepth, -1 * beta, -1 * alpha, allowNullMove);
-			unmakeMove(state, &m);
+			unmakeMove(state, m);
 
 			if (moveScore >= beta) {
 				result->betaCutoffs++;
@@ -189,7 +202,7 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 				alpha = moveScore;
 			}
 		} else {
-			unmakeMove(state, &m);
+			unmakeMove(state, m);
 		}
 	}
 

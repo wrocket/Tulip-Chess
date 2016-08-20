@@ -94,9 +94,11 @@ bool canAttack(const int32_t color, const int32_t sq, GameState* state) {
 		return true;
 	}
 
+	const int64_t queenBits = BITS(queen);
+
 	// If an opposing rook or queen is on the file or rank...
 	mask = BITS_ROOK[sq];
-	if ((BITS(rook) & mask) || BITS(queen) & mask) {
+	if ((BITS(rook) & mask) || queenBits & mask) {
 		result = slide(sq, OFFSET_N, b, rook, queen)
 		         || slide(sq, OFFSET_S, b, rook, queen)
 		         || slide(sq, OFFSET_E, b, rook, queen)
@@ -108,7 +110,7 @@ bool canAttack(const int32_t color, const int32_t sq, GameState* state) {
 	}
 
 	mask = BITS_BISHOP[sq];
-	if ((BITS(bishop) & mask) || BITS(queen) & mask) {
+	if ((BITS(bishop) & mask) || queenBits & mask) {
 		result = slide(sq, OFFSET_NE, b, bishop, queen)
 		         || slide(sq, OFFSET_NW, b, bishop, queen)
 		         || slide(sq, OFFSET_SE, b, bishop, queen)
