@@ -3,26 +3,31 @@ Tulip-Chess
 
 Purpose
 -------
-This is a chess engine written for my own amusement. Not designed to be the absolute strongest, but rather a fun programming project. The current goal is play strength >= 2000 ELO. I've been writing chess engines since my undergraduate years using various technologies and techniques. Tulip represents what development I find "fun" at the moment - it is my forever project.
+This is a chess engine written for my own amusement. My goal isn't to write a world-beating chess monster, but to have fun applying programming techniques to a recreational pursuit. 
+
+I've been writing little chess engines ever since my undergraduate years using all sorts of languages and styles, and Tulip is my current endeavor. It's not yet my strongest engine, though I hope it achieves that distinction.
 
 Requirements
 ------------
-The application is intended to be built on any UNIX-ish system using a GCC-like C compiler. Currently the default makefile uses Clang 3.7. At the time of this writing, 90% of development is done on a Linux machine, so build issues with OS/X and such might slowly creep in.
+The application is intended to be built on any UNIX-ish system using a GCC-like C compiler. Windows compilation should be straightforward using a POSIX-like layer such as Cygwin.
 
-SQLite is used as a storage engine for opening books and similar. The application expects that the "sqlite3" command is available on the host system.
+Currently the default makefile uses Clang 3.7. At the time of this writing, 90% of development is done on a Linux machine, so build issues with OS/X and such might slowly creep in as I don't test the build as frequently on that platform as I should.
 
-Principles
-----------
+SQLite is used as a storage engine for opening books and such. The application expects that the `sqlite3` command is available on the host system somewhere on the default path.
+
+Principles of Development
+-------------------------
 * Tulip should be reasonably self-contained.
   * Ideally, the only dependencies would be standard POSIX headers and programs supplied by the OS.
   * SQLite is used as an opening book storage engine.
 * Tulip should be readily portable to any UNIX-like system.
-* Tulip should be buildable, ideally with a one-step invocation of 'make'.
+* Tulip should be easily buildable, ideally with a one-step invocation of 'make'.
+* Code should favor clarity over cleverness.
+  * Except where cleverness is truly clever.
 
 Current Status
 --------------
 Currently, Tulip can play a relatively weak game of chess, taking advantage of obvious blunders, using the XBoard front-end.
-
 
 Technical Concepts
 ------------------
@@ -46,10 +51,10 @@ self.assertEqual('whiteCheckmated', result['status'])
 </pre>
 
 #### Gameplay
-Currently the XBoard protocol is used due to its simplicity. The interface is a very primitive syncronous stdin/stdout-based system. Eventually, the search will happen in a separate thread, enabling interrupting via the UI and such possible.
+Currently the XBoard protocol is used due to its simplicity. The interface is a very primitive synchronous `stdin`/`stdout`-based system. Eventually, the search will happen in a separate thread, enabling interrupting via the UI and such possible.
 
 #### Opening Books
-Tulip uses a SQLite database for its opening books. Generating these books from a set of games in a PGN format is accomplished via the enclosed Python scripts in /utils:
+Tulip uses a SQLite database for its opening books. Generating these books from a set of games in a PGN format is accomplished via the enclosed Python scripts in `/utils`:
 
 <pre>
 utils > ./digest_pgn.py some_pgn_file.pgn | ./build_book.py
