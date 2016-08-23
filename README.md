@@ -15,6 +15,10 @@ Currently the default makefile uses Clang 3.7. At the time of this writing, 90% 
 
 SQLite is used as a storage engine for opening books and such. The application expects that the `sqlite3` command is available on the host system somewhere on the default path.
 
+Licensing
+---------
+Tulip is MIT-licensed.
+
 Principles of Development
 -------------------------
 * Tulip should be reasonably self-contained.
@@ -27,7 +31,7 @@ Principles of Development
 
 Current Status
 --------------
-Currently, Tulip can play a relatively weak game of chess, taking advantage of obvious blunders, using the XBoard front-end.
+Currently, Tulip can play a relatively weak (by computer standards) game of chess, taking advantage of obvious blunders, using the XBoard front-end.
 
 Technical Concepts
 ------------------
