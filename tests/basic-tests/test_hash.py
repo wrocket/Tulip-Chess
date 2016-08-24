@@ -25,7 +25,7 @@ import json
 import unittest
 
 def call_tulip(args):
-    cmd = ['../../src/tulip']
+    cmd = ['../../src/tulip', '--action']
     cmd.extend(args)
     out = subprocess.check_output(cmd)
     return out.decode('utf-8')

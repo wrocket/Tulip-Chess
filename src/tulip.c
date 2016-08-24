@@ -29,6 +29,7 @@
 #include <time.h>
 
 #include "attack.h"
+#include "cmdargs.h"
 #include "board.h"
 #include "draw.h"
 #include "fen.h"
@@ -476,51 +477,56 @@ int main(int argc, char** argv) {
     // Randomness needn't be cryptographic strength for our purposes.
     srand((unsigned int) time(NULL));
 
-    if (argc >= 1) {
-        if (0 == strcmp("-listmoves", argv[0])) {
+    TulipContext context = cmd_parseArgs(argc, argv);
+
+    if (context.argc >= 1) {
+        char* action = context.argv[0];
+        argc = context.argc;
+        argv = context.argv;
+        if (0 == strcmp("-listmoves", action)) {
             listMoves(argc, argv);
-        } else if (0 == strcmp("-printstate", argv[0])) {
+        } else if (0 == strcmp("-printstate", action)) {
             printState(argc, argv);
-        } else if (0 == strcmp("-listattacks", argv[0])) {
+        } else if (0 == strcmp("-listattacks", action)) {
             listAttacks(argc, argv);
-        } else if (0 == strcmp("-makemove", argv[0])) {
+        } else if (0 == strcmp("-makemove", action)) {
             printMoveResult(argc, argv);
-        } else if (0 == strcmp("-nullmove", argv[0])) {
+        } else if (0 == strcmp("-nullmove", action)) {
             printNullMoveResult(argc, argv);
-        } else if (0 == strcmp("-checkstatus", argv[0])) {
+        } else if (0 == strcmp("-checkstatus", action)) {
             checkStatus(argc, argv);
-        } else if (0 == strcmp("-makeunmake", argv[0])) {
+        } else if (0 == strcmp("-makeunmake", action)) {
             printMakeUnmakeMoveResult(argc, argv);
-        } else if (0 == strcmp("-matchmove", argv[0])) {
+        } else if (0 == strcmp("-matchmove", action)) {
             printMatchMove(argc, argv);
-        } else if (0 == strcmp("-gamestatus", argv[0])) {
+        } else if (0 == strcmp("-gamestatus", action)) {
             makeMovesAndPrintGameResultStatus(argc, argv);
-        } else if (0 == strcmp("-bookline", argv[0])) {
+        } else if (0 == strcmp("-bookline", action)) {
             bookLine(argc, argv);
-        } else if (0 == strcmp("-bookmoves", argv[0])) {
+        } else if (0 == strcmp("-bookmoves", action)) {
             findBookMoves(argc, argv);
-        } else if (0 == strcmp("-evalposition", argv[0])) {
+        } else if (0 == strcmp("-evalposition", action)) {
             evalPosition(argc, argv);
-        } else if (0 == strcmp("-simplesearch", argv[0])) {
+        } else if (0 == strcmp("-simplesearch", action)) {
             simpleSearch(argc, argv);
-        } else if (0 == strcmp("-ordermoves", argv[0])) {
+        } else if (0 == strcmp("-ordermoves", action)) {
             printMoveOrder(argc, argv);
-        } else if (0 == strcmp("-classifyendgame", argv[0])) {
+        } else if (0 == strcmp("-classifyendgame", action)) {
             printEndgame(argc, argv);
-        } else if (0 == strcmp("-passedpawns", argv[0])) {
+        } else if (0 == strcmp("-passedpawns", action)) {
             checkPassedPawn(argc, argv);
-        } else if (0 == strcmp("-interactive", argv[0])) {
+        } else if (0 == strcmp("-interactive", action)) {
           startInteractive();
-        } else if (0 == strcmp("-kingrect", argv[0])) {
+        } else if (0 == strcmp("-kingrect", action)) {
             kingRect(argc, argv);
         } else {
             printBanner();
-            printf("Unknown command \"%s\"\n", argv[0]);
+            printf("Unknown command \"%s\"\n", action);
         }
     } else {
         printBanner();
         printf(">> No operation mode specified, entering XBoard mode.\n");
-        startXBoard();
+        startXBoard(context);
     }
 
     return EXIT_SUCCESS;

@@ -20,31 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef XBOARD_H
-#define XBOARD_H
+#ifndef CMD_ARGS_H
+#define CMD_ARGS_H
 
 #include <stdbool.h>
-
-#include "cmdargs.h"
-#include "gamestate.h"
-#include "book.h"
-#include "log.h"
-
-#define XBOARD_BUFF_LEN 1024
+#include <inttypes.h>
 
 typedef struct {
-    GameState gameState;
-    bool forceMode;
-    OpenBook currentBook;
-    bool bookOpen;
-    GameLog log;
-    char* outputBuffer;
-    int myTime;
-    int opponentTime;
-    bool postThinking;
-    bool onIcs;
-} XBoardState;
+	char** argv;
+	char* bookFile;
+	int32_t argc;
+	int32_t zTableBits;
+	bool useOpeningBook;
+} TulipContext;
 
-bool startXBoard(TulipContext cxt);
-void postXBOutput(void* xBoardState, int ply, int score, long timeCentiseconds, long nodes, MoveBuffer* pv);
+TulipContext cmd_parseArgs(int argc, char** argv);
+
 #endif

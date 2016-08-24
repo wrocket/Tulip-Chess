@@ -344,7 +344,7 @@ void postXBOutput(void* chessInterfaceState, int ply, int score, long timeCentis
 #define INPUT_BUFFER_SIZE 2048
 #define MAX_INPUT_TOKENS 32
 #define MAX_TOKEN_LEN 64
-bool startXBoard() {
+bool startXBoard(TulipContext cxt) {
 	char* inputBuffer;
 	bool result = true;
 	char** tb;
@@ -377,9 +377,14 @@ bool startXBoard() {
 
 	initializeGamestate(&xbState.gameState);
 
-	// TODO: Define elsewhere
-	const char* openingBook = "tulip_openings.sqlite";
-	xbState.bookOpen = book_open(openingBook, &xbState.currentBook);
+	if (cxt.useOpeningBook) {
+		// TODO: Define elsewhere
+		const char* openingBook = "tulip_openings.sqlite";
+		xbState.bookOpen = book_open(openingBook, &xbState.currentBook);
+	} else {
+		xbState.bookOpen = false;
+	}
+
 	xbState.postThinking = false;
 
 	if (!log_open(&xbState.log)) {
