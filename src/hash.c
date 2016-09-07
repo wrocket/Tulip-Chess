@@ -30,6 +30,7 @@
 #include "gamestate.h"
 #include "ztable.h"
 #include "string.h"
+#include "cmdargs.h"
 
 int32_t hash_probe(GameState* state, int32_t currentDepth, int32_t alpha, int32_t beta) {
     const uint64_t hash = state->current->hash;
@@ -106,12 +107,12 @@ uint64_t computeHash(GameState* gameState) {
     return h;
 }
 
-size_t hash_zTableSizeBytes() {
-    return ZTABLE_SIZE * sizeof(ZTableEntry);
+size_t hash_zTableSizeBytes(TulipContext* cxt) {
+    return cxt->zTableEntries * sizeof(ZTableEntry);
 }
 
-void hash_friendlySize(char* str, size_t size) {
-    size_t zTableBytes = hash_zTableSizeBytes();
+void hash_friendlySize(TulipContext* cxt, char* str, size_t size) {
+    size_t zTableBytes = hash_zTableSizeBytes(cxt);
     const char* suffix;
     double qty;
     if (zTableBytes > 1024 * 1024) {

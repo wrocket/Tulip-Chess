@@ -67,7 +67,7 @@ static void printBanner(TulipContext context) {
         printf("OS: %s\n", str);
     }
 
-    hash_friendlySize(str, size);
+    hash_friendlySize(&context, str, size);
     printf("Hash table size: %s\n", str);
     free(str);
 

@@ -28,6 +28,7 @@
 
 #include "ztable.h"
 #include "gamestate.h"
+#include "cmdargs.h"
 
 #define HASH_NOT_FOUND INT_MAX
 
@@ -54,7 +55,7 @@ void hash_clearZTable(ZTable* table);
 size_t hash_zTableSizeBytes();
 
 // Prints a "friendly" size of the hash table.
-void hash_friendlySize(char* str, size_t size);
+void hash_friendlySize(TulipContext* cxt, char* str, size_t size);
 
 // Computes the hash of the given state.
 // SLOW. Do not use in tight loops.

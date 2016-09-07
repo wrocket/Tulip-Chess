@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 
 #include <stdbool.h>
+#include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
 #include <stdio.h>
@@ -33,6 +34,9 @@ TulipContext cmd_parseArgs(int argc, char** argv) {
 	result.argc = 0;
 	result.argv = NULL;
 	result.bookFile = "tulip_openings.sqlite";
+	result.zTableBits = 19;
+	result.zTableEntries = 512 * 1024;
+	result.zTableMask = (512 * 1024) - 1;
 
 	for (int i = 0; i < argc; i++) {
 		char* arg = argv[i];
@@ -47,6 +51,26 @@ TulipContext cmd_parseArgs(int argc, char** argv) {
 				result.bookFile = argv[++i];
 			} else {
 				fprintf(stderr, "--bookfile option given without valid argument.\n");
+				exit(EXIT_FAILURE);
+			}
+		} else if (0 == strcmp("--ztablebits", arg)) {
+			if (i < argc - 1) {
+				char* endToken;
+				result.zTableBits = strtol(argv[++i], &endToken, 10);
+				if (*endToken != '\0') {
+					fprintf(stderr, "--ztablebits given invalid input of \"%s\".\n", argv[i]);
+					exit(EXIT_FAILURE);
+				} else {
+					if (result.zTableBits >= 64) {
+						printf("Excessively long ztable bits of %ld.\n", result.zTableBits);
+						exit(EXIT_FAILURE);
+					}
+					result.zTableEntries = 0x1 << result.zTableBits;
+					result.zTableMask = result.zTableEntries - 1;
+				}
+			} else {
+				fprintf(stderr, "--ztablebits option given without valid argument.\n");
+				exit(EXIT_FAILURE);
 			}
 		}
 	}
