@@ -28,6 +28,22 @@
 
 #include "cmdargs.h"
 
+static void parseZTableBits(TulipContext* cxt, char* param) {
+	char* endToken;
+	cxt->zTableBits = strtol(param, &endToken, 10);
+	if (*endToken != '\0') {
+		fprintf(stderr, "--ztablebits given invalid input of \"%s\".\n", param);
+		exit(EXIT_FAILURE);
+	} else {
+		if (cxt->zTableBits >= 64) {
+			printf("Excessively long ztable bits of %ld.\n", cxt->zTableBits);
+			exit(EXIT_FAILURE);
+		}
+		cxt->zTableEntries = 0x1 << cxt->zTableBits;
+		cxt->zTableMask = cxt->zTableEntries - 1;
+	}
+}
+
 TulipContext cmd_parseArgs(int argc, char** argv) {
 	TulipContext result;
 	result.useOpeningBook = true;
@@ -55,19 +71,8 @@ TulipContext cmd_parseArgs(int argc, char** argv) {
 			}
 		} else if (0 == strcmp("--ztablebits", arg)) {
 			if (i < argc - 1) {
-				char* endToken;
-				result.zTableBits = strtol(argv[++i], &endToken, 10);
-				if (*endToken != '\0') {
-					fprintf(stderr, "--ztablebits given invalid input of \"%s\".\n", argv[i]);
-					exit(EXIT_FAILURE);
-				} else {
-					if (result.zTableBits >= 64) {
-						printf("Excessively long ztable bits of %ld.\n", result.zTableBits);
-						exit(EXIT_FAILURE);
-					}
-					result.zTableEntries = 0x1 << result.zTableBits;
-					result.zTableMask = result.zTableEntries - 1;
-				}
+				i++;
+				parseZTableBits(&result, argv[i]);
 			} else {
 				fprintf(stderr, "--ztablebits option given without valid argument.\n");
 				exit(EXIT_FAILURE);
