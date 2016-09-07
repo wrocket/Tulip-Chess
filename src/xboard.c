@@ -378,8 +378,7 @@ bool startXBoard(TulipContext cxt) {
 	initializeGamestate(&xbState.gameState);
 
 	if (cxt.useOpeningBook) {
-		// TODO: Define elsewhere
-		const char* openingBook = "tulip_openings.sqlite";
+		const char* openingBook = cxt.bookFile;
 		xbState.bookOpen = book_open(openingBook, &xbState.currentBook);
 	} else {
 		xbState.bookOpen = false;

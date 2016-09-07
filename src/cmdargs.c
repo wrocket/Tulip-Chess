@@ -23,6 +23,7 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "cmdargs.h"
 
@@ -31,7 +32,8 @@ TulipContext cmd_parseArgs(int argc, char** argv) {
 	result.useOpeningBook = true;
 	result.argc = 0;
 	result.argv = NULL;
-	
+	result.bookFile = "tulip_openings.sqlite";
+
 	for (int i = 0; i < argc; i++) {
 		char* arg = argv[i];
 		if (0 == strcmp("--action", arg)) {
@@ -40,6 +42,12 @@ TulipContext cmd_parseArgs(int argc, char** argv) {
 			return result;
 		} else if (0 == strcmp("--nobook", arg)) {
 			result.useOpeningBook = false;
+		} else if (0 == strcmp("--bookfile", arg)) {
+			if (i < argc - 1) {
+				result.bookFile = argv[++i];
+			} else {
+				fprintf(stderr, "--bookfile option given without valid argument.\n");
+			}
 		}
 	}
 

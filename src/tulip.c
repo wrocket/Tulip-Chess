@@ -53,7 +53,7 @@
 #include "env.h"
 #include "hash.h"
 
-static void printBanner() {
+static void printBanner(TulipContext context) {
     printf("Tulip Chess Engine 0.001\n");
     printf("Size of uint64: %lu bits\n", CHAR_BIT * sizeof(uint64_t));
 
@@ -69,9 +69,13 @@ static void printBanner() {
 
     hash_friendlySize(str, size);
     printf("Hash table size: %s\n", str);
-
     free(str);
 
+    if (context.useOpeningBook) {
+    	printf("Using book: %s\n", context.bookFile);
+    } else {
+    	printf("Opening book disabled.\n");
+    }
 }
 
 // Simple alternative to getopt(). Consider using getopt anyway...
@@ -520,11 +524,11 @@ int main(int argc, char** argv) {
         } else if (0 == strcmp("-kingrect", action)) {
             kingRect(argc, argv);
         } else {
-            printBanner();
+            printBanner(context);
             printf("Unknown command \"%s\"\n", action);
         }
     } else {
-        printBanner();
+        printBanner(context);
         printf(">> No operation mode specified, entering XBoard mode.\n");
         startXBoard(context);
     }
