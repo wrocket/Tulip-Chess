@@ -38,6 +38,10 @@ static void parseZTableBits(TulipContext* cxt, char* param) {
 		if (cxt->zTableBits >= 64) {
 			printf("Excessively long ztable bits of %ld.\n", cxt->zTableBits);
 			exit(EXIT_FAILURE);
+		} else if (cxt->zTableBits <= 0) {
+			// Apply a minimum default so we don't have to check this every time we access the zTable.
+			// 8 bits (256 slots) is small enough.
+			cxt->zTableBits = 8;
 		}
 	}
 }
