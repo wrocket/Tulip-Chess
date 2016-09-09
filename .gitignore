@@ -4,6 +4,7 @@ src/tulip
 src/sqlite/*.o
 src/sqlite/*.h
 src/sqlite/*.c
+book_files/*
 *.log
 .DS_Store
 __pycache__
