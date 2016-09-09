@@ -375,7 +375,7 @@ bool startXBoard(TulipContext cxt) {
 		goto cleanup_inputBuff;
 	}
 
-	initializeGamestate(&xbState.gameState);
+	initializeGamestate(&xbState.gameState, cxt.zTableBits);
 
 	if (cxt.useOpeningBook) {
 		const char* openingBook = cxt.bookFile;

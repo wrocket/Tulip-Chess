@@ -1,0 +1,15 @@
+[Event "Computer Chess Game"]
+[Site "spica"]
+[Date "2016.03.19"]
+[Round "-"]
+[White "bwray"]
+[Black "tulip"]
+[Result "*"]
+[TimeControl "40/300"]
+[Annotator "3... -0.54"]
+
+1. e4 c5 2. Nf3 Nc6 3. Nc3 Qa5 {-0.54/10 1.2} 4. d3 Nd4 {-1.80/10 1.5} 5.
+Nxd4 cxd4 {-2.74/10 3} 6. Bd2 dxc3 {-2.95/10 3} 7. Bxc3 Qe5 {-3.88/10 3} 8.
+Be2 Qf6 {-3.90/10 3}
+*
+

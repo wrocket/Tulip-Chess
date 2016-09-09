@@ -36,7 +36,7 @@ int32_t hash_probe(GameState* state, int32_t currentDepth, int32_t alpha, int32_
     const uint64_t hash = state->current->hash;
     ZTable* table = &state->zTable;
 
-    ZTableEntry* entry = &table->data[hash % ZTABLE_SIZE];
+    ZTableEntry* entry = &table->data[hash & table->sizeMask];
 
     // Lower depths mean the hash was computer "higher" on the tree, so it's a more accurate score.
     // E.g. a depth of MAX_DEPTH would be a leaf node, which has pretty shallow evaluation.
@@ -61,7 +61,7 @@ void hash_put(GameState* state, int32_t score, int32_t depth, int32_t flag) {
     const uint64_t hash = state->current->hash;
     ZTable* table = &state->zTable;
 
-    ZTableEntry* entry = &table->data[hash % ZTABLE_SIZE];
+    ZTableEntry* entry = &table->data[hash % table->sizeMask];
 
     entry->score = score;
     entry->depth = depth;
@@ -70,13 +70,15 @@ void hash_put(GameState* state, int32_t score, int32_t depth, int32_t flag) {
 }
 
 void hash_clearZTable(ZTable* table) {
-    memset(table->data, 0, ZTABLE_SIZE * sizeof(ZTableEntry));
+    memset(table->data, 0, table->size * sizeof(ZTableEntry));
 }
 
-void hash_createZTable(ZTable* table) {
-    table->data = calloc(ZTABLE_SIZE, sizeof(ZTableEntry));
+void hash_createZTable(ZTable* table, int64_t sizeBits) {
+    table->size = 0x1 << sizeBits;
+    table->data = calloc(table->size, sizeof(ZTableEntry));
+    table->sizeMask = table->size - 1;
     if (!table->data) {
-        perror("Unable to allocate Zobrist table.");
+        perror("Unable to allocate Zobrist table");
         exit(-1);
     }
 }
@@ -108,7 +110,7 @@ uint64_t computeHash(GameState* gameState) {
 }
 
 size_t hash_zTableSizeBytes(TulipContext* cxt) {
-    return cxt->zTableEntries * sizeof(ZTableEntry);
+    return (0x1 << cxt->zTableBits) * sizeof(ZTableEntry);
 }
 
 void hash_friendlySize(TulipContext* cxt, char* str, size_t size) {

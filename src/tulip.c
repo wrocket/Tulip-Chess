@@ -72,9 +72,9 @@ static void printBanner(TulipContext context) {
     free(str);
 
     if (context.useOpeningBook) {
-    	printf("Using book: %s\n", context.bookFile);
+        printf("Using book: %s\n", context.bookFile);
     } else {
-    	printf("Opening book disabled.\n");
+        printf("Opening book disabled.\n");
     }
 }
 
@@ -93,9 +93,9 @@ static const char* findArg(int argc, char** argv, const char* argName) {
     return result;
 }
 
-static GameState parseFenOrQuit(char* str) {
+static GameState parseFenOrQuit(char* str, TulipContext* cxt) {
     GameState gs;
-    initializeGamestate(&gs);
+    initializeGamestate(&gs, cxt->zTableBits);
 
     if (!parseFen(&gs, str)) {
         fprintf(stderr, "Unable to parse FEN \"%s\"\n", str);
@@ -106,25 +106,31 @@ static GameState parseFenOrQuit(char* str) {
     return gs;
 }
 
-static void printState(int argc, char** argv) {
+static void printState(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 2) {
         fprintf(stderr, "Usage: -printstate \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[1]);
+    GameState gs = parseFenOrQuit(argv[1], cxt);
 
     printGameState(argv[1], &gs);
     destroyGamestate(&gs);
 }
 
-static void checkPassedPawn(int argc, char** argv) {
+static void checkPassedPawn(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 2) {
         fprintf(stderr, "Usage: -passedpawns \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[1]);
+    GameState gs = parseFenOrQuit(argv[1], cxt);
 
     int whitePassedPawns[8];
     int whiteCount = 0;
@@ -150,13 +156,16 @@ static void checkPassedPawn(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void listAttacks(int argc, char** argv) {
+static void listAttacks(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 2) {
         fprintf(stderr, "Usage: -listattacks \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[1]);
+    GameState gs = parseFenOrQuit(argv[1], cxt);
 
     bool* attackGrid = ALLOC(144, bool, attackGrid, "Unable to allocate attack grid.");
     for (int rank = RANK_1; rank <= RANK_8; rank++) {
@@ -172,13 +181,16 @@ static void listAttacks(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void listMoves(int argc, char** argv) {
+static void listMoves(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 3) {
         fprintf(stderr, "Usage: -listmoves [pseudo/legal] \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[2]);
+    GameState gs = parseFenOrQuit(argv[2], cxt);
 
     MoveBuffer buffer;
     createMoveBuffer(&buffer);
@@ -198,13 +210,16 @@ static void listMoves(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void printMoveResult(int argc, char** argv) {
+static void printMoveResult(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 3) {
         fprintf(stderr, "Usage: -makemove [moveString] \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[2]);
+    GameState gs = parseFenOrQuit(argv[2], cxt);
     Move m;
 
     if (!notation_matchMove(argv[1], &gs, &m)) {
@@ -217,25 +232,31 @@ static void printMoveResult(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void printNullMoveResult(int argc, char** argv) {
+static void printNullMoveResult(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 2) {
         fprintf(stderr, "Usage: -nullmove \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[1]);
+    GameState gs = parseFenOrQuit(argv[1], cxt);
     makeNullMove(&gs);
     printMakeMoveResult(argv[2], NULL, &gs);
     destroyGamestate(&gs);
 }
 
-static void checkStatus(int argc, char** argv) {
+static void checkStatus(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 2) {
         fprintf(stderr, "Usage: -checkstatus \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[1]);
+    GameState gs = parseFenOrQuit(argv[1], cxt);
 
     bool posCheck = isCheck(&gs);
 
@@ -244,7 +265,10 @@ static void checkStatus(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void findBookMoves(int argc, char** argv) {
+static void findBookMoves(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 3) {
         fprintf(stderr, "Usage: -bookmoves [book file] \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
@@ -253,7 +277,7 @@ static void findBookMoves(int argc, char** argv) {
     char* bookFile = argv[1];
     char* fen = argv[2];
     OpenBook book;
-    GameState gs = parseFenOrQuit(fen);
+    GameState gs = parseFenOrQuit(fen, cxt);
     MoveBuffer buff;
     createMoveBuffer(&buff);
 
@@ -270,14 +294,17 @@ static void findBookMoves(int argc, char** argv) {
 
 }
 
-static void evalPosition(int argc, char** argv) {
+static void evalPosition(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 2) {
         fprintf(stderr, "Usage: -evalposition \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
     char* fen = argv[1];
-    GameState gs = parseFenOrQuit(fen);
+    GameState gs = parseFenOrQuit(fen, cxt);
     int mult = gs.current->toMove == COLOR_WHITE ? 1 : -1;
 
     int result = mult * evaluate(&gs);
@@ -286,13 +313,16 @@ static void evalPosition(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void printMakeUnmakeMoveResult(int argc, char** argv) {
+static void printMakeUnmakeMoveResult(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 3) {
         fprintf(stderr, "Usage: -makeunmake [moveString] \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[2]);
+    GameState gs = parseFenOrQuit(argv[2], cxt);
     Move m;
 
     if (!notation_matchMove(argv[1], &gs, &m)) {
@@ -307,13 +337,16 @@ static void printMakeUnmakeMoveResult(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void printMatchMove(int argc, char** argv) {
+static void printMatchMove(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 3) {
         fprintf(stderr, "Usage: -matchmove [moveString] \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[2]);
+    GameState gs = parseFenOrQuit(argv[2], cxt);
 
     Move m;
     if (!notation_matchMove(argv[1], &gs, &m)) {
@@ -325,7 +358,10 @@ static void printMatchMove(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void makeMovesAndPrintGameResultStatus(int argc, char** argv) {
+static void makeMovesAndPrintGameResultStatus(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     Move m;
 
     if (argc < 2) {
@@ -333,7 +369,7 @@ static void makeMovesAndPrintGameResultStatus(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[1]);
+    GameState gs = parseFenOrQuit(argv[1], cxt);
 
     for (int i = 2; i < argc; i++) {
         if (!notation_matchMove(argv[i], &gs, &m)) {
@@ -349,7 +385,9 @@ static void makeMovesAndPrintGameResultStatus(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void bookLine(int argc, char** argv) {
+static void bookLine(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
     Move m;
     HashSeqItem* seqItems = ALLOC(512, HashSeqItem, seqItems, "Unable to allocate hash seq items array");
     int count = 0;
@@ -359,7 +397,7 @@ static void bookLine(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[1]);
+    GameState gs = parseFenOrQuit(argv[1], cxt);
 
     const uint64_t initialHash = book_bookHash(&gs);
 
@@ -379,21 +417,27 @@ static void bookLine(int argc, char** argv) {
     free(seqItems);
 }
 
-static void printEndgame(int argc, char** argv) {
+static void printEndgame(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 2) {
         fprintf(stderr, "Usage: -classifyendgame \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
     char* fen = argv[argc - 1];
-    GameState gs = parseFenOrQuit(fen);
+    GameState gs = parseFenOrQuit(fen, cxt);
     int result = classifyEndgame(&gs);
     destroyGamestate(&gs);
 
     printEndgameClassification(result);
 }
 
-static void simpleSearch(int argc, char** argv) {
+static void simpleSearch(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc < 2) {
         fprintf(stderr, "Usage: -simplesearch \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
@@ -411,7 +455,7 @@ static void simpleSearch(int argc, char** argv) {
     }
 
     char* fen = argv[argc - 1];
-    GameState gs = parseFenOrQuit(fen);
+    GameState gs = parseFenOrQuit(fen, cxt);
 
     SearchArgs args;
     initSearchArgs(&args);
@@ -428,13 +472,16 @@ static void simpleSearch(int argc, char** argv) {
     destroySearchResult(&result);
 }
 
-static void printMoveOrder(int argc, char** argv) {
+static void printMoveOrder(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 2) {
         fprintf(stderr, "Usage: -ordermoves \"[FEN string]\"\n");
         exit(EXIT_FAILURE);
     }
 
-    GameState gs = parseFenOrQuit(argv[1]);
+    GameState gs = parseFenOrQuit(argv[1], cxt);
 
     MoveBuffer buffer;
     createMoveBuffer(&buffer);
@@ -448,13 +495,16 @@ static void printMoveOrder(int argc, char** argv) {
     destroyGamestate(&gs);
 }
 
-static void kingRect(int argc, char** argv) {
+static void kingRect(TulipContext* cxt) {
+    char** argv = cxt->argv;
+    int argc = cxt->argc;
+
     if (argc != 2) {
         fprintf(stderr, "Usage: -kingrect [square]\n");
         exit(EXIT_FAILURE);
     }
 
-    if(strlen(argv[1]) != 2) {
+    if (strlen(argv[1]) != 2) {
         fprintf(stderr, "Invalid square: %s\n", argv[1]);
         exit(EXIT_FAILURE);
     }
@@ -462,7 +512,7 @@ static void kingRect(int argc, char** argv) {
     const int32_t file = parseFileChar(argv[1][0]);
     const int32_t rank = parseRankChar(argv[1][1]);
 
-    if(file == INVALID_FILE || rank == INVALID_RANK) {
+    if (file == INVALID_FILE || rank == INVALID_RANK) {
         fprintf(stderr, "Invalid square: %s\n", argv[1]);
         exit(EXIT_FAILURE);
     }
@@ -485,44 +535,42 @@ int main(int argc, char** argv) {
 
     if (context.argc >= 1) {
         char* action = context.argv[0];
-        argc = context.argc;
-        argv = context.argv;
         if (0 == strcmp("-listmoves", action)) {
-            listMoves(argc, argv);
+            listMoves(&context);
         } else if (0 == strcmp("-printstate", action)) {
-            printState(argc, argv);
+            printState(&context);
         } else if (0 == strcmp("-listattacks", action)) {
-            listAttacks(argc, argv);
+            listAttacks(&context);
         } else if (0 == strcmp("-makemove", action)) {
-            printMoveResult(argc, argv);
+            printMoveResult(&context);
         } else if (0 == strcmp("-nullmove", action)) {
-            printNullMoveResult(argc, argv);
+            printNullMoveResult(&context);
         } else if (0 == strcmp("-checkstatus", action)) {
-            checkStatus(argc, argv);
+            checkStatus(&context);
         } else if (0 == strcmp("-makeunmake", action)) {
-            printMakeUnmakeMoveResult(argc, argv);
+            printMakeUnmakeMoveResult(&context);
         } else if (0 == strcmp("-matchmove", action)) {
-            printMatchMove(argc, argv);
+            printMatchMove(&context);
         } else if (0 == strcmp("-gamestatus", action)) {
-            makeMovesAndPrintGameResultStatus(argc, argv);
+            makeMovesAndPrintGameResultStatus(&context);
         } else if (0 == strcmp("-bookline", action)) {
-            bookLine(argc, argv);
+            bookLine(&context);
         } else if (0 == strcmp("-bookmoves", action)) {
-            findBookMoves(argc, argv);
+            findBookMoves(&context);
         } else if (0 == strcmp("-evalposition", action)) {
-            evalPosition(argc, argv);
+            evalPosition(&context);
         } else if (0 == strcmp("-simplesearch", action)) {
-            simpleSearch(argc, argv);
+            simpleSearch(&context);
         } else if (0 == strcmp("-ordermoves", action)) {
-            printMoveOrder(argc, argv);
+            printMoveOrder(&context);
         } else if (0 == strcmp("-classifyendgame", action)) {
-            printEndgame(argc, argv);
+            printEndgame(&context);
         } else if (0 == strcmp("-passedpawns", action)) {
-            checkPassedPawn(argc, argv);
+            checkPassedPawn(&context);
         } else if (0 == strcmp("-interactive", action)) {
-          startInteractive();
+            startInteractive();
         } else if (0 == strcmp("-kingrect", action)) {
-            kingRect(argc, argv);
+            kingRect(&context);
         } else {
             printBanner(context);
             printf("Unknown command \"%s\"\n", action);

@@ -23,8 +23,6 @@
 #ifndef ZTABLE_H
 #define ZTABLE_H
 
-#define ZTABLE_SIZE (512 * 1024)
-
 typedef struct {
 	int32_t score;
 	int32_t depth;
@@ -34,6 +32,8 @@ typedef struct {
 
 typedef struct {
 	ZTableEntry* data;
+	uint64_t sizeMask;
+	uint64_t size;
 } ZTable;
 
 #endif

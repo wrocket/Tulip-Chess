@@ -34,7 +34,7 @@
 #include "bitboard.h"
 #include "hash.h"
 
-void initializeGamestate(GameState* gs) {
+void initializeGamestate(GameState* gs, int64_t zTableBits) {
     // Allocate memory space for arrays.
     gs->bitboards = ALLOC_ZERO(ORD_MAX + 1, uint64_t, gs->bitboards, "Unable to allocate bitboards.");
     gs->dataStack = ALLOC(_GS_STACK_SIZE, StateData, gs->dataStack, "Unable to allocate state data stack.");
@@ -65,7 +65,7 @@ void initializeGamestate(GameState* gs) {
         createMoveBuffer(&gs->moveBuffers[i]);
     }
 
-    hash_createZTable(&gs->zTable);
+    hash_createZTable(&gs->zTable, zTableBits);
 }
 
 void reinitBitboards(GameState* gs) {

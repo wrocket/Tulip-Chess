@@ -42,8 +42,8 @@ int32_t hash_probe(GameState* state, int32_t currentDepth, int32_t alpha, int32_
 // Put a new value in the hash table.
 void hash_put(GameState* state, int32_t score, int32_t depth, int32_t flag);
 
-// Creates a new ZTable of the given size.
-void hash_createZTable(ZTable* table);
+// Creates a new ZTable of the given size in bits.
+void hash_createZTable(ZTable* table, int64_t sizeBits);
 
 // Clean up a ZTable
 void hash_destroyZTable(ZTable* table);

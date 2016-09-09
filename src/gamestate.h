@@ -56,7 +56,7 @@ typedef struct {
 } GameState;
 
 // Allocate memory and otherwise initialize a GameState to a default state.
-void initializeGamestate(GameState*);
+void initializeGamestate(GameState*, int64_t);
 
 // Free memory and otherwise release resources of a GameState.
 void destroyGamestate(GameState*);

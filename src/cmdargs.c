@@ -39,8 +39,6 @@ static void parseZTableBits(TulipContext* cxt, char* param) {
 			printf("Excessively long ztable bits of %ld.\n", cxt->zTableBits);
 			exit(EXIT_FAILURE);
 		}
-		cxt->zTableEntries = 0x1 << cxt->zTableBits;
-		cxt->zTableMask = cxt->zTableEntries - 1;
 	}
 }
 
@@ -51,8 +49,6 @@ TulipContext cmd_parseArgs(int argc, char** argv) {
 	result.argv = NULL;
 	result.bookFile = "tulip_openings.sqlite";
 	result.zTableBits = 19;
-	result.zTableEntries = 512 * 1024;
-	result.zTableMask = (512 * 1024) - 1;
 
 	for (int i = 0; i < argc; i++) {
 		char* arg = argv[i];

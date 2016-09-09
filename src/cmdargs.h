@@ -31,8 +31,6 @@ typedef struct {
 	char* bookFile;
 	int32_t argc;
 	int64_t zTableBits;
-	uint64_t zTableEntries;
-	uint64_t zTableMask;
 	bool useOpeningBook;
 } TulipContext;
 
