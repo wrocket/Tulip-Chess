@@ -29,11 +29,11 @@
 
 // Determines if a given color can attack (ignoring check) a given square.
 // This determination ignores rules around moving into check.
-bool canAttack(const int32_t color, const int32_t sq, GameState* state);
+bool attack_canAttack(const int32_t color, const int32_t sq, GameState* state);
 
 // Determine if the current gamestate represents a checking position.
-bool isCheck(GameState* state);
+bool attack_isCheck(GameState* state);
 
 // Determine if the current position is a legal position.
-bool isLegalPosition(GameState* state);
+bool attack_isLegalPosition(GameState* state);
 #endif

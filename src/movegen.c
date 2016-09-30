@@ -253,7 +253,7 @@ static void blackKingCastle(GameState* gs, const Piece** board, Move* moveArr, i
         if ((castleFlags & CASTLE_BK)
             && board[SQ_F8] == &EMPTY
             && board[SQ_G8] == &EMPTY
-            && !canAttack(COLOR_WHITE, SQ_F8, gs)) {
+            && !attack_canAttack(COLOR_WHITE, SQ_F8, gs)) {
                 PUSH_MOVE(m, SQ_E8, SQ_G8, &BKING, &EMPTY, NO_MOVE_CODE);
                 (*count)++;
                 m++;
@@ -263,7 +263,7 @@ static void blackKingCastle(GameState* gs, const Piece** board, Move* moveArr, i
             && board[SQ_D8] == &EMPTY
             && board[SQ_C8] == &EMPTY
             && board[SQ_B8] == &EMPTY
-            && !canAttack(COLOR_WHITE, SQ_D8, gs)) {
+            && !attack_canAttack(COLOR_WHITE, SQ_D8, gs)) {
                 PUSH_MOVE(m, SQ_E8, SQ_C8, &BKING, &EMPTY, NO_MOVE_CODE);
                 (*count)++;
         }
@@ -276,7 +276,7 @@ static void whiteKingCastle(GameState* gs, const Piece** board, Move* moveArr, i
         if ((castleFlags & CASTLE_WK)
             && board[SQ_F1] == &EMPTY
             && board[SQ_G1] == &EMPTY
-            && !canAttack(COLOR_BLACK, SQ_F1, gs)) {
+            && !attack_canAttack(COLOR_BLACK, SQ_F1, gs)) {
                 PUSH_MOVE(m, SQ_E1, SQ_G1, &WKING, &EMPTY, NO_MOVE_CODE);
                 (*count)++;
                 m++;
@@ -286,7 +286,7 @@ static void whiteKingCastle(GameState* gs, const Piece** board, Move* moveArr, i
             && board[SQ_D1] == &EMPTY
             && board[SQ_C1] == &EMPTY
             && board[SQ_B1] == &EMPTY
-            && !canAttack(COLOR_BLACK, SQ_D1, gs)) {
+            && !attack_canAttack(COLOR_BLACK, SQ_D1, gs)) {
                 PUSH_MOVE(m, SQ_E1, SQ_C1, &WKING, &EMPTY, NO_MOVE_CODE);
                 (*count)++;
         }
@@ -329,7 +329,7 @@ int32_t generatePseudoMovesBlack(GameState* gs, MoveBuffer* moveBuff) {
                 case ORD_BKING:
                         king(sq, board, moveArr, &count, COLOR_WHITE);
                         if ((gs->current->castleFlags & (CASTLE_BK | CASTLE_BQ))
-                            && !canAttack(COLOR_WHITE, SQ_E8, gs)) {
+                            && !attack_canAttack(COLOR_WHITE, SQ_E8, gs)) {
                                 blackKingCastle(gs, board, moveArr, &count);
                         }
                         break;
@@ -377,7 +377,7 @@ int32_t generatePseudoMovesWhite(GameState* gs, MoveBuffer* moveBuff) {
                 case ORD_WKING:
                         king(sq, board, moveArr, &count, COLOR_BLACK);
                         if ((gs->current->castleFlags & (CASTLE_WK | CASTLE_WQ))
-                            && !canAttack(COLOR_BLACK, SQ_E1, gs)) {
+                            && !attack_canAttack(COLOR_BLACK, SQ_E1, gs)) {
                                 whiteKingCastle(gs, board, moveArr, &count);
                         }
                         break;
@@ -409,7 +409,7 @@ int32_t generateLegalMoves(GameState* gameState, MoveBuffer* destination) {
         for (int32_t i = 0; i < pseudoMoves.length; i++) {
                 Move* m = &pseudoMoves.moves[i];
                 makeMove(gameState, m);
-                if (isLegalPosition(gameState)) {
+                if (attack_isLegalPosition(gameState)) {
                         destination->moves[count++] = *m;
                 }
                 unmakeMove(gameState, m);
@@ -430,7 +430,7 @@ int32_t countLegalMoves(GameState* gameState) {
         for (int32_t i = 0; i < pseudoMoves.length; i++) {
                 Move* m = &pseudoMoves.moves[i];
                 makeMove(gameState, m);
-                if (isLegalPosition(gameState)) {
+                if (attack_isLegalPosition(gameState)) {
                         count++;
                 }
                 unmakeMove(gameState, m);

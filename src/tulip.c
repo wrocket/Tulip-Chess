@@ -171,7 +171,7 @@ static void listAttacks(TulipContext* cxt) {
     for (int rank = RANK_1; rank <= RANK_8; rank++) {
         for (int file = FILE_A; file <= FILE_H; file++) {
             int idx = B_IDX(file, rank);
-            attackGrid[idx] = canAttack(gs.current->toMove, idx, &gs);
+            attackGrid[idx] = attack_canAttack(gs.current->toMove, idx, &gs);
         }
     }
 
@@ -258,7 +258,7 @@ static void checkStatus(TulipContext* cxt) {
 
     GameState gs = parseFenOrQuit(argv[1], cxt);
 
-    bool posCheck = isCheck(&gs);
+    bool posCheck = attack_isCheck(&gs);
 
     printCheckStatus(argv[1], posCheck);
 

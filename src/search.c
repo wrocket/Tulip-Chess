@@ -95,7 +95,7 @@ static int32_t qsearch(GameState* state, SearchResult* result, const int32_t dep
 		Move m = buffer->moves[i];
 		if (m.captures != &EMPTY) {
 			makeMove(state, &m);
-			if (isLegalPosition(state)) {
+			if (attack_isLegalPosition(state)) {
 				const int32_t moveScore =  -1 * qsearch(state, result, depth + 1, -1 * beta, -1 * alpha);
 				unmakeMove(state, &m);
 
@@ -139,7 +139,7 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 		return storedScore;
 	}
 
-	const bool check = isCheck(state);
+	const bool check = attack_isCheck(state);
 
 	// Apply the null-move heuristic if the situation warrants.
 	//
@@ -171,7 +171,7 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 
 		makeMove(state, &m);
 
-		if (isLegalPosition(state)) {
+		if (attack_isLegalPosition(state)) {
 			noLegalMoves = false;
 			const int32_t moveScore =  -1 * alphaBeta(state, result, depth + 1, maxDepth, -1 * beta, -1 * alpha, allowNullMove);
 			unmakeMove(state, &m);
@@ -374,7 +374,7 @@ static void orderRootNode(GameState* state, MoveBuffer* buffer) {
 
 		// Add special bonus to checks.
 		makeMove(state, m);
-		if (isCheck(state)) {
+		if (attack_isCheck(state)) {
 			score += 10; // Arbitrary value; high enough to put checks before captures.
 		}
 		unmakeMove(state, m);

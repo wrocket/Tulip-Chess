@@ -43,7 +43,7 @@ int32_t getResult(GameState* g) {
         const int32_t moves = countLegalMoves(g);
 
         if (moves == 0) {
-                const bool check = isCheck(g);
+                const bool check = attack_isCheck(g);
 
                 if (check) {
                         return g->current->toMove == COLOR_WHITE ?

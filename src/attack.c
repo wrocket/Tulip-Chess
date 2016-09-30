@@ -30,7 +30,7 @@
 #include "piece.h"
 #include "tulip.h"
 
-static bool slide(const int32_t startSq, const int32_t offset, const Piece** board, const Piece* slider, const Piece* queen) {
+static bool _slide(const int32_t startSq, const int32_t offset, const Piece** board, const Piece* slider, const Piece* queen) {
 	const Piece* p;
 	int32_t q = startSq;
 
@@ -43,14 +43,14 @@ static bool slide(const int32_t startSq, const int32_t offset, const Piece** boa
 	return p == slider || p == queen;
 }
 
-bool isCheck(GameState* state) {
+bool attack_isCheck(GameState* state) {
 	StateData* data = state->current;
 	return data->toMove == COLOR_WHITE ?
-	       canAttack(COLOR_BLACK, data->whiteKingSquare, state) :
-	       canAttack(COLOR_WHITE, data->blackKingSquare, state);
+	       attack_canAttack(COLOR_BLACK, data->whiteKingSquare, state) :
+	       attack_canAttack(COLOR_WHITE, data->blackKingSquare, state);
 }
 
-bool canAttack(const int32_t color, const int32_t sq, GameState* state) {
+bool attack_canAttack(const int32_t color, const int32_t sq, GameState* state) {
 	uint64_t mask;
 	const Piece* knight;
 	const Piece* bishop;
@@ -95,10 +95,10 @@ bool canAttack(const int32_t color, const int32_t sq, GameState* state) {
 	// If an opposing rook or queen is on the file or rank...
 	mask = BITS_ROOK[sq];
 	if ((BITS(rook) & mask) || BITS(queen) & mask) {
-		result = slide(sq, OFFSET_N, b, rook, queen)
-		         || slide(sq, OFFSET_S, b, rook, queen)
-		         || slide(sq, OFFSET_E, b, rook, queen)
-		         || slide(sq, OFFSET_W, b, rook, queen);
+		result = _slide(sq, OFFSET_N, b, rook, queen)
+		         || _slide(sq, OFFSET_S, b, rook, queen)
+		         || _slide(sq, OFFSET_E, b, rook, queen)
+		         || _slide(sq, OFFSET_W, b, rook, queen);
 
 		if (result) {
 			return true;
@@ -107,10 +107,10 @@ bool canAttack(const int32_t color, const int32_t sq, GameState* state) {
 
 	mask = BITS_BISHOP[sq];
 	if ((BITS(bishop) & mask) || BITS(queen) & mask) {
-		result = slide(sq, OFFSET_NE, b, bishop, queen)
-		         || slide(sq, OFFSET_NW, b, bishop, queen)
-		         || slide(sq, OFFSET_SE, b, bishop, queen)
-		         || slide(sq, OFFSET_SW, b, bishop, queen);
+		result = _slide(sq, OFFSET_NE, b, bishop, queen)
+		         || _slide(sq, OFFSET_NW, b, bishop, queen)
+		         || _slide(sq, OFFSET_SE, b, bishop, queen)
+		         || _slide(sq, OFFSET_SW, b, bishop, queen);
 
 		if (result) {
 			return true;
@@ -129,13 +129,13 @@ bool canAttack(const int32_t color, const int32_t sq, GameState* state) {
 	return false;
 }
 
-bool isLegalPosition(GameState* state) {
+bool attack_isLegalPosition(GameState* state) {
 	bool result;
 
 	if (state->current->toMove == COLOR_WHITE) {
-		result = !canAttack(COLOR_WHITE, state->current->blackKingSquare, state);
+		result = !attack_canAttack(COLOR_WHITE, state->current->blackKingSquare, state);
 	} else {
-		result = !canAttack(COLOR_BLACK, state->current->whiteKingSquare, state);
+		result = !attack_canAttack(COLOR_BLACK, state->current->whiteKingSquare, state);
 	}
 
 	return result;

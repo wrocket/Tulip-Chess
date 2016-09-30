@@ -136,7 +136,7 @@ int32_t notation_printShortAlg(Move* move, GameState* gameState, char* buffer) {
 add_check:
 
         makeMove(gameState, move);
-        if (isCheck(gameState)) {
+        if (attack_isCheck(gameState)) {
                 buffer[count++] = countLegalMoves(gameState) == 0 ? '#' : '+';
         }
 
