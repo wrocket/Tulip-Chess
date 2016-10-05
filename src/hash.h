@@ -29,6 +29,7 @@
 #include "ztable.h"
 #include "gamestate.h"
 #include "cmdargs.h"
+#include "hash.h"
 
 #define HASH_NOT_FOUND INT_MAX
 
@@ -43,13 +44,13 @@ int32_t hash_probe(GameState* state, int32_t currentDepth, int32_t alpha, int32_
 void hash_put(GameState* state, int32_t score, int32_t depth, int32_t flag);
 
 // Creates a new ZTable of the given size in bits.
-void hash_createZTable(ZTable* table, int64_t sizeBits);
+void hash_createZTable(GameLog* log, ZTable* table, int64_t sizeBits);
 
 // Clean up a ZTable
-void hash_destroyZTable(ZTable* table);
+void hash_destroyZTable(GameLog* log, ZTable* table);
 
 // Reset a ZTable without reallocating memory
-void hash_clearZTable(ZTable* table);
+void hash_clearZTable(GameLog* log, ZTable* table);
 
 // Get the size of the ZTable in bytes.
 size_t hash_zTableSizeBytes();

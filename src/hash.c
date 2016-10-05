@@ -69,11 +69,11 @@ void hash_put(GameState* state, int32_t score, int32_t depth, int32_t flag) {
     entry->flag = flag;
 }
 
-void hash_clearZTable(ZTable* table) {
+void hash_clearZTable(GameLog* log, ZTable* table) {
     memset(table->data, 0, table->size * sizeof(ZTableEntry));
 }
 
-void hash_createZTable(ZTable* table, int64_t sizeBits) {
+void hash_createZTable(GameLog* log, ZTable* table, int64_t sizeBits) {
     table->size = 0x1 << sizeBits;
     table->data = calloc(table->size, sizeof(ZTableEntry));
     table->sizeMask = table->size - 1;
@@ -81,10 +81,13 @@ void hash_createZTable(ZTable* table, int64_t sizeBits) {
         perror("Unable to allocate Zobrist table");
         exit(-1);
     }
+
+    log_debug(log, "Allocated ztable with %d slots at %p", 0x1 << sizeBits, table);
 }
 
-void hash_destroyZTable(ZTable* table) {
+void hash_destroyZTable(GameLog* log, ZTable* table) {
     free(table->data);
+    log_debug(log, "Deallocated ztable at %p", table);
 }
 
 uint64_t computeHash(GameState* gameState) {

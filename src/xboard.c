@@ -375,8 +375,6 @@ bool startXBoard(TulipContext cxt) {
 		goto cleanup_inputBuff;
 	}
 
-	initializeGamestate(&xbState.gameState, cxt.zTableBits);
-
 	if (cxt.useOpeningBook) {
 		const char* openingBook = cxt.bookFile;
 		xbState.bookOpen = book_open(openingBook, &xbState.currentBook);
@@ -390,6 +388,8 @@ bool startXBoard(TulipContext cxt) {
 		xBoardWrite(&xbState, "Error: Unable to open game log.");
 		goto cleanup_book;
 	}
+
+	initializeGamestate(&xbState.log, &xbState.gameState, cxt.zTableBits);
 
 	bool done = false;
 	while (!done) {
@@ -476,17 +476,17 @@ bool startXBoard(TulipContext cxt) {
 		}
 	}
 
-	log_close(&xbState.log);
 cleanup_book:
 	if (xbState.bookOpen) {
 		book_close(&xbState.currentBook);
 	}
 cleanup_gamestate:
-	destroyGamestate(&xbState.gameState);
+	destroyGamestate(&xbState.log, &xbState.gameState);
 	freeTokenBuffer(tb, MAX_INPUT_TOKENS);
 cleanup_outputBuff:
 	free(inputBuffer);
 cleanup_inputBuff:
+	log_close(&xbState.log);
 	return result;
 }
 

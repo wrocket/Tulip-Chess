@@ -27,6 +27,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+#include "log.h"
 #include "tulip.h"
 #include "piece.h"
 #include "move.h"
@@ -56,12 +57,12 @@ typedef struct {
 } GameState;
 
 // Allocate memory and otherwise initialize a GameState to a default state.
-void initializeGamestate(GameState*, int64_t);
+void initializeGamestate(GameLog* log, GameState*, int64_t);
 
 // Free memory and otherwise release resources of a GameState.
-void destroyGamestate(GameState*);
+void destroyGamestate(GameLog* log, GameState*);
 
 // Recalculate the bitboards array on the given state. Not performant.
-void reinitBitboards(GameState* gs);
+void reinitBitboards(GameLog* log, GameState* gs);
 
 #endif

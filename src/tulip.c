@@ -95,11 +95,11 @@ static const char* findArg(int argc, char** argv, const char* argName) {
 
 static GameState parseFenOrQuit(char* str, TulipContext* cxt) {
     GameState gs;
-    initializeGamestate(&gs, cxt->zTableBits);
+    initializeGamestate(NULL, &gs, cxt->zTableBits);
 
     if (!parseFen(&gs, str)) {
         fprintf(stderr, "Unable to parse FEN \"%s\"\n", str);
-        destroyGamestate(&gs);
+        destroyGamestate(NULL, &gs);
         exit(EXIT_FAILURE);
     }
 
@@ -118,7 +118,7 @@ static void printState(TulipContext* cxt) {
     GameState gs = parseFenOrQuit(argv[1], cxt);
 
     printGameState(argv[1], &gs);
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void checkPassedPawn(TulipContext* cxt) {
@@ -153,7 +153,7 @@ static void checkPassedPawn(TulipContext* cxt) {
 
     printPassedPawns(argv[1], whitePassedPawns, whiteCount, blackPassedPawns, blackCount);
 
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void listAttacks(TulipContext* cxt) {
@@ -178,7 +178,7 @@ static void listAttacks(TulipContext* cxt) {
     printAttackList(argv[1], attackGrid, &gs);
 
     free(attackGrid);
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void listMoves(TulipContext* cxt) {
@@ -207,7 +207,7 @@ static void listMoves(TulipContext* cxt) {
     printMovelistJson(argv[2], argv[1], &gs, &buffer);
 
     destroyMoveBuffer(&buffer);
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void printMoveResult(TulipContext* cxt) {
@@ -229,7 +229,7 @@ static void printMoveResult(TulipContext* cxt) {
 
     makeMove(&gs, &m);
     printMakeMoveResult(argv[2], &m, &gs);
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void printNullMoveResult(TulipContext* cxt) {
@@ -244,7 +244,7 @@ static void printNullMoveResult(TulipContext* cxt) {
     GameState gs = parseFenOrQuit(argv[1], cxt);
     makeNullMove(&gs);
     printMakeMoveResult(argv[2], NULL, &gs);
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void checkStatus(TulipContext* cxt) {
@@ -262,7 +262,7 @@ static void checkStatus(TulipContext* cxt) {
 
     printCheckStatus(argv[1], posCheck);
 
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void findBookMoves(TulipContext* cxt) {
@@ -290,7 +290,7 @@ static void findBookMoves(TulipContext* cxt) {
     printMovelistJson(fen, "legal", &gs, &buff);
 
     destroyMoveBuffer(&buff);
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 
 }
 
@@ -310,7 +310,7 @@ static void evalPosition(TulipContext* cxt) {
     int result = mult * evaluate(&gs);
 
     printEvaluation(fen, result);
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void printMakeUnmakeMoveResult(TulipContext* cxt) {
@@ -334,7 +334,7 @@ static void printMakeUnmakeMoveResult(TulipContext* cxt) {
     unmakeMove(&gs, &m);
     printGameState(argv[2], &gs);
 
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void printMatchMove(TulipContext* cxt) {
@@ -355,7 +355,7 @@ static void printMatchMove(TulipContext* cxt) {
         printMatchMoveResult(&m);
     }
 
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void makeMovesAndPrintGameResultStatus(TulipContext* cxt) {
@@ -382,7 +382,7 @@ static void makeMovesAndPrintGameResultStatus(TulipContext* cxt) {
 
     int result = getResult(&gs);
     printGameStatus(argv[1], result);
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void bookLine(TulipContext* cxt) {
@@ -413,7 +413,7 @@ static void bookLine(TulipContext* cxt) {
     }
 
     printHashSequence(seqItems, count, initialHash);
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
     free(seqItems);
 }
 
@@ -429,7 +429,7 @@ static void printEndgame(TulipContext* cxt) {
     char* fen = argv[argc - 1];
     GameState gs = parseFenOrQuit(fen, cxt);
     int result = classifyEndgame(&gs);
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 
     printEndgameClassification(result);
 }
@@ -468,7 +468,7 @@ static void simpleSearch(TulipContext* cxt) {
 
     printSearchResult(&result, &gs);
 
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
     srch_destroyResult(NULL, &result);
 }
 
@@ -492,7 +492,7 @@ static void printMoveOrder(TulipContext* cxt) {
     printMovelistJson(argv[1], "moveOrder", &gs, &buffer);
 
     destroyMoveBuffer(&buffer);
-    destroyGamestate(&gs);
+    destroyGamestate(NULL, &gs);
 }
 
 static void kingRect(TulipContext* cxt) {

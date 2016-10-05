@@ -33,8 +33,9 @@
 #include "move.h"
 #include "bitboard.h"
 #include "hash.h"
+#include "log.h"
 
-void initializeGamestate(GameState* gs, int64_t zTableBits) {
+void initializeGamestate(GameLog* log, GameState* gs, int64_t zTableBits) {
     // Allocate memory space for arrays.
     gs->bitboards = ALLOC_ZERO(ORD_MAX + 1, uint64_t, gs->bitboards, "Unable to allocate bitboards.");
     gs->dataStack = ALLOC(_GS_STACK_SIZE, StateData, gs->dataStack, "Unable to allocate state data stack.");
@@ -65,10 +66,11 @@ void initializeGamestate(GameState* gs, int64_t zTableBits) {
         createMoveBuffer(&gs->moveBuffers[i]);
     }
 
-    hash_createZTable(&gs->zTable, zTableBits);
+    hash_createZTable(log, &gs->zTable, zTableBits);
+    log_debug(log, "Created gamestate at %p", gs);
 }
 
-void reinitBitboards(GameState* gs) {
+void reinitBitboards(GameLog* log, GameState* gs) {
     // Zero out all current bitboards.
     for (int32_t i = 0; i <= ORD_MAX; i++) {
         gs->bitboards[i] = 0;
@@ -81,9 +83,11 @@ void reinitBitboards(GameState* gs) {
         int ord = board[sq]->ordinal;
         (gs->bitboards[ord]) |= BITS_SQ[sq];
     }
+
+    log_debug(log, "Reinitialized bitboards at %p", gs);
 }
 
-void destroyGamestate(GameState* gs) {
+void destroyGamestate(GameLog* log, GameState* gs) {
     if (!(gs->created)) {
         fprintf(stderr, "Attempting to destroy gamestate that isn't created (or already destroyed)");
     }
@@ -98,7 +102,8 @@ void destroyGamestate(GameState* gs) {
     }
 
     free(gs->moveBuffers);
-    hash_destroyZTable(&gs->zTable);
+    hash_destroyZTable(log, &gs->zTable);
 
     gs->created = false;
+    log_debug(log, "Destroyed gamestate at %p", gs);
 }
