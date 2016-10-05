@@ -26,8 +26,11 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+typedef enum { DEBUG = 1, INFO = 2 } LogLevel;
+
 typedef struct {
 	FILE* fh;
+	LogLevel level;
 } GameLog;
 
 // The maximum size of a log message.
@@ -39,6 +42,12 @@ bool log_open(GameLog* log);
 
 // Write a formatted message to the log.
 void log_write(GameLog* log, const char* format, ...);
+
+// Write a formatted message to the log.
+void log_debug(GameLog* log, const char* format, ...);
+
+// Determine if the DEBUG level is enabled.
+bool log_isDebug(GameLog* log);
 
 // Close a log.
 void log_close(GameLog* log);

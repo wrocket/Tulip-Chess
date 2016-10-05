@@ -77,7 +77,22 @@ bool log_open(GameLog* log) {
 
 open_log_fail:
 	free(fname);
+
+	log->level = DEBUG;
 	return result;
+}
+
+bool log_isDebug(GameLog* log) {
+	return log->level <= DEBUG;
+}
+
+void log_debug(GameLog* log, const char* format, ...) {
+	if (log_isDebug(log)) {
+		va_list argptr;
+		va_start(argptr, format);
+		log_write(log, format, argptr);
+		va_end(argptr);
+	}
 }
 
 void log_write(GameLog* log, const char* format, ...) {
