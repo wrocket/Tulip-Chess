@@ -458,18 +458,18 @@ static void simpleSearch(TulipContext* cxt) {
     GameState gs = parseFenOrQuit(fen, cxt);
 
     SearchArgs args;
-    initSearchArgs(&args);
+    srch_initArgs(&args);
     args.depth = depth;
 
     SearchResult result;
-    createSearchResult(&result);
+    srch_createResult(&result);
 
-    search(&gs, &args, &result);
+    srch_search(&gs, &args, &result);
 
     printSearchResult(&result, &gs);
 
     destroyGamestate(&gs);
-    destroySearchResult(&result);
+    srch_destroyResult(&result);
 }
 
 static void printMoveOrder(TulipContext* cxt) {
@@ -487,7 +487,7 @@ static void printMoveOrder(TulipContext* cxt) {
     createMoveBuffer(&buffer);
     mgen_legalMoves(&gs, &buffer);
 
-    orderByMvvLva(&buffer);
+    srch_orderByMvvLva(&buffer);
 
     printMovelistJson(argv[1], "moveOrder", &gs, &buffer);
 

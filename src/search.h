@@ -66,17 +66,17 @@ typedef struct {
 	int64_t timeToThinkMillis; // An approximate number of milliseconds to use for thinking.
 } SearchArgs;
 
-void initSearchArgs(SearchArgs* args);
+void srch_initArgs(SearchArgs* args);
 
 // Allocate resources for a search result.
-void createSearchResult(SearchResult* result);
+void srch_createResult(SearchResult* result);
 
 // Release resources for a search result.
-void destroySearchResult(SearchResult* result);
+void srch_destroyResult(SearchResult* result);
 
 // Think. Figure out the best move. This is a blocking operation at the moment.
-bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result);
+bool srch_search(GameState* state, SearchArgs* searchArgs, SearchResult* result);
 
 // Do a zero-depth move ordering, first by most valuable victim (Mvv) and then by least valuable attacker (lva).
-void orderByMvvLva(MoveBuffer* buffer);
+void srch_orderByMvvLva(MoveBuffer* buffer);
 #endif

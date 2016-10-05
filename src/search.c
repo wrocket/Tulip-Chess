@@ -65,11 +65,11 @@ static void _sortMoveScores(MoveScore* scores, const int32_t length) {
 	qsort(scores, (size_t) length, sizeof(MoveScore), _cmpMoveScore);
 }
 
-void orderByMvvLva(MoveBuffer* buffer) {
+void srch_orderByMvvLva(MoveBuffer* buffer) {
 	qsort(buffer->moves, ((size_t) buffer->length), sizeof(Move), _cmpMvvLva);
 }
 
-void initSearchArgs(SearchArgs* args) {
+void srch_initArgs(SearchArgs* args) {
 	args->log = NULL;
 	args->depth = 5;
 	args->chessInterfaceState = NULL;
@@ -161,7 +161,7 @@ static int32_t _alphaBeta(GameState* state, SearchResult* result, const int32_t 
 
 	// If we're early in the search, sort the moves a bit nicer.
 	if (depth < 3) {
-		orderByMvvLva(buffer);
+		srch_orderByMvvLva(buffer);
 	}
 
 	bool noLegalMoves = true;
@@ -412,7 +412,7 @@ static void _logIterativeResult(GameState* state, SearchArgs* searchArgs, MoveSc
 	log_write(searchArgs->log, "After depth=%i, best move is %s (%+0.2f)", depth, moveStr, score);
 }
 
-bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
+bool srch_search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 	MoveBuffer buffer;
 	result->searchStatus = SEARCH_STATUS_NONE;
 	createMoveBuffer(&buffer);
@@ -483,7 +483,7 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 	return true;
 }
 
-void createSearchResult(SearchResult* result) {
+void srch_createResult(SearchResult* result) {
 	result->searchStatus = SEARCH_STATUS_NONE;
 	result->score = INT_MIN;
 	result->nodes = 0;
@@ -491,6 +491,6 @@ void createSearchResult(SearchResult* result) {
 	result->moveScoreLength = 0;
 }
 
-void destroySearchResult(SearchResult* result) {
+void srch_destroyResult(SearchResult* result) {
 	free(result->moveScores);
 }
