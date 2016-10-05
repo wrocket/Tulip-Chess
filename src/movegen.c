@@ -388,7 +388,7 @@ static int32_t _generatePseudoMovesWhite(GameState* gs, MoveBuffer* moveBuff) {
     return count;
 }
 
-int32_t generatePseudoMoves(GameState* gs, MoveBuffer* moveBuff) {
+int32_t mgen_pseudoMoves(GameState* gs, MoveBuffer* moveBuff) {
     const int32_t toMove = gs->current->toMove;
     if (toMove == COLOR_WHITE) {
         return _generatePseudoMovesWhite(gs, moveBuff);
@@ -400,10 +400,10 @@ int32_t generatePseudoMoves(GameState* gs, MoveBuffer* moveBuff) {
     }
 }
 
-int32_t generateLegalMoves(GameState* gameState, MoveBuffer* destination) {
+int32_t mgen_legalMoves(GameState* gameState, MoveBuffer* destination) {
     MoveBuffer pseudoMoves;
     createMoveBuffer(&pseudoMoves);
-    generatePseudoMoves(gameState, &pseudoMoves);
+    mgen_pseudoMoves(gameState, &pseudoMoves);
     int32_t count = 0;
 
     for (int32_t i = 0; i < pseudoMoves.length; i++) {
@@ -421,10 +421,10 @@ int32_t generateLegalMoves(GameState* gameState, MoveBuffer* destination) {
     return count;
 }
 
-int32_t countLegalMoves(GameState* gameState) {
+int32_t mgen_countLegalMoves(GameState* gameState) {
     MoveBuffer pseudoMoves;
     createMoveBuffer(&pseudoMoves);
-    generatePseudoMoves(gameState, &pseudoMoves);
+    mgen_pseudoMoves(gameState, &pseudoMoves);
     int32_t count = 0;
 
     for (int32_t i = 0; i < pseudoMoves.length; i++) {

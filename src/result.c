@@ -40,7 +40,7 @@ int32_t getResult(GameState* g) {
 
         // TODO: Fifty move count!
 
-        const int32_t moves = countLegalMoves(g);
+        const int32_t moves = mgen_countLegalMoves(g);
 
         if (moves == 0) {
                 const bool check = attack_isCheck(g);

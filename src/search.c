@@ -89,7 +89,7 @@ static int32_t qsearch(GameState* state, SearchResult* result, const int32_t dep
 	}
 
 	MoveBuffer* buffer = &state->moveBuffers[depth];
-	const int32_t moveCount = generatePseudoMoves(state, buffer);
+	const int32_t moveCount = mgen_pseudoMoves(state, buffer);
 
 	for (int32_t i = 0; i < moveCount; i++) {
 		Move m = buffer->moves[i];
@@ -157,7 +157,7 @@ static int32_t alphaBeta(GameState* state, SearchResult* result, const int32_t d
 	}
 
 	MoveBuffer* buffer = &state->moveBuffers[depth];
-	const int32_t moveCount = generatePseudoMoves(state, buffer);
+	const int32_t moveCount = mgen_pseudoMoves(state, buffer);
 
 	// If we're early in the search, sort the moves a bit nicer.
 	if (depth < 3) {
@@ -420,7 +420,7 @@ bool search(GameState* state, SearchArgs* searchArgs, SearchResult* result) {
 	log_write(searchArgs->log, "Search starting with depth=%i", searchArgs->depth);
 
 	const int64_t start = getCurrentTimeMillis();
-	const int32_t moveCount = generateLegalMoves(state, &buffer);
+	const int32_t moveCount = mgen_legalMoves(state, &buffer);
 
 	// Put captures and checks at the top.
 	orderRootNode(state, &buffer);

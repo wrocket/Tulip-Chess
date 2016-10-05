@@ -32,14 +32,14 @@
 // not only if) you ignore rules around moving into check. The assumption
 // is that the caller will check the actual legality of the move before
 // playing the move to a game state.
-int32_t generatePseudoMoves(GameState* gameState, MoveBuffer* destination);
+int32_t mgen_pseudoMoves(GameState* gameState, MoveBuffer* destination);
 
 // Fills a given move buffer with legal moves. This checks the validity
 // of every resulting gamestate from each pseudolegal move, so it has
 // substantial runtime cost.
-int32_t generateLegalMoves(GameState* gameState, MoveBuffer* destination);
+int32_t mgen_legalMoves(GameState* gameState, MoveBuffer* destination);
 
 // Counts the number of legal moves.
-int32_t countLegalMoves(GameState* gameState);
+int32_t mgen_countLegalMoves(GameState* gameState);
 
 #endif

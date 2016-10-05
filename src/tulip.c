@@ -196,9 +196,9 @@ static void listMoves(TulipContext* cxt) {
     createMoveBuffer(&buffer);
 
     if (0 == strcmp("pseudo", argv[1])) {
-        generatePseudoMoves(&gs, &buffer);
+        mgen_pseudoMoves(&gs, &buffer);
     } else if (0 == strcmp("legal", argv[1])) {
-        generateLegalMoves(&gs, &buffer);
+        mgen_legalMoves(&gs, &buffer);
     } else {
         fprintf(stderr, "Move list mode \"%s\" unknown.\n", argv[1]);
         exit(EXIT_FAILURE);
@@ -485,7 +485,7 @@ static void printMoveOrder(TulipContext* cxt) {
 
     MoveBuffer buffer;
     createMoveBuffer(&buffer);
-    generateLegalMoves(&gs, &buffer);
+    mgen_legalMoves(&gs, &buffer);
 
     orderByMvvLva(&buffer);
 

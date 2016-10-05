@@ -52,7 +52,7 @@ static int32_t notation_printMoveDisambiguation(GameState* g, Move* move, char* 
         int32_t collidingMoveCnt = 0;
 
         createMoveBuffer(&legalMoves);
-        generateLegalMoves(g, &legalMoves);
+        mgen_legalMoves(g, &legalMoves);
 
         collidingMoves = ALLOC((uint64_t) legalMoves.length, int32_t, collidingMoves, "Unable to allocate ambiguous move buffer.");
 
@@ -137,7 +137,7 @@ add_check:
 
         makeMove(gameState, move);
         if (attack_isCheck(gameState)) {
-                buffer[count++] = countLegalMoves(gameState) == 0 ? '#' : '+';
+                buffer[count++] = mgen_countLegalMoves(gameState) == 0 ? '#' : '+';
         }
 
         unmakeMove(gameState, move);
@@ -201,7 +201,7 @@ bool notation_matchMove(char* str, GameState* gs, Move* m) {
         bool result = false;
 
         createMoveBuffer(&buffer);
-        generateLegalMoves(gs, &buffer);
+        mgen_legalMoves(gs, &buffer);
 
         normalizeMove(str, normalizedInputMove);
 
@@ -237,7 +237,7 @@ bool notation_matchPseudoMoveCoord(GameState* gameState, char* moveStr, Move* m)
         char moveStrBuff[8];
 
         createMoveBuffer(&moveBuff);
-        moveCount = generatePseudoMoves(gameState, &moveBuff);
+        moveCount = mgen_pseudoMoves(gameState, &moveBuff);
 
         for (int32_t i = 0; i < moveCount; i++) {
                 Move current = moveBuff.moves[i];
