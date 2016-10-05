@@ -69,10 +69,10 @@ typedef struct {
 void srch_initArgs(SearchArgs* args);
 
 // Allocate resources for a search result.
-void srch_createResult(SearchResult* result);
+void srch_createResult(GameLog* log, SearchResult* result);
 
 // Release resources for a search result.
-void srch_destroyResult(SearchResult* result);
+void srch_destroyResult(GameLog* log, SearchResult* result);
 
 // Think. Figure out the best move. This is a blocking operation at the moment.
 bool srch_search(GameState* state, SearchArgs* searchArgs, SearchResult* result);

@@ -114,7 +114,7 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
 		args.log = &xbs->log;
 		args.timeToThinkMillis = time_thinkTimeMillis(&xbs->gameState, xbs->myTime, xbs->opponentTime);
 		args.chessInterfaceState = (void*) xbs;
-		srch_createResult(&searchResult);
+		srch_createResult(&xbs->log, &searchResult);
 
 		log_write(&xbs->log, "Allocating %.2fs of think time.", (double) args.timeToThinkMillis / 1000.0);
 
@@ -125,7 +125,7 @@ static bool xBoardThinkAndMove(XBoardState* xbs) {
 			foundMove = true;
 		}
 
-		srch_destroyResult(&searchResult);
+		srch_destroyResult(&xbs->log, &searchResult);
 	}
 
 	if (foundMove) {

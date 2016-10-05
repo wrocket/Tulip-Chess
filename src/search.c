@@ -483,14 +483,18 @@ bool srch_search(GameState* state, SearchArgs* searchArgs, SearchResult* result)
 	return true;
 }
 
-void srch_createResult(SearchResult* result) {
+void srch_createResult(GameLog* log, SearchResult* result) {
 	result->searchStatus = SEARCH_STATUS_NONE;
 	result->score = INT_MIN;
 	result->nodes = 0;
 	result->moveScores = ALLOC(MOVE_BUFFER_LENGTH, MoveScore, result->moveScores, "Error allocating move score array.");
 	result->moveScoreLength = 0;
+
+	log_debug(log, "Created search result at %p", result);
 }
 
-void srch_destroyResult(SearchResult* result) {
+void srch_destroyResult(GameLog* log, SearchResult* result) {
 	free(result->moveScores);
+
+	log_debug(log, "Destroyed search result at %p", result);
 }

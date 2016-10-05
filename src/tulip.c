@@ -462,14 +462,14 @@ static void simpleSearch(TulipContext* cxt) {
     args.depth = depth;
 
     SearchResult result;
-    srch_createResult(&result);
+    srch_createResult(NULL, &result);
 
     srch_search(&gs, &args, &result);
 
     printSearchResult(&result, &gs);
 
     destroyGamestate(&gs);
-    srch_destroyResult(&result);
+    srch_destroyResult(NULL, &result);
 }
 
 static void printMoveOrder(TulipContext* cxt) {

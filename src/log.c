@@ -83,7 +83,7 @@ open_log_fail:
 }
 
 bool log_isDebug(GameLog* log) {
-	return log->level <= DEBUG;
+	return log != NULL && log->level <= DEBUG;
 }
 
 void log_debug(GameLog* log, const char* format, ...) {
