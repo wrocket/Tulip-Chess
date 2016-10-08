@@ -82,7 +82,7 @@ void hash_createZTable(GameLog* log, ZTable* table, int64_t sizeBits) {
         exit(-1);
     }
 
-    log_debug(log, "Allocated ztable with %d slots at %p", 0x1 << sizeBits, table);
+    log_debug(log, "Allocated ztable with %" PRIu64 " slots at %p", 0x1 << sizeBits, table);
 }
 
 void hash_destroyZTable(GameLog* log, ZTable* table) {

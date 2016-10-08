@@ -350,6 +350,7 @@ bool startXBoard(TulipContext cxt) {
 	char** tb;
 	XBoardState xbState;
 
+	xbState.log = EMPTY_LOG;
 	xbState.onIcs = false;
 
 	// Initialize time in case we don't know better!

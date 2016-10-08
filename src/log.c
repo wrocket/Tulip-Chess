@@ -32,6 +32,12 @@
 #define DATE_BUFF_SIZE 32
 #define FILE_NAME_SIZE 128
 
+const GameLog EMPTY_LOG = {
+	.open = false,
+	.fh = NULL,
+	.level = DEBUG
+};
+
 static void printDt(char* buff, const char* format) {
 	struct tm* tm_info;
 	time_t timer;
@@ -55,6 +61,8 @@ bool log_open(GameLog* log) {
 	char* fname;
 	char dateBuff[DATE_BUFF_SIZE];
 
+	log->open = false;
+
 	fname = malloc(FILE_NAME_SIZE * sizeof(char));
 	if (!fname) {
 		perror("Unable allocate memory for log file name.");
@@ -75,6 +83,8 @@ bool log_open(GameLog* log) {
 		goto open_log_fail;
 	}
 
+	log->open = true;
+
 open_log_fail:
 	free(fname);
 
@@ -83,26 +93,39 @@ open_log_fail:
 }
 
 bool log_isDebug(GameLog* log) {
-	return log != NULL && log->level <= DEBUG;
+	return log != NULL && log->open && log->level <= DEBUG;
+}
+
+static char* _allocLogBuff(size_t size) {
+	char* outputMessage = malloc(size * sizeof(char));
+
+	if (!outputMessage) {
+		perror("Error: Unable to allocate log message buffer.\n");
+		exit(-1);
+	}
+
+	return outputMessage;
 }
 
 void log_debug(GameLog* log, const char* format, ...) {
+	// TODO: Figure out why calling log_write(...) directly results in funny varargs behavior.
 	if (log_isDebug(log)) {
+		char* outputMessage = _allocLogBuff(LOG_BUFFER_SIZE);
+
 		va_list argptr;
 		va_start(argptr, format);
-		log_write(log, format, argptr);
+		vsnprintf(outputMessage, LOG_BUFFER_SIZE, format, argptr);
 		va_end(argptr);
+
+		writeEntry(log, outputMessage);
+
+		free(outputMessage);
 	}
 }
 
 void log_write(GameLog* log, const char* format, ...) {
-	if (log != NULL) {
-		char* outputMessage = malloc(LOG_BUFFER_SIZE * sizeof(char));
-
-		if (!outputMessage) {
-			perror("Error: Unable to allocate log message buffer.\n");
-			exit(-1);
-		}
+	if (log != NULL && log->open) {
+		char* outputMessage = _allocLogBuff(LOG_BUFFER_SIZE);
 
 		va_list argptr;
 		va_start(argptr, format);
@@ -116,8 +139,10 @@ void log_write(GameLog* log, const char* format, ...) {
 }
 
 void log_close(GameLog* log) {
-	if (log != NULL) {
+	if (log != NULL && log->open) {
+		writeEntry(log, "Log closed.");
 		fclose(log->fh);
+		log->open = false;
 	}
 }
 

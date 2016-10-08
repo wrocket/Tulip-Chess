@@ -31,7 +31,11 @@ typedef enum { DEBUG = 1, INFO = 2 } LogLevel;
 typedef struct {
 	FILE* fh;
 	LogLevel level;
+	bool open;
 } GameLog;
+
+// This constant represents a "closed" log, useful for initialization.
+extern const GameLog EMPTY_LOG;
 
 // The maximum size of a log message.
 #define LOG_BUFFER_SIZE 2048
